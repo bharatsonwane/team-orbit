@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, LoginData, RegisterData } from '../types/user';
+import type { User, LoginData, RegisterData } from '../types/user';
 import { apiService } from '../services/api';
 
 interface AuthState {

@@ -1,4 +1,4 @@
-import { User, CreateUserData, UpdateUserData, LoginData, RegisterData, AuthResponse, ApiResponse } from '../types/user';
+import type { User, CreateUserData, UpdateUserData, LoginData, RegisterData, AuthResponse, ApiResponse } from '../types/user';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
