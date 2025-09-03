@@ -31,6 +31,27 @@ const extractVersion = (name: string): number | null => {
   return match ? parseInt(match[1], 10) : null;
 };
 
+// Function to load TypeScript migration files
+const loadTypeScriptMigration = async (filePath: string): Promise<any> => {
+  try {
+    // For TypeScript files, we need to use a different approach
+    // Since we're running with ts-node, we can use require() for .ts files
+    if (filePath.endsWith('.ts')) {
+      // Use require() for TypeScript files when running with ts-node
+      const migration = require(filePath);
+      return migration;
+    } else {
+      // For JavaScript files, use dynamic import
+      const fileUrl = pathToFileURL(filePath).href;
+      const migration = await import(fileUrl);
+      return migration;
+    }
+  } catch (error) {
+    logger.error(`Failed to load migration from ${filePath}:`, error);
+    throw error;
+  }
+};
+
 export const runMigrationForSchema = async (schemaName: string = "public"): Promise<void> => {
   const client = await db.getDbClient();
   const migrationDir = path.join(currentDir, `src/database/migrations/${schemaName}`);
@@ -99,10 +120,9 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
             const sql = await fs.readFile(fullPath, "utf8");
             await client.query(sql);
           } else {
-            // For TypeScript/JavaScript files, use dynamic import
+            // For TypeScript/JavaScript files, use our custom loader
             try {
-              const fileUrl = pathToFileURL(fullPath).href;
-              const migration = await import(fileUrl);
+              const migration = await loadTypeScriptMigration(fullPath);
               if (migration.up && typeof migration.up === 'function') {
                 await migration.up(client);
               } else {

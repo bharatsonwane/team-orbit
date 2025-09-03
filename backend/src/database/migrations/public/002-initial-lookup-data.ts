@@ -1,6 +1,17 @@
-export const up = async (client) => {
+import { PoolClient } from 'pg';
+
+interface LookupItem {
+  label: string;
+}
+
+interface LookupTypeData {
+  lookupType: string;
+  lookups: LookupItem[];
+}
+
+export const up = async (client: PoolClient): Promise<void> => {
   // Define lookup data structure
-  const lookupData = [
+  const lookupData: LookupTypeData[] = [
     {
       lookupType: "userRole",
       lookups: [
@@ -38,7 +49,7 @@ export const up = async (client) => {
     );
 
     // If lookup type was inserted (not already existed), get the ID
-    let lookupTypeId;
+    let lookupTypeId: number;
     if (lookupTypeResult.rows.length > 0) {
       lookupTypeId = lookupTypeResult.rows[0].id;
     } else {
@@ -64,7 +75,7 @@ export const up = async (client) => {
   }
 };
 
-export const down = async (client) => {
+export const down = async (client: PoolClient): Promise<void> => {
   // Rollback logic can be implemented here if needed
   // For now, we'll leave it empty as removing lookup data might affect other parts of the system
 };
