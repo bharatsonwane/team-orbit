@@ -7,7 +7,7 @@ import db from "./db";
 import logger from "../utils/logger";
 
 // Use process.cwd() for current working directory
-const __dirname = process.cwd();
+const currentDir = process.cwd();
 
 interface MigrationFile {
   name: string;
@@ -33,7 +33,7 @@ const extractVersion = (name: string): number | null => {
 
 export const runMigrationForSchema = async (schemaName: string = "public"): Promise<void> => {
   const client = await db.getDbClient();
-  const migrationDir = path.join(__dirname, `src/database/migrations/${schemaName}`);
+  const migrationDir = path.join(currentDir, `src/database/migrations/${schemaName}`);
 
   // 🔧 Ensure migration directory exists
   await fs.mkdir(migrationDir, { recursive: true });
@@ -99,8 +99,19 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
             const sql = await fs.readFile(fullPath, "utf8");
             await client.query(sql);
           } else {
-            const migration = await import(pathToFileURL(fullPath).href);
-            await migration.up(client);
+            // For TypeScript/JavaScript files, use dynamic import
+            try {
+              const fileUrl = pathToFileURL(fullPath).href;
+              const migration = await import(fileUrl);
+              if (migration.up && typeof migration.up === 'function') {
+                await migration.up(client);
+              } else {
+                throw new Error(`Migration file ${name} does not export an 'up' function`);
+              }
+            } catch (importError) {
+              logger.error(`Failed to import migration ${name}:`, importError);
+              throw new Error(`Failed to import migration ${name}: ${importError}`);
+            }
           }
           await client.query("COMMIT");
           logger.info(`✅ Applied migration: ${name}`);
