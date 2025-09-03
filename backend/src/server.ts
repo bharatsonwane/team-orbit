@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import http from "http";
 import { Server } from "socket.io";
 
@@ -14,9 +13,6 @@ import apiRoutes from './routes/routes';
 import openApiRoutes from './doc/openApiRoutes';
 import responseHandler from './middleware/responseHandler';
 import logger from './utils/logger';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
