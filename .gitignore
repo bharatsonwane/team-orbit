@@ -90,7 +90,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public
 
 # Storybook build outputs
 .out
@@ -156,10 +156,6 @@ storybook-static/
 # Turbo
 .turbo
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
 
 # Backup files
 *.bak
@@ -176,17 +172,6 @@ storybook-static/
 *.key
 *.crt
 *.csr
-
-# Docker
-.dockerignore
-Dockerfile
-docker-compose.yml
-docker-compose.override.yml
-
-# Kubernetes
-*.yaml
-*.yml
-!docker-compose.yml
 
 # Terraform
 *.tfstate
