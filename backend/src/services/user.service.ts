@@ -26,50 +26,28 @@ interface UserData {
 interface UserProfile {
   id: number;
   title: string | null;
-  first_name: string;
-  last_name: string;
-  middle_name: string | null;
-  maiden_name: string | null;
+  "firstName": string;
+  "lastName": string;
+  "middleName": string | null;
+  "maidenName": string | null;
   gender: string | null;
   dob: string;
-  blood_group: string | null;
-  married_status: string | null;
+  "bloodGroup": string | null;
+  "marriedStatus": string | null;
   email: string;
   phone: string;
   password?: string;
-  profile_picture: string | null;
+  "profilePicture": string | null;
   bio: string | null;
-  user_status_lookup_id: number | null;
-  user_role_lookup_id: number | null;
-  user_status?: string;
-  user_role?: string;
-  created_at: string;
-  updated_at: string;
+  "userStatusLookupId": number | null;
+  "userRoleLookupId": number | null;
+  userStatus?: string;
+  userRole?: string;
+  "createdAt": string;
+  "updatedAt": string;
 }
 
 export default class User {
-  static columnMapping: Record<string, string> = {
-    title: "title",
-    firstName: "first_name",
-    lastName: "last_name",
-    middleName: "middle_name",
-    maidenName: "maiden_name",
-    gender: "gender",
-    dob: "dob",
-    bloodGroup: "blood_group",
-    marriedStatus: "married_status",
-    email: "email",
-    phone: "phone",
-    password: "password",
-    hashPassword: "hash_password",
-    profilePicture: "profile_picture",
-    bio: "bio",
-    userStatusLookupId: "user_status_lookup_id",
-    userRoleLookupId: "user_role_lookup_id",
-    createdAt: "created_at",
-    updatedAt: "updated_at",
-  };
-
   private id: number | null;
   private title: string | null;
   private firstName: string;
@@ -90,6 +68,21 @@ export default class User {
   private userRoleLookupId: number | null;
   private createdAt: string;
   private updatedAt: string;
+
+  // Static column mapping for database column names
+  static columnMapping: { [key: string]: string } = {
+    firstName: '"firstName"',
+    lastName: '"lastName"',
+    middleName: '"middleName"',
+    maidenName: '"maidenName"',
+    bloodGroup: '"bloodGroup"',
+    marriedStatus: '"marriedStatus"',
+    profilePicture: '"profilePicture"',
+    userStatusLookupId: '"userStatusLookupId"',
+    userRoleLookupId: '"userRoleLookupId"',
+    createdAt: '"createdAt"',
+    updatedAt: '"updatedAt"'
+  };
 
   constructor(reqObj: UserData) {
     this.id = reqObj.id || null;
@@ -121,12 +114,12 @@ export default class User {
                 email,
                 password,
                 phone,
-                first_name,
-                last_name,
-                user_status_lookup_id,
-                user_role_lookup_id,
-                created_at,
-                updated_at
+                "firstName",
+                "lastName",
+                "userStatusLookupId",
+                "userRoleLookupId",
+                "createdAt",
+                "updatedAt"
             ) VALUES (
                 '${this.email}',
                 '${this.hashPassword}',
@@ -149,31 +142,31 @@ export default class User {
         SELECT 
         up.id,
         up.title,
-        up.first_name,
-        up.last_name,
-        up.middle_name,
-        up.maiden_name,
+        up."firstName",
+        up."lastName",
+        up."middleName",
+        up."maidenName",
         up.gender,
         up.dob,
-        up.blood_group,
-        up.married_status,
+        up."bloodGroup",
+        up."marriedStatus",
         up.email,
         up.phone,
         up.password,
-        up.profile_picture,
+        up."profilePicture",
         up.bio,
-        up.user_status_lookup_id,
-        up.user_role_lookup_id,
-        usl.label AS user_status,
-        url.label AS user_role,
-        up.created_at,
-        up.updated_at
+        up."userStatusLookupId",
+        up."userRoleLookupId",
+        usl.label AS "userStatus",
+        url.label AS "userRole",
+        up."createdAt",
+        up."updatedAt"
       FROM 
         user_profile up
       LEFT JOIN 
-        lookup usl ON up.user_status_lookup_id = usl.id
+        lookup usl ON up."userStatusLookupId" = usl.id
       LEFT JOIN 
-        lookup url ON up.user_role_lookup_id = url.id
+        lookup url ON up."userRoleLookupId" = usl.id
       WHERE email = '${this.email}' OR phone = '${this.phone}';`;
 
     const results = await db.query(queryString);
@@ -187,30 +180,30 @@ export default class User {
     SELECT 
     up.id,
     up.title,
-    up.first_name,
-    up.last_name,
-    up.middle_name,
-    up.maiden_name,
+    up."firstName",
+    up."lastName",
+    up."middleName",
+    up."maidenName",
     up.gender,
     up.dob,
-    up.blood_group,
-    up.married_status,
+    up."bloodGroup",
+    up."marriedStatus",
     up.email,
     up.phone,
-    up.profile_picture,
+    up."profilePicture",
     up.bio,
-    up.user_status_lookup_id,
-    up.user_role_lookup_id,
-    usl.label AS user_status,
-    url.label AS user_role,
-    up.created_at,
-    up.updated_at
+    up."userStatusLookupId",
+    up."userRoleLookupId",
+    usl.label AS "userStatus",
+    url.label AS "userRole",
+    up."createdAt",
+    up."updatedAt"
   FROM 
     user_profile up
   LEFT JOIN 
-    lookup usl ON up.user_status_lookup_id = usl.id
+    lookup usl ON up."userStatusLookupId" = usl.id
   LEFT JOIN 
-    lookup url ON up.user_role_lookup_id = url.id
+    lookup url ON up."userRoleLookupId" = usl.id
   WHERE up.id = ${this.id};`;
 
     const results = await db.query(queryString);
@@ -224,30 +217,30 @@ export default class User {
         SELECT 
           up.id,
           up.title,
-          up.first_name,
-          up.last_name,
-          up.middle_name,
-          up.maiden_name,
+          up."firstName",
+          up."lastName",
+          up."middleName",
+          up."maidenName",
           up.gender,
           up.dob,
-          up.blood_group,
-          up.married_status,
+          up."bloodGroup",
+          up."marriedStatus",
           up.email,
           up.phone,
-          up.profile_picture,
+          up."profilePicture",
           up.bio,
-          up.user_status_lookup_id,
-          up.user_role_lookup_id,
-          usl.label AS user_status,
-          url.label AS user_role,
-          up.created_at,
-          up.updated_at
+          up."userStatusLookupId",
+          up."userRoleLookupId",
+          usl.label AS "userStatus",
+          url.label AS "userRole",
+          up."createdAt",
+          up."updatedAt"
       FROM 
         user_profile up
       LEFT JOIN 
-        lookup usl ON up.user_status_lookup_id = usl.id
+        lookup usl ON up."userStatusLookupId" = usl.id
       LEFT JOIN 
-        lookup url ON up.user_role_lookup_id = url.id;`;
+        lookup url ON up."userRoleLookupId" = usl.id;`;
 
     const results = await db.query(queryString);
 
@@ -334,8 +327,8 @@ export default class User {
     const queryString = `
     INSERT INTO user_profile (
       ${columns.join(", ")},
-      created_at,
-      updated_at
+      "createdAt",
+      "updatedAt"
     ) VALUES (
       ${values.join(", ")},
       NOW(),

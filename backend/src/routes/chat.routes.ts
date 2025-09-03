@@ -6,7 +6,7 @@ import { getMessagesByChatRoom, sendMessage } from "../controllers/chat.controll
 const router = express.Router();
 
 const registrar = new RouteRegistrar(router, {
-  basePath: "/chat",
+  basePath: "/api/chat",
   tags: ["Chat"],
 });
 

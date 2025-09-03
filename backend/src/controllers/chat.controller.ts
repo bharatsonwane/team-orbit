@@ -4,10 +4,10 @@ import Chat from "../services/chat.service";
 interface ChatMessageBody {
   text: string;
   media?: string;
-  sent_user_id: string;
-  chat_room_id: string;
-  delivered_to?: string[];
-  read_by?: string[];
+  sentUserId: string;
+  chatRoomId: string;
+  deliveredTo?: string[];
+  readBy?: string[];
   reaction?: Record<string, any>;
 }
 
@@ -16,20 +16,20 @@ export const sendMessage = async (req: Request<{}, {}, ChatMessageBody>, res: Re
     const {
       text,
       media,
-      sent_user_id,
-      chat_room_id,
-      delivered_to,
-      read_by,
+      sentUserId,
+      chatRoomId,
+      deliveredTo,
+      readBy,
       reaction,
     } = req.body;
 
     const chatMessage = new Chat({
       text,
       media,
-      sent_user_id,
-      chat_room_id,
-      delivered_to,
-      read_by,
+      sentUserId,
+      chatRoomId,
+      deliveredTo,
+      readBy,
       reaction: reaction || {},
     });
 
@@ -51,8 +51,8 @@ export const sendMessage = async (req: Request<{}, {}, ChatMessageBody>, res: Re
 
 export const getMessagesByChatRoom = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { chat_room_id } = req.params as { chat_room_id: string };
-    const messages = await Chat.getMessagesForRoom(chat_room_id);
+    const { chatRoomId } = req.params as { chatRoomId: string };
+    const messages = await Chat.getMessagesForRoom(chatRoomId);
     res.status(200).json({
       success: true,
       data: messages,

@@ -26,7 +26,7 @@ import { authRoleMiddleware } from "../middleware/authRoleMiddleware";
 const router = express.Router();
 
 const registrar = new RouteRegistrar(router, {
-  basePath: "/user",
+  basePath: "/api/user",
   tags: ["User"],
 });
 

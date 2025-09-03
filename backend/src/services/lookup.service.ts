@@ -26,7 +26,7 @@ export default class Lookup {
        l.id AS "lookupId",
        l.label AS "lookupLabel"
      FROM lookup_type lt
-     LEFT JOIN lookup l ON lt.id = l.lookup_type_id;
+     LEFT JOIN lookup l ON lt.id = l."lookupTypeId";
    `;
 
     // Execute the queryString
@@ -78,7 +78,7 @@ export default class Lookup {
        l.id AS "lookupId",
        l.label AS "lookupLabel"
      FROM lookup_type lt
-     INNER JOIN lookup l ON lt.id = l.lookup_type_id
+     INNER JOIN lookup l ON lt.id = l."lookupTypeId"
      WHERE lt.id = ${id};
     `;
 
@@ -113,7 +113,7 @@ export default class Lookup {
     const queryString = `
       SELECT l.id 
       FROM lookup l
-      INNER JOIN lookup_type lt ON l.lookup_type_id = lt.id
+      INNER JOIN lookup_type lt ON l."lookupTypeId" = lt.id
       WHERE l.label = 'Pending' AND lt.name = 'userStatus';
     `;
     const results = await db.query(queryString);
@@ -129,7 +129,7 @@ export default class Lookup {
     const queryString = `
       SELECT l.id
       FROM lookup l
-      INNER JOIN lookup_type lt ON l.lookup_type_id = lt.id
+      INNER JOIN lookup_type lt ON l."lookupTypeId" = lt.id
       WHERE l.label = 'Standard' AND lt.name = 'userRole';`;
     const results = await db.query(queryString);
 

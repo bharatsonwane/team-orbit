@@ -13,7 +13,7 @@ import { idValidation } from "../schemas/common.schema";
 
 const router = express.Router();
 const registrar = new RouteRegistrar(router, {
-  basePath: "/lookup",
+  basePath: "/api/lookup",
   tags: ["Lookup"],
 });
 

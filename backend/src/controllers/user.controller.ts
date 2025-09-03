@@ -30,7 +30,7 @@ export const postUserLogin = async (req: Request, res: Response, next: NextFunct
     const token = createJwtToken({
       userId: userData.id,
       email: userData.email,
-      userRole: userData.user_role,
+      userRole: userData.userRole,
     });
 
     res.status(200).json({
