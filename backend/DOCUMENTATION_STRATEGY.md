@@ -7,6 +7,7 @@ This document explains the hybrid documentation approach used in the Lokvani bac
 We use a **hybrid approach** that combines the best of both centralized and distributed documentation:
 
 ### 📁 **Centralized Documentation (`docs/`)**
+
 **Purpose:** High-level, cross-cutting concerns and developer guides
 
 ```
@@ -19,6 +20,7 @@ docs/
 ```
 
 **Use for:**
+
 - Project setup and configuration
 - Development guidelines and best practices
 - Cross-cutting features (authentication, database, architecture)
@@ -26,6 +28,7 @@ docs/
 - Developer onboarding
 
 ### 📁 **Distributed Documentation (`src/`)**
+
 **Purpose:** Code-specific documentation and implementation details
 
 ```
@@ -51,6 +54,7 @@ src/
 ```
 
 **Use for:**
+
 - Component usage examples and patterns
 - API documentation and code examples
 - Implementation details and code-specific guides
@@ -102,6 +106,7 @@ src/
 ## 📋 **Documentation Guidelines**
 
 ### **What Goes in `docs/`**
+
 - Project setup and installation
 - Development environment setup
 - Architecture decisions and patterns
@@ -111,6 +116,7 @@ src/
 - High-level component library documentation
 
 ### **What Goes in `src/`**
+
 - Component usage examples and patterns
 - API documentation and code examples
 - Implementation details and code-specific guides
@@ -119,6 +125,7 @@ src/
 - Specific component or service documentation
 
 ### **Cross-References**
+
 - Link between `docs/` and `src/` documentation
 - Use relative paths for internal links
 - Maintain consistent naming and structure
@@ -160,21 +167,25 @@ src/
 ## 🎯 **Best Practices**
 
 ### **1. Consistency**
+
 - Use consistent naming conventions
 - Follow the same structure across all docs
 - Use consistent formatting and style
 
 ### **2. Clarity**
+
 - Write clear, concise documentation
 - Use code examples where helpful
 - Include screenshots or diagrams when needed
 
 ### **3. Maintenance**
+
 - Keep documentation up-to-date with code
 - Remove outdated information
 - Update cross-references when moving content
 
 ### **4. Discoverability**
+
 - Use clear folder and file names
 - Include README files in each directory
 - Create index files for easy navigation
@@ -182,6 +193,7 @@ src/
 ## 📚 **Examples**
 
 ### **High-Level Documentation (`docs/`)**
+
 ```markdown
 # API Documentation
 
@@ -189,40 +201,48 @@ This document explains the API architecture,
 endpoints, and how to use them.
 
 ## Architecture
+
 - RESTful API design
 - JWT authentication
 - Request validation with Zod
 
 ## Endpoints
+
 - Authentication endpoints
 - User management endpoints
 - Chat endpoints
 
 ## Implementation
+
 See [Controller Usage Guide](../../src/controllers/docs/USAGE.md)
 for detailed implementation examples.
 ```
 
 ### **Code-Specific Documentation (`src/`)**
-```markdown
+
+````markdown
 # Controller Usage Guide
 
 Detailed usage examples for all controllers.
 
 ## User Controller
+
 ```typescript
-import { userController } from './userController'
+import { userController } from './userController';
 
 // Get all users
-const users = await userController.getUsers()
+const users = await userController.getUsers();
 
 // Get user by ID
-const user = await userController.getUserById('123')
+const user = await userController.getUserById('123');
 ```
+````
 
 ## Authentication
+
 All controllers support JWT authentication.
 See [API Documentation](../../../docs/api/API.md) for details.
+
 ```
 
 ## 🚀 **Future Improvements**
@@ -243,3 +263,4 @@ See [API Documentation](../../../docs/api/API.md) for details.
    - Automated documentation validation
 
 This hybrid approach provides the best of both worlds: centralized high-level documentation and distributed code-specific documentation, making it easy for developers to find the information they need when they need it.
+```

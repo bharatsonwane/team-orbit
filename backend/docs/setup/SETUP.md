@@ -5,12 +5,14 @@ Complete guide for setting up the Lokvani backend from scratch.
 ## 🚀 Prerequisites
 
 ### Required Software
+
 - **Node.js** 18 or higher
 - **PostgreSQL** 12 or higher
 - **npm** or **yarn** package manager
 - **Git** for version control
 
 ### System Requirements
+
 - **RAM:** Minimum 4GB, Recommended 8GB
 - **Storage:** At least 2GB free space
 - **OS:** Windows 10+, macOS 10.15+, or Linux
@@ -18,6 +20,7 @@ Complete guide for setting up the Lokvani backend from scratch.
 ## 📋 Installation Steps
 
 ### 1. Clone Repository
+
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -25,6 +28,7 @@ cd lokvani/backend
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 # Install all dependencies
 npm install
@@ -34,6 +38,7 @@ yarn install
 ```
 
 ### 3. Environment Configuration
+
 ```bash
 # Copy environment template
 cp env.example .env
@@ -47,6 +52,7 @@ code .env
 ### 4. Database Setup
 
 #### Install PostgreSQL
+
 ```bash
 # macOS (using Homebrew)
 brew install postgresql
@@ -61,6 +67,7 @@ sudo apt install postgresql postgresql-contrib
 ```
 
 #### Create Database
+
 ```bash
 # Connect to PostgreSQL
 psql -U postgres
@@ -77,6 +84,7 @@ GRANT ALL PRIVILEGES ON DATABASE lokvani TO lokvani_user;
 ```
 
 ### 5. Environment Variables
+
 Create `.env` file with the following configuration:
 
 ```env
@@ -103,6 +111,7 @@ LOG_LEVEL=info
 ```
 
 ### 6. Database Migration
+
 ```bash
 # Run database migrations
 npm run migrate
@@ -112,6 +121,7 @@ npm run seed
 ```
 
 ### 7. Start Development Server
+
 ```bash
 # Start development server
 npm run dev
@@ -122,10 +132,12 @@ npm run dev
 ### Environment Variables
 
 #### Server Configuration
+
 - `API_PORT` - Port number for the API server (default: 5000)
 - `NODE_ENV` - Environment mode (development, production, test)
 
 #### Database Configuration
+
 - `DB_HOST` - PostgreSQL host (default: localhost)
 - `DB_PORT` - PostgreSQL port (default: 5432)
 - `DB_NAME` - Database name
@@ -133,13 +145,16 @@ npm run dev
 - `DB_PASSWORD` - Database password
 
 #### JWT Configuration
+
 - `JWT_SECRET` - Secret key for JWT token signing
 - `JWT_EXPIRES_IN` - Token expiration time (e.g., 24h, 7d)
 
 #### CORS Configuration
+
 - `CORS_ORIGIN` - Allowed origin for CORS (frontend URL)
 
 ### TypeScript Configuration
+
 The project uses TypeScript with the following configuration:
 
 ```json
@@ -167,9 +182,11 @@ The project uses TypeScript with the following configuration:
 ## 🗄️ Database Schema
 
 ### Initial Tables
+
 The migration creates the following tables:
 
 #### Users Table
+
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -184,6 +201,7 @@ CREATE TABLE users (
 ```
 
 #### Chat Messages Table
+
 ```sql
 CREATE TABLE chat_messages (
   id SERIAL PRIMARY KEY,
@@ -198,12 +216,14 @@ CREATE TABLE chat_messages (
 ## 🚀 Development Workflow
 
 ### 1. Start Development
+
 ```bash
 # Start development server with hot reload
 npm run dev
 ```
 
 ### 2. Build for Production
+
 ```bash
 # Build TypeScript to JavaScript
 npm run build
@@ -213,6 +233,7 @@ npm start
 ```
 
 ### 3. Database Operations
+
 ```bash
 # Run migrations
 npm run migrate
@@ -225,6 +246,7 @@ npm run migrate && npm run seed
 ```
 
 ### 4. Code Quality
+
 ```bash
 # Type checking
 npx tsc --noEmit
@@ -239,6 +261,7 @@ npm run format
 ## 🔍 Verification
 
 ### 1. Check Server Status
+
 ```bash
 # Health check
 curl http://localhost:5000/health
@@ -252,9 +275,11 @@ curl http://localhost:5000/health
 ```
 
 ### 2. Check API Documentation
+
 Visit `http://localhost:5000/docs` to access Swagger UI documentation.
 
 ### 3. Check Database Connection
+
 ```bash
 # Test database connection
 psql -U postgres -d lokvani -c "SELECT COUNT(*) FROM users;"
@@ -265,6 +290,7 @@ psql -U postgres -d lokvani -c "SELECT COUNT(*) FROM users;"
 ### Common Issues
 
 #### 1. Port Already in Use
+
 ```bash
 # Find process using port 5000
 lsof -i :5000
@@ -277,6 +303,7 @@ API_PORT=5001 npm run dev
 ```
 
 #### 2. Database Connection Failed
+
 ```bash
 # Check PostgreSQL status
 pg_ctl status
@@ -290,6 +317,7 @@ psql -U postgres -l
 ```
 
 #### 3. TypeScript Compilation Errors
+
 ```bash
 # Check TypeScript configuration
 npx tsc --noEmit
@@ -300,6 +328,7 @@ npm run build
 ```
 
 #### 4. Module Not Found Errors
+
 ```bash
 # Reinstall dependencies
 rm -rf node_modules package-lock.json
@@ -307,6 +336,7 @@ npm install
 ```
 
 #### 5. Environment Variables Not Loading
+
 ```bash
 # Check .env file exists
 ls -la .env
@@ -316,6 +346,7 @@ node -e "console.log(process.env.DB_HOST)"
 ```
 
 ### Debug Mode
+
 ```bash
 # Run with debug logging
 DEBUG=* npm run dev
@@ -327,9 +358,10 @@ DEBUG=app:* npm run dev
 ## 🔧 Advanced Configuration
 
 ### 1. Database Connection Pooling
+
 ```typescript
 // src/database/db.ts
-import { Pool } from 'pg'
+import { Pool } from 'pg';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -340,13 +372,14 @@ const pool = new Pool({
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
   connectionTimeoutMillis: 2000, // Return an error after 2 seconds
-})
+});
 ```
 
 ### 2. Logging Configuration
+
 ```typescript
 // src/utils/logger.ts
-import winston from 'winston'
+import winston from 'winston';
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -359,24 +392,25 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
     new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Console({
-      format: winston.format.simple()
-    })
-  ]
-})
+      format: winston.format.simple(),
+    }),
+  ],
+});
 ```
 
 ### 3. CORS Configuration
+
 ```typescript
 // src/server.ts
-import cors from 'cors'
+import cors from 'cors';
 
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   credentials: true,
-  optionsSuccessStatus: 200
-}
+  optionsSuccessStatus: 200,
+};
 
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
 ```
 
 ## 📚 Next Steps
@@ -396,4 +430,4 @@ app.use(cors(corsOptions))
 
 ---
 
-*This setup guide should get you up and running with the Lokvani backend. For more detailed information, check the other documentation files.*
+_This setup guide should get you up and running with the Lokvani backend. For more detailed information, check the other documentation files._

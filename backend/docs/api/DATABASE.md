@@ -14,6 +14,7 @@ The Lokvani backend uses PostgreSQL as the primary database with the following c
 ## 📊 Database Schema
 
 ### Users Table
+
 Stores user account information and authentication data.
 
 ```sql
@@ -32,6 +33,7 @@ CREATE TABLE users (
 ```
 
 **Columns:**
+
 - `id` - Primary key, auto-incrementing
 - `email` - Unique email address for login
 - `password` - Hashed password using bcrypt
@@ -44,6 +46,7 @@ CREATE TABLE users (
 - `updated_at` - Last update timestamp
 
 ### Chat Messages Table
+
 Stores chat messages between users.
 
 ```sql
@@ -60,6 +63,7 @@ CREATE TABLE chat_messages (
 ```
 
 **Columns:**
+
 - `id` - Primary key, auto-incrementing
 - `sender_id` - Foreign key to users table
 - `receiver_id` - Foreign key to users table
@@ -70,6 +74,7 @@ CREATE TABLE chat_messages (
 - `created_at` - Message creation timestamp
 
 ### Chat Rooms Table
+
 Stores chat room information for group chats.
 
 ```sql
@@ -85,6 +90,7 @@ CREATE TABLE chat_rooms (
 ```
 
 **Columns:**
+
 - `id` - Primary key, auto-incrementing
 - `name` - Room name
 - `description` - Room description
@@ -94,6 +100,7 @@ CREATE TABLE chat_rooms (
 - `updated_at` - Last update timestamp
 
 ### Room Participants Table
+
 Junction table for many-to-many relationship between users and chat rooms.
 
 ```sql
@@ -107,6 +114,7 @@ CREATE TABLE room_participants (
 ```
 
 **Columns:**
+
 - `id` - Primary key, auto-incrementing
 - `room_id` - Foreign key to chat_rooms table
 - `user_id` - Foreign key to users table
@@ -118,17 +126,20 @@ CREATE TABLE room_participants (
 ### One-to-Many Relationships
 
 #### Users → Chat Messages
+
 - One user can send many messages
 - One user can receive many messages
 - Foreign keys: `sender_id`, `receiver_id`
 
 #### Users → Chat Rooms
+
 - One user can create many rooms
 - Foreign key: `created_by`
 
 ### Many-to-Many Relationships
 
 #### Users ↔ Chat Rooms (via Room Participants)
+
 - One user can be in many rooms
 - One room can have many users
 - Junction table: `room_participants`
@@ -136,16 +147,19 @@ CREATE TABLE room_participants (
 ## 📈 Indexes
 
 ### Primary Indexes
+
 - `users.id` - Primary key
 - `chat_messages.id` - Primary key
 - `chat_rooms.id` - Primary key
 - `room_participants.id` - Primary key
 
 ### Unique Indexes
+
 - `users.email` - Unique email constraint
 - `room_participants(room_id, user_id)` - Unique participant constraint
 
 ### Performance Indexes
+
 ```sql
 -- Chat messages performance indexes
 CREATE INDEX idx_chat_messages_sender_id ON chat_messages(sender_id);
@@ -165,9 +179,11 @@ CREATE INDEX idx_users_is_active ON users(is_active);
 ## 🔄 Database Migrations
 
 ### Migration System
+
 The project uses a custom migration system built with TypeScript and Umzug.
 
 ### Migration Files
+
 Located in `src/database/migrations/`:
 
 ```
@@ -179,6 +195,7 @@ migrations/
 ```
 
 ### Running Migrations
+
 ```bash
 # Run all pending migrations
 npm run migrate
@@ -191,9 +208,10 @@ npx ts-node src/database/migrate.ts --rollback
 ```
 
 ### Migration Example
+
 ```typescript
 // src/database/migrations/001_create_users.ts
-import { Migration } from '../migrate'
+import { Migration } from '../migrate';
 
 export const up = async (migration: Migration) => {
   await migration.createTable('users', {
@@ -202,22 +220,23 @@ export const up = async (migration: Migration) => {
     password: 'VARCHAR(255) NOT NULL',
     first_name: 'VARCHAR(100)',
     last_name: 'VARCHAR(100)',
-    role: 'VARCHAR(50) DEFAULT \'user\'',
+    role: "VARCHAR(50) DEFAULT 'user'",
     is_active: 'BOOLEAN DEFAULT true',
     last_login: 'TIMESTAMP',
     created_at: 'TIMESTAMP DEFAULT NOW()',
-    updated_at: 'TIMESTAMP DEFAULT NOW()'
-  })
-}
+    updated_at: 'TIMESTAMP DEFAULT NOW()',
+  });
+};
 
 export const down = async (migration: Migration) => {
-  await migration.dropTable('users')
-}
+  await migration.dropTable('users');
+};
 ```
 
 ## 🌱 Database Seeding
 
 ### Seed Data
+
 Located in `src/database/seed/`:
 
 ```
@@ -229,6 +248,7 @@ seed/
 ```
 
 ### Running Seeds
+
 ```bash
 # Run all seed files
 npm run seed
@@ -238,10 +258,11 @@ npx ts-node src/database/seed/users.seed.ts
 ```
 
 ### Seed Example
+
 ```typescript
 // src/database/seed/users.seed.ts
-import { db } from '../db'
-import bcrypt from 'bcryptjs'
+import { db } from '../db';
+import bcrypt from 'bcryptjs';
 
 export const seedUsers = async () => {
   const users = [
@@ -250,32 +271,33 @@ export const seedUsers = async () => {
       password: await bcrypt.hash('admin123', 10),
       first_name: 'Admin',
       last_name: 'User',
-      role: 'admin'
+      role: 'admin',
     },
     {
       email: 'user@lokvani.com',
       password: await bcrypt.hash('user123', 10),
       first_name: 'Regular',
       last_name: 'User',
-      role: 'user'
-    }
-  ]
+      role: 'user',
+    },
+  ];
 
   for (const user of users) {
     await db.query(
       'INSERT INTO users (email, password, first_name, last_name, role) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (email) DO NOTHING',
       [user.email, user.password, user.first_name, user.last_name, user.role]
-    )
+    );
   }
-}
+};
 ```
 
 ## 🔧 Database Configuration
 
 ### Connection Pool
+
 ```typescript
 // src/database/db.ts
-import { Pool } from 'pg'
+import { Pool } from 'pg';
 
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
@@ -286,13 +308,17 @@ const pool = new Pool({
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
   connectionTimeoutMillis: 2000, // Return an error after 2 seconds
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-})
+  ssl:
+    process.env.NODE_ENV === 'production'
+      ? { rejectUnauthorized: false }
+      : false,
+});
 
-export { pool as db }
+export { pool as db };
 ```
 
 ### Environment Variables
+
 ```env
 # Database Configuration
 DB_HOST=localhost
@@ -312,8 +338,9 @@ DB_CONNECTION_TIMEOUT=2000
 ### Common Queries
 
 #### Get User with Messages
+
 ```sql
-SELECT 
+SELECT
   u.id,
   u.email,
   u.first_name,
@@ -327,8 +354,9 @@ ORDER BY message_count DESC;
 ```
 
 #### Get Recent Messages
+
 ```sql
-SELECT 
+SELECT
   cm.id,
   cm.message,
   cm.created_at,
@@ -343,8 +371,9 @@ LIMIT 50;
 ```
 
 #### Get User's Chat Rooms
+
 ```sql
-SELECT 
+SELECT
   cr.id,
   cr.name,
   cr.description,
@@ -360,12 +389,14 @@ ORDER BY cr.created_at DESC;
 ## 🔒 Security Considerations
 
 ### Data Protection
+
 - Passwords are hashed using bcrypt with salt rounds
 - Sensitive data is not logged
 - Database connections use SSL in production
 - Input validation prevents SQL injection
 
 ### Access Control
+
 - Row-level security can be implemented
 - Database users have minimal required permissions
 - Connection pooling prevents connection exhaustion
@@ -374,12 +405,14 @@ ORDER BY cr.created_at DESC;
 ## 📈 Performance Optimization
 
 ### Query Optimization
+
 - Use appropriate indexes for frequently queried columns
 - Implement pagination for large result sets
 - Use connection pooling to manage database connections
 - Monitor slow queries and optimize them
 
 ### Monitoring
+
 - Track database performance metrics
 - Monitor connection pool usage
 - Set up alerts for database issues
@@ -388,6 +421,7 @@ ORDER BY cr.created_at DESC;
 ## 🧪 Testing
 
 ### Test Database
+
 ```bash
 # Create test database
 createdb lokvani_test
@@ -400,6 +434,7 @@ npm test
 ```
 
 ### Test Data
+
 - Use separate test database
 - Seed test data for each test
 - Clean up test data after tests

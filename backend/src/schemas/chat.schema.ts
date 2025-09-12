@@ -1,18 +1,23 @@
-import { z } from "zod";
+import { z } from 'zod';
 import {
   createApiResponse,
   docRegistry,
-} from "../doc/openAPIDocumentGenerator";
-import { ChatMessageSchema } from "./user.schema";
+} from '../doc/openAPIDocumentGenerator';
+import { ChatMessageSchema } from './user.schema';
 
 interface SendMessageDocConfig {
   routePath: string;
-  method: "get" | "post" | "put" | "delete" | "patch";
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch';
   tags: string[];
   security?: Array<Record<string, string[]>>;
 }
 
-export const sendMessageDoc = ({ routePath, method, tags, security }: SendMessageDocConfig): void => {
+export const sendMessageDoc = ({
+  routePath,
+  method,
+  tags,
+  security,
+}: SendMessageDocConfig): void => {
   docRegistry.registerPath({
     method,
     path: routePath,
@@ -20,9 +25,9 @@ export const sendMessageDoc = ({ routePath, method, tags, security }: SendMessag
     security,
     request: {
       body: {
-        description: "Send one-to-one message",
+        description: 'Send one-to-one message',
         content: {
-          "application/json": {
+          'application/json': {
             schema: ChatMessageSchema.openapi({}),
           },
         },
@@ -37,7 +42,7 @@ export const sendMessageDoc = ({ routePath, method, tags, security }: SendMessag
         mediaUrl: z.string().optional(),
         timestamp: z.string(),
       }),
-      "Message sent"
+      'Message sent'
     ),
   });
 };

@@ -5,16 +5,19 @@ Welcome to the Lokvani Frontend documentation. This directory contains comprehen
 ## 📁 Documentation Structure
 
 ### 🚀 Setup & Configuration
+
 - **[Project Setup](./setup/SETUP.md)** - Complete guide for setting up the project from scratch
 - **[Development Environment](./development/DEVELOPMENT.md)** - Development guidelines and best practices
 
 ### 🎨 Features & Components
+
 - **[Theming System](./features/THEMING.md)** - Complete theming guide with dark/light mode support
 - **[Authentication](./features/AUTHENTICATION.md)** - Login/signup implementation and user flows
 - **[Routing & Navigation](./features/ROUTING.md)** - React Router setup and navigation patterns
 - **[Components](./components/COMPONENTS.md)** - Component library and usage guidelines
 
 ### 🚀 Deployment & Operations
+
 - **[Deployment Guide](./deployment/DEPLOYMENT.md)** - Production deployment to various platforms
 
 ## 🎯 Quick Start
@@ -27,16 +30,19 @@ Welcome to the Lokvani Frontend documentation. This directory contains comprehen
 ## 📚 Documentation Guidelines
 
 ### For Developers
+
 - Follow the patterns and examples in the component documentation
 - Use the development guidelines for consistent code quality
 - Reference the theming guide for UI consistency
 
 ### For DevOps
+
 - Use the deployment guide for production deployments
 - Follow security best practices outlined in deployment docs
 - Monitor performance using the provided guidelines
 
 ### For Contributors
+
 - Read the development guidelines before contributing
 - Follow the component patterns for new features
 - Update documentation when adding new features
@@ -68,4 +74,4 @@ When making changes to the project:
 
 ---
 
-*This documentation is maintained alongside the codebase. Please keep it updated when making changes to the project.*
+_This documentation is maintained alongside the codebase. Please keep it updated when making changes to the project._

@@ -7,6 +7,7 @@ This document explains the hybrid documentation approach used in the Lokvani fro
 We use a **hybrid approach** that combines the best of both centralized and distributed documentation:
 
 ### 📁 **Centralized Documentation (`docs/`)**
+
 **Purpose:** High-level, cross-cutting concerns and developer guides
 
 ```
@@ -19,6 +20,7 @@ docs/
 ```
 
 **Use for:**
+
 - Project setup and configuration
 - Development guidelines and best practices
 - Cross-cutting features (theming, authentication, routing)
@@ -27,6 +29,7 @@ docs/
 - Developer onboarding
 
 ### 📁 **Distributed Documentation (`src/`)**
+
 **Purpose:** Code-specific documentation and implementation details
 
 ```
@@ -45,6 +48,7 @@ src/
 ```
 
 **Use for:**
+
 - Component usage examples and patterns
 - API documentation and code examples
 - Implementation details and code-specific guides
@@ -96,6 +100,7 @@ src/
 ## 📋 **Documentation Guidelines**
 
 ### **What Goes in `docs/`**
+
 - Project setup and installation
 - Development environment setup
 - Architecture decisions and patterns
@@ -105,6 +110,7 @@ src/
 - High-level component library documentation
 
 ### **What Goes in `src/`**
+
 - Component usage examples and patterns
 - API documentation and code examples
 - Implementation details and code-specific guides
@@ -113,6 +119,7 @@ src/
 - Specific component or page documentation
 
 ### **Cross-References**
+
 - Link between `docs/` and `src/` documentation
 - Use relative paths for internal links
 - Maintain consistent naming and structure
@@ -154,21 +161,25 @@ src/
 ## 🎯 **Best Practices**
 
 ### **1. Consistency**
+
 - Use consistent naming conventions
 - Follow the same structure across all docs
 - Use consistent formatting and style
 
 ### **2. Clarity**
+
 - Write clear, concise documentation
 - Use code examples where helpful
 - Include screenshots or diagrams when needed
 
 ### **3. Maintenance**
+
 - Keep documentation up-to-date with code
 - Remove outdated information
 - Update cross-references when moving content
 
 ### **4. Discoverability**
+
 - Use clear folder and file names
 - Include README files in each directory
 - Create index files for easy navigation
@@ -176,6 +187,7 @@ src/
 ## 📚 **Examples**
 
 ### **High-Level Documentation (`docs/`)**
+
 ```markdown
 # Theming System
 
@@ -183,38 +195,46 @@ This document explains the theming system architecture,
 how to use it, and how to extend it.
 
 ## Architecture
+
 - CSS variables approach
 - Theme provider implementation
 - Color token system
 
 ## Usage
+
 - Basic theming
 - Custom themes
 - Theme switching
 
 ## Implementation
+
 See [Component Usage Guide](../../src/components/docs/USAGE.md)
 for detailed implementation examples.
 ```
 
 ### **Code-Specific Documentation (`src/`)**
-```markdown
+
+````markdown
 # Component Usage Guide
 
 Detailed usage examples for all components.
 
 ## Button Component
-```tsx
-import { Button } from "@/components/ui/button"
 
-<Button variant="outline" size="lg">
+```tsx
+import { Button } from '@/components/ui/button';
+
+<Button variant='outline' size='lg'>
   Click me
-</Button>
+</Button>;
 ```
+````
 
 ## Theme Integration
+
 All components support the theme system.
 See [Theming System](../../../docs/features/THEMING.md) for details.
+
 ```
 
 ## 🚀 **Future Improvements**
@@ -235,3 +255,4 @@ See [Theming System](../../../docs/features/THEMING.md) for details.
    - Automated documentation validation
 
 This hybrid approach provides the best of both worlds: centralized high-level documentation and distributed code-specific documentation, making it easy for developers to find the information they need when they need it.
+```

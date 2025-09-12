@@ -14,7 +14,7 @@ export const store = configureStore({
     notification: notificationSlice.reducer,
     user: userSlice.reducer,
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these action types

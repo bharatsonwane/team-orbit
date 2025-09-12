@@ -21,16 +21,16 @@ const notificationSlice = createSlice({
   name: 'notification',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Handle get notification action
     builder
       .addCase(getNotificationAction.fulfilled, (state, action) => {
         const newNotification = action.payload;
-        
+
         // Add new notification
         state.notifications.push(newNotification);
 
@@ -55,11 +55,14 @@ export const { clearError } = notificationSlice.actions;
 export default notificationSlice;
 
 // Selectors
-export const selectNotifications = (state: { notification: NotificationState }) =>
-  state.notification.notifications;
+export const selectNotifications = (state: {
+  notification: NotificationState;
+}) => state.notification.notifications;
 
-export const selectNotificationCount = (state: { notification: NotificationState }) =>
-  state.notification.notifications.length;
+export const selectNotificationCount = (state: {
+  notification: NotificationState;
+}) => state.notification.notifications.length;
 
-export const selectNotificationError = (state: { notification: NotificationState }) =>
-  state.notification.error;
+export const selectNotificationError = (state: {
+  notification: NotificationState;
+}) => state.notification.error;

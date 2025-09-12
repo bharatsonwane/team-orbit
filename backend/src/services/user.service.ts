@@ -1,4 +1,4 @@
-import db from "../database/db";
+import db from '../database/db';
 
 interface UserData {
   id?: number | null;
@@ -26,25 +26,25 @@ interface UserData {
 interface UserProfile {
   id: number;
   title: string | null;
-  "firstName": string;
-  "lastName": string;
-  "middleName": string | null;
-  "maidenName": string | null;
+  firstName: string;
+  lastName: string;
+  middleName: string | null;
+  maidenName: string | null;
   gender: string | null;
   dob: string;
-  "bloodGroup": string | null;
-  "marriedStatus": string | null;
+  bloodGroup: string | null;
+  marriedStatus: string | null;
   email: string;
   phone: string;
   password?: string;
-  "profilePicture": string | null;
+  profilePicture: string | null;
   bio: string | null;
-  "userStatusLookupId": number | null;
-  "userRoleLookupId": number | null;
+  userStatusLookupId: number | null;
+  userRoleLookupId: number | null;
   userStatus?: string;
   userRole?: string;
-  "createdAt": string;
-  "updatedAt": string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default class User {
@@ -81,7 +81,7 @@ export default class User {
     userStatusLookupId: '"userStatusLookupId"',
     userRoleLookupId: '"userRoleLookupId"',
     createdAt: '"createdAt"',
-    updatedAt: '"updatedAt"'
+    updatedAt: '"updatedAt"',
   };
 
   constructor(reqObj: UserData) {
@@ -249,32 +249,32 @@ export default class User {
 
   async updateUserInfo(): Promise<UserProfile> {
     const acceptedKeys = [
-      "title",
-      "firstName",
-      "lastName",
-      "middleName",
-      "maidenName",
-      "gender",
-      "dob",
-      "bloodGroup",
-      "marriedStatus",
-      "bio",
+      'title',
+      'firstName',
+      'lastName',
+      'middleName',
+      'maidenName',
+      'gender',
+      'dob',
+      'bloodGroup',
+      'marriedStatus',
+      'bio',
     ];
 
     const setQueryString = Object.keys(this)
       .filter(
-        (key) =>
+        key =>
           (this as any)[key] !== undefined &&
           (this as any)[key] !== null &&
           acceptedKeys.includes(key)
       )
       .map(
-        (key) =>
+        key =>
           `${User.columnMapping[key] ? User.columnMapping[key] : key} = '${
             (this as any)[key]
           }'`
       )
-      .join(", ");
+      .join(', ');
 
     const queryString = `
       UPDATE user_profile
@@ -299,38 +299,38 @@ export default class User {
 
   async createUserInfo(): Promise<UserProfile> {
     const acceptedKeys = [
-      "title",
-      "firstName",
-      "lastName",
-      "middleName",
-      "maidenName",
-      "gender",
-      "dob",
-      "bloodGroup",
-      "marriedStatus",
-      "email",
-      "phone",
-      "hashPassword",
-      "profilePicture",
-      "bio",
-      "userStatusLookupId",
-      "userRoleLookupId",
+      'title',
+      'firstName',
+      'lastName',
+      'middleName',
+      'maidenName',
+      'gender',
+      'dob',
+      'bloodGroup',
+      'marriedStatus',
+      'email',
+      'phone',
+      'hashPassword',
+      'profilePicture',
+      'bio',
+      'userStatusLookupId',
+      'userRoleLookupId',
     ];
 
     const keysToInsert = acceptedKeys.filter(
-      (key) => (this as any)[key] !== undefined && (this as any)[key] !== null
+      key => (this as any)[key] !== undefined && (this as any)[key] !== null
     );
 
-    const columns = keysToInsert.map((key) => User.columnMapping[key] || key);
-    const values = keysToInsert.map((key) => `'${(this as any)[key]}'`);
+    const columns = keysToInsert.map(key => User.columnMapping[key] || key);
+    const values = keysToInsert.map(key => `'${(this as any)[key]}'`);
 
     const queryString = `
     INSERT INTO user_profile (
-      ${columns.join(", ")},
+      ${columns.join(', ')},
       "createdAt",
       "updatedAt"
     ) VALUES (
-      ${values.join(", ")},
+      ${values.join(', ')},
       NOW(),
       NOW()
     )

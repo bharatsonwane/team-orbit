@@ -23,13 +23,15 @@ env.example               # Example environment file
 ## 🔧 **Environment Variables**
 
 ### **Required Variables:**
+
 - `APP_NAME` - Application name
-- `APP_VERSION` - Application version  
+- `APP_VERSION` - Application version
 - `APP_ENV` - Environment (development/production/test)
 - `API_BASE_URL` - Backend API base URL
 - `JWT_STORAGE_KEY` - Local storage key for JWT tokens
 
 ### **Optional Variables:**
+
 - `API_TIMEOUT` - API request timeout (default: 10000ms)
 - `TOKEN_EXPIRY_BUFFER` - Token expiry buffer (default: 300000ms)
 - `ENABLE_DEV_TOOLS` - Enable development tools (default: false)
@@ -41,13 +43,14 @@ env.example               # Example environment file
 ## 🚀 **Implementation Details**
 
 ### **1. Environment Variable Validation (`src/config/envVariable.ts`)**
+
 ```typescript
-import { z } from "zod";
-import { logger } from "../utils/logger";
+import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 const envVariableSchema = z.object({
-  APP_NAME: z.string().min(1, "APP_NAME is mandatory"),
-  API_BASE_URL: z.string().url({ message: "API_BASE_URL must be a valid URL" }),
+  APP_NAME: z.string().min(1, 'APP_NAME is mandatory'),
+  API_BASE_URL: z.string().url({ message: 'API_BASE_URL must be a valid URL' }),
   // ... other variables
 });
 
@@ -55,42 +58,46 @@ export const envVariable = getEnvVariable();
 ```
 
 ### **2. API Service Integration (`src/utils/api.ts`)**
+
 ```typescript
-import { envVariable } from "../config/envVariable";
+import { envVariable } from '../config/envVariable';
 
 class ApiService {
   private baseURL = envVariable.API_BASE_URL;
   private timeout = envVariable.API_TIMEOUT;
-  
+
   private getAuthToken(): string | null {
     return localStorage.getItem(envVariable.JWT_STORAGE_KEY);
   }
-  
+
   // ... API methods using environment variables
 }
 ```
 
 ### **3. AuthContext Integration (`src/contexts/AuthContext.tsx`)**
+
 ```typescript
-import { envVariable } from '../config/envVariable'
-import { apiService } from '../utils/api'
+import { envVariable } from '../config/envVariable';
+import { apiService } from '../utils/api';
 
 // Using environment variables for token storage
-localStorage.setItem(envVariable.JWT_STORAGE_KEY, token)
+localStorage.setItem(envVariable.JWT_STORAGE_KEY, token);
 
 // Using API service for requests
-const response = await apiService.post('/auth/login', credentials)
+const response = await apiService.post('/auth/login', credentials);
 ```
 
 ## 🔄 **Updates Made**
 
 ### **AuthContext Updates:**
+
 - ✅ Replaced hardcoded API URLs with `envVariable.API_BASE_URL`
 - ✅ Replaced hardcoded token storage key with `envVariable.JWT_STORAGE_KEY`
 - ✅ Integrated with new API service for cleaner HTTP requests
 - ✅ Improved error handling with typed responses
 
 ### **API Service Features:**
+
 - ✅ Automatic authentication header injection
 - ✅ Request timeout handling
 - ✅ Comprehensive error handling
@@ -101,12 +108,15 @@ const response = await apiService.post('/auth/login', credentials)
 ## 📋 **Setup Instructions**
 
 ### **1. Copy Environment File**
+
 ```bash
 cp env.example .env.local
 ```
 
 ### **2. Configure Variables**
+
 Edit `.env.local`:
+
 ```env
 APP_NAME=Lokvani
 APP_VERSION=1.0.0
@@ -117,6 +127,7 @@ ENABLE_DEV_TOOLS=true
 ```
 
 ### **3. Restart Development Server**
+
 ```bash
 npm run dev
 ```
@@ -124,26 +135,31 @@ npm run dev
 ## 🎯 **Benefits**
 
 ### **1. Type Safety**
+
 - All environment variables are typed with TypeScript
 - Compile-time validation of variable usage
 - IntelliSense support in IDE
 
 ### **2. Runtime Validation**
+
 - Zod schema validation on application startup
 - Clear error messages for missing or invalid variables
 - Prevents runtime errors from configuration issues
 
 ### **3. Centralized Configuration**
+
 - Single source of truth for all environment variables
 - Easy to manage and update
 - Consistent usage across the application
 
 ### **4. Development Experience**
+
 - Auto-completion for environment variables
 - Clear documentation for each variable
 - Example configuration file provided
 
 ### **5. Security**
+
 - Clear separation between client-side and server-side variables
 - No sensitive data exposed to the browser
 - Validation prevents configuration mistakes
@@ -151,24 +167,27 @@ npm run dev
 ## 🔍 **Usage Examples**
 
 ### **Basic Usage**
+
 ```typescript
-import { envVariable } from "@/config/envVariable"
+import { envVariable } from '@/config/envVariable';
 
 // Access configuration
-console.log(envVariable.APP_NAME)
-console.log(envVariable.API_BASE_URL)
+console.log(envVariable.APP_NAME);
+console.log(envVariable.API_BASE_URL);
 ```
 
 ### **API Service Usage**
+
 ```typescript
-import { apiService } from "@/utils/api"
+import { apiService } from '@/utils/api';
 
 // Automatic authentication and error handling
-const users = await apiService.get<User[]>('/users')
-const newUser = await apiService.post<User>('/users', userData)
+const users = await apiService.get<User[]>('/users');
+const newUser = await apiService.post<User>('/users', userData);
 ```
 
 ### **Feature Flags**
+
 ```typescript
 import { envVariable } from "@/config/envVariable"
 
@@ -183,18 +202,22 @@ function DevTools() {
 ## 🔒 **Security Considerations**
 
 ### **Client-Side Variables**
+
 - All `VITE_` prefixed variables are exposed to the browser
 - Never put sensitive data in environment variables
 - Use for configuration only, not for secrets
 
 ### **Safe Variables**
+
 ✅ **Safe to use:**
+
 - API URLs
 - Feature flags
 - App configuration
 - Public tracking IDs
 
 ❌ **Never use:**
+
 - Database credentials
 - API secrets
 - Private keys
@@ -203,6 +226,7 @@ function DevTools() {
 ## 🚀 **Next Steps**
 
 ### **Recommended Enhancements:**
+
 1. **Environment-Specific Configs**
    - `.env.development`
    - `.env.production`

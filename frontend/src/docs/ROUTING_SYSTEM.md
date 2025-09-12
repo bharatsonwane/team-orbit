@@ -46,11 +46,11 @@ src/
 
 ```typescript
 interface Route {
-  path: string
-  element: React.ReactNode
-  authRoles: UserRole[]
-  title?: string
-  description?: string
+  path: string;
+  element: React.ReactNode;
+  authRoles: UserRole[];
+  title?: string;
+  description?: string;
 }
 ```
 
@@ -58,17 +58,18 @@ interface Route {
 
 ```typescript
 const roleKeys = {
-  SUPER: 'SUPER' as const,      // Super admin access
-  ADMIN: 'ADMIN' as const,      // Admin access
-  USER: 'USER' as const,        // Regular user access
-  GUEST: 'GUEST' as const,      // Guest access
-  ANY: 'ANY' as const,          // Any authenticated user
-}
+  SUPER: 'SUPER' as const, // Super admin access
+  ADMIN: 'ADMIN' as const, // Admin access
+  USER: 'USER' as const, // Regular user access
+  GUEST: 'GUEST' as const, // Guest access
+  ANY: 'ANY' as const, // Any authenticated user
+};
 ```
 
 ### Route Arrays
 
 #### Public Routes
+
 ```typescript
 const publicRouteList: Route[] = [
   {
@@ -89,6 +90,7 @@ const publicRouteList: Route[] = [
 ```
 
 #### User Routes
+
 ```typescript
 const userRouteList: Route[] = [
   {
@@ -109,6 +111,7 @@ const userRouteList: Route[] = [
 ```
 
 #### Admin Routes
+
 ```typescript
 const adminRouteList: Route[] = [
   {
@@ -122,6 +125,7 @@ const adminRouteList: Route[] = [
 ```
 
 #### Super Admin Routes
+
 ```typescript
 const superAdminRouteList: Route[] = [
   {
@@ -142,9 +146,9 @@ The `RouteGuardRenderer` component handles authentication and authorization for 
 
 ```typescript
 interface RouteGuardRendererProps {
-  children?: React.ReactNode
-  authRoles?: string[]
-  routes?: Route[]
+  children?: React.ReactNode;
+  authRoles?: string[];
+  routes?: Route[];
 }
 ```
 
@@ -154,27 +158,24 @@ interface RouteGuardRendererProps {
 const checkUserAuthorization = (): boolean => {
   if (authRoles.length > 0) {
     if (!isAuthenticated) {
-      return false
-    } else if (
-      authRoles.includes(roleKeys.SUPER) &&
-      verifyUserRole('SUPER')
-    ) {
-      return true
+      return false;
+    } else if (authRoles.includes(roleKeys.SUPER) && verifyUserRole('SUPER')) {
+      return true;
     } else if (authRoles.includes(roleKeys.ADMIN) && hasAdminAccess()) {
-      return true
+      return true;
     } else if (authRoles.includes(roleKeys.USER) && verifyUserRole('USER')) {
-      return true
+      return true;
     } else if (authRoles.includes(roleKeys.CIM) && hasCIMAccess()) {
-      return true
+      return true;
     } else if (authRoles.includes(roleKeys.ANY) && isAuthenticated) {
-      return true
+      return true;
     }
   } else {
     // If no auth roles, return true (public route)
-    return true
+    return true;
   }
-  return false
-}
+  return false;
+};
 ```
 
 ### Access Denied Handling
@@ -214,13 +215,13 @@ The `AuthContext` provides centralized authentication state management:
 
 ```typescript
 interface AuthContextType extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<void>
-  register: (data: RegisterData) => Promise<void>
-  logout: () => void
-  clearError: () => void
-  verifyUserRole: (role: UserRole) => boolean
-  hasAdminAccess: () => boolean
-  hasSuperAccess: () => boolean
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  logout: () => void;
+  clearError: () => void;
+  verifyUserRole: (role: UserRole) => boolean;
+  hasAdminAccess: () => boolean;
+  hasSuperAccess: () => boolean;
 }
 ```
 
@@ -228,16 +229,16 @@ interface AuthContextType extends AuthState {
 
 ```typescript
 interface User {
-  id: number
-  email: string
-  first_name: string
-  last_name: string
-  role: UserRole
-  created_at: string
-  updated_at: string
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
 }
 
-type UserRole = 'SUPER' | 'ADMIN' | 'USER' | 'GUEST'
+type UserRole = 'SUPER' | 'ADMIN' | 'USER' | 'GUEST';
 ```
 
 ### Authentication Flow
@@ -254,6 +255,7 @@ type UserRole = 'SUPER' | 'ADMIN' | 'USER' | 'GUEST'
 ### Adding a New Route
 
 1. **Create the Page Component**
+
 ```typescript
 // src/pages/NewPage.tsx
 export default function NewPage() {
@@ -266,6 +268,7 @@ export default function NewPage() {
 ```
 
 2. **Add to Route Configuration**
+
 ```typescript
 // src/utils/routes.tsx
 import NewPage from '../pages/NewPage'
@@ -286,13 +289,14 @@ const userRouteList: Route[] = [
 ```
 
 3. **Update Main Route List**
+
 ```typescript
 const mainRouteList: Route[] = [
   ...publicRouteList,
   ...userRouteList,
   ...adminRouteList,
   ...superAdminRouteList,
-]
+];
 ```
 
 ### Role-Based Navigation
@@ -318,17 +322,17 @@ return (
 ```typescript
 // In a service or component
 const makeAuthenticatedRequest = async (url: string) => {
-  const token = localStorage.getItem('auth_token')
-  
+  const token = localStorage.getItem('auth_token');
+
   const response = await fetch(url, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-  })
-  
-  return response.json()
-}
+  });
+
+  return response.json();
+};
 ```
 
 ## 🎨 Styling and Theming
@@ -345,7 +349,7 @@ export default function ExamplePage() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Page content */}
       </div>
@@ -418,7 +422,7 @@ const renderWithAuth = (component: React.ReactElement, user?: User) => {
 
 test('admin route requires admin access', () => {
   renderWithAuth(<App />, { role: 'USER' })
-  
+
   // Navigate to admin route
   // Should show access denied
   expect(screen.getByText('Access Denied')).toBeInTheDocument()
@@ -431,9 +435,9 @@ test('admin route requires admin access', () => {
 // Test authentication flow
 test('login redirects to dashboard', async () => {
   const mockLogin = jest.fn()
-  
+
   renderWithAuth(<Login />)
-  
+
   // Fill in login form
   fireEvent.change(screen.getByLabelText('Email'), {
     target: { value: 'test@example.com' }
@@ -441,10 +445,10 @@ test('login redirects to dashboard', async () => {
   fireEvent.change(screen.getByLabelText('Password'), {
     target: { value: 'password123' }
   })
-  
+
   // Submit form
   fireEvent.click(screen.getByText('Sign in'))
-  
+
   // Should call login function
   expect(mockLogin).toHaveBeenCalledWith({
     email: 'test@example.com',
@@ -456,30 +460,35 @@ test('login redirects to dashboard', async () => {
 ## 📚 Best Practices
 
 ### 1. Route Organization
+
 - Group routes by access level
 - Use descriptive route paths
 - Include metadata for documentation
 - Keep route arrays focused and manageable
 
 ### 2. Authentication
+
 - Always check authentication status
 - Use role-based access control
 - Handle authentication errors gracefully
 - Provide clear feedback to users
 
 ### 3. Security
+
 - Validate all user inputs
 - Use HTTPS in production
 - Implement proper token expiration
 - Handle token refresh appropriately
 
 ### 4. Performance
+
 - Lazy load route components
 - Use React.memo for expensive components
 - Implement proper error boundaries
 - Optimize bundle size
 
 ### 5. User Experience
+
 - Provide loading states
 - Show appropriate error messages
 - Implement proper navigation
@@ -513,15 +522,15 @@ test('login redirects to dashboard', async () => {
 
 ```typescript
 // Debug authentication state
-const { user, isAuthenticated, error } = useAuth()
-console.log('Auth State:', { user, isAuthenticated, error })
+const { user, isAuthenticated, error } = useAuth();
+console.log('Auth State:', { user, isAuthenticated, error });
 
 // Debug route access
-const { verifyUserRole, hasAdminAccess } = useAuth()
+const { verifyUserRole, hasAdminAccess } = useAuth();
 console.log('Role Check:', {
   isSuper: verifyUserRole('SUPER'),
-  isAdmin: hasAdminAccess()
-})
+  isAdmin: hasAdminAccess(),
+});
 ```
 
 ## 📖 Additional Resources

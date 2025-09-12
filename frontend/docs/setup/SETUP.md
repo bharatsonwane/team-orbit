@@ -5,11 +5,13 @@ This document provides a comprehensive guide for setting up the Lokvani frontend
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18 or higher
 - npm, pnpm, or yarn package manager
 - Git
 
 ### Installation
+
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -25,6 +27,7 @@ npm run dev
 ## 📋 Initial Setup
 
 ### 1. Create Vite Project
+
 ```bash
 # Create new React + TypeScript project
 npm create vite@latest frontend -- --template react-ts
@@ -33,6 +36,7 @@ npm install
 ```
 
 ### 2. Install Tailwind CSS
+
 ```bash
 # Install Tailwind CSS v4
 npm add tailwindcss @tailwindcss/vite
@@ -42,7 +46,9 @@ echo '@import "tailwindcss";' > src/index.css
 ```
 
 ### 3. Configure TypeScript
+
 Update `tsconfig.json`:
+
 ```json
 {
   "files": [],
@@ -60,6 +66,7 @@ Update `tsconfig.json`:
 ```
 
 Update `tsconfig.app.json`:
+
 ```json
 {
   "compilerOptions": {
@@ -73,29 +80,33 @@ Update `tsconfig.app.json`:
 ```
 
 ### 4. Configure Vite
+
 Update `vite.config.ts`:
+
 ```typescript
-import path from "path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-})
+});
 ```
 
 Install required dependencies:
+
 ```bash
 npm add -D @types/node
 ```
 
 ### 5. Initialize shadcn/ui
+
 ```bash
 # Initialize shadcn/ui
 npx shadcn@latest init
@@ -105,6 +116,7 @@ npx shadcn@latest add button input card label form dropdown-menu
 ```
 
 ### 6. Install React Router
+
 ```bash
 npm install react-router-dom
 ```
@@ -112,7 +124,9 @@ npm install react-router-dom
 ## 🎨 Theme System Setup
 
 ### 1. Create Theme Provider
+
 Create `src/components/theme-provider.tsx`:
+
 ```typescript
 "use client"
 
@@ -192,7 +206,9 @@ export const useTheme = () => {
 ```
 
 ### 2. Create Theme Toggle
+
 Create `src/components/theme-toggle.tsx`:
+
 ```typescript
 "use client"
 
@@ -236,7 +252,9 @@ export function ThemeToggle() {
 ```
 
 ### 3. Update Main Entry Point
+
 Update `src/main.tsx`:
+
 ```typescript
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -256,17 +274,20 @@ createRoot(document.getElementById('root')!).render(
 ## 📄 Page Setup
 
 ### 1. Create Pages Directory
+
 ```bash
 mkdir src/pages
 ```
 
 ### 2. Create Page Components
+
 - `src/pages/Home.tsx` - Landing page
 - `src/pages/Login.tsx` - Login page
 - `src/pages/Signup.tsx` - Signup page
 - `src/pages/Dashboard.tsx` - Dashboard page
 
 ### 3. Update App.tsx
+
 ```typescript
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Home from "./pages/Home"
@@ -293,6 +314,7 @@ export default App
 ## 🔧 Configuration Files
 
 ### package.json
+
 ```json
 {
   "name": "frontend",
@@ -329,6 +351,7 @@ export default App
 ```
 
 ### components.json
+
 ```json
 {
   "$schema": "https://ui.shadcn.com/schema.json",
@@ -357,22 +380,27 @@ export default App
 ## 🚀 Development Workflow
 
 ### Start Development
+
 ```bash
 npm run dev
 ```
+
 Opens at `http://localhost:5173`
 
 ### Build for Production
+
 ```bash
 npm run build
 ```
 
 ### Preview Production Build
+
 ```bash
 npm run preview
 ```
 
 ### Lint Code
+
 ```bash
 npm run lint
 ```
@@ -382,26 +410,31 @@ npm run lint
 ### Common Issues
 
 #### 1. Path Alias Not Working
+
 - Ensure `tsconfig.json` and `tsconfig.app.json` have path configuration
 - Check `vite.config.ts` has resolve alias setup
 - Restart development server
 
 #### 2. Theme Not Working
+
 - Check if `ThemeProvider` wraps the app
 - Verify CSS variables are defined in `index.css`
 - Ensure `useTheme` is used within `ThemeProvider`
 
 #### 3. Components Not Styled
+
 - Verify Tailwind CSS is properly configured
 - Check if `@import "tailwindcss"` is in `index.css`
 - Ensure components use correct class names
 
 #### 4. Routing Not Working
+
 - Check if `BrowserRouter` wraps the routes
 - Verify route paths are correct
 - Ensure components are properly exported
 
 ### Debug Steps
+
 1. Check browser console for errors
 2. Verify all dependencies are installed
 3. Restart development server
@@ -420,21 +453,25 @@ npm run lint
 ## 🔄 Updates and Maintenance
 
 ### Adding New Components
+
 ```bash
 npx shadcn@latest add [component-name]
 ```
 
 ### Updating Dependencies
+
 ```bash
 npm update
 ```
 
 ### Adding New Pages
+
 1. Create component in `src/pages/`
 2. Add route in `src/App.tsx`
 3. Add navigation links where needed
 
 ### Theme Customization
+
 1. Modify CSS variables in `src/index.css`
 2. Update `components.json` if needed
 3. Test in both light and dark modes

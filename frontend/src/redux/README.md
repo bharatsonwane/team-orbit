@@ -19,6 +19,7 @@ src/redux/
 ## 🛠️ Features
 
 ### **Notification System**
+
 - ✅ **Multiple notification types** - success, error, warning, info
 - ✅ **Maximum notification limit** - Prevents UI clutter
 - ✅ **Unique ID generation** - Each notification has a unique identifier
@@ -26,6 +27,7 @@ src/redux/
 - ✅ **Async thunk** - Using createAsyncThunk for notification creation
 
 ### **User System**
+
 - ✅ **Login functionality** - Async login with token storage
 - ✅ **User state management** - Authentication state tracking
 - ✅ **Error handling** - Login error management
@@ -34,6 +36,7 @@ src/redux/
 ## 🚀 Usage
 
 ### **Basic Setup**
+
 ```tsx
 import { Provider } from 'react-redux';
 import { store } from '@/redux/store';
@@ -48,6 +51,7 @@ function App() {
 ```
 
 ### **Using Notifications**
+
 ```tsx
 import { useDispatch, useSelector } from 'react-redux';
 import { getNotificationAction } from '@/redux/actions/notificationActions';
@@ -56,34 +60,40 @@ import type { RootState, AppDispatch } from '@/redux/store';
 
 // Typed hooks
 const useAppDispatch = () => useDispatch<AppDispatch>();
-const useAppSelector = useSelector as (selector: (state: RootState) => any) => any;
+const useAppSelector = useSelector as (
+  selector: (state: RootState) => any
+) => any;
 
 function MyComponent() {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(selectNotifications);
 
   const handleSuccess = () => {
-    dispatch(getNotificationAction({
-      type: 'success',
-      title: 'Success!',
-      message: 'Operation completed successfully'
-    }));
+    dispatch(
+      getNotificationAction({
+        type: 'success',
+        title: 'Success!',
+        message: 'Operation completed successfully',
+      })
+    );
   };
 
   const handleError = () => {
-    dispatch(getNotificationAction({
-      type: 'error',
-      title: 'Error!',
-      message: 'Something went wrong'
-    }));
+    dispatch(
+      getNotificationAction({
+        type: 'error',
+        title: 'Error!',
+        message: 'Something went wrong',
+      })
+    );
   };
 
   return (
     <div>
       <button onClick={handleSuccess}>Show Success</button>
       <button onClick={handleError}>Show Error</button>
-      
-      {notifications.map((notification) => (
+
+      {notifications.map(notification => (
         <div key={notification.id}>
           <h4>{notification.title}</h4>
           <p>{notification.message}</p>
@@ -95,15 +105,21 @@ function MyComponent() {
 ```
 
 ### **Advanced Usage**
+
 ```tsx
 import { useDispatch, useSelector } from 'react-redux';
 import { getNotificationAction } from '@/redux/actions/notificationActions';
-import { selectNotifications, selectNotificationCount } from '@/redux/slices/notificationSlice';
+import {
+  selectNotifications,
+  selectNotificationCount,
+} from '@/redux/slices/notificationSlice';
 import type { RootState, AppDispatch } from '@/redux/store';
 
 // Typed hooks
 const useAppDispatch = () => useDispatch<AppDispatch>();
-const useAppSelector = useSelector as (selector: (state: RootState) => any) => any;
+const useAppSelector = useSelector as (
+  selector: (state: RootState) => any
+) => any;
 
 function AdvancedComponent() {
   const dispatch = useAppDispatch();
@@ -111,12 +127,14 @@ function AdvancedComponent() {
 
   // Custom notification
   const showCustomNotification = () => {
-    dispatch(getNotificationAction({
-      type: 'info',
-      title: 'Custom Notification',
-      message: 'This is a custom notification',
-      duration: 10000 // 10 seconds
-    }));
+    dispatch(
+      getNotificationAction({
+        type: 'info',
+        title: 'Custom Notification',
+        message: 'This is a custom notification',
+        duration: 10000, // 10 seconds
+      })
+    );
   };
 
   return (
@@ -129,20 +147,23 @@ function AdvancedComponent() {
 ```
 
 ### **Using User Actions**
+
 ```tsx
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAction } from '@/redux/actions/userActions';
-import { 
-  selectUser, 
-  selectIsAuthenticated, 
-  selectUserLoading, 
-  selectUserError 
+import {
+  selectUser,
+  selectIsAuthenticated,
+  selectUserLoading,
+  selectUserError,
 } from '@/redux/slices/userSlice';
 import type { RootState, AppDispatch } from '@/redux/store';
 
 // Typed hooks
 const useAppDispatch = () => useDispatch<AppDispatch>();
-const useAppSelector = useSelector as (selector: (state: RootState) => any) => any;
+const useAppSelector = useSelector as (
+  selector: (state: RootState) => any
+) => any;
 
 function LoginComponent() {
   const dispatch = useAppDispatch();
@@ -180,9 +201,11 @@ function LoginComponent() {
 ## 🔧 Available Actions
 
 ### **Notification Actions**
+
 - `getNotificationAction(notification)` - Create and show a notification (async thunk)
 
 ### **User Actions**
+
 - `loginAction(credentials)` - Login user with credentials (async thunk)
 
 ## 📊 State Structure
@@ -225,32 +248,39 @@ interface User {
 ### **Available Selectors**
 
 #### **Notification Selectors**
+
 - `selectNotifications` - Get all notifications
 - `selectNotificationCount` - Get notification count
 
 #### **User Selectors**
+
 - `selectUser` - Get current user
 - `selectIsAuthenticated` - Get authentication status
 - `selectUserLoading` - Get user loading state
 - `selectUserError` - Get user error state
 
 ### **Usage**
+
 ```tsx
 import { useSelector } from 'react-redux';
-import { 
-  selectNotifications, 
+import {
+  selectNotifications,
   selectNotificationCount,
-  selectNotificationsByType 
+  selectNotificationsByType,
 } from '@/redux/slices/notificationSlice';
 import type { RootState } from '@/redux/store';
 
 // Typed hook
-const useAppSelector = useSelector as (selector: (state: RootState) => any) => any;
+const useAppSelector = useSelector as (
+  selector: (state: RootState) => any
+) => any;
 
 function MyComponent() {
   const notifications = useAppSelector(selectNotifications);
   const count = useAppSelector(selectNotificationCount);
-  const errors = useAppSelector((state) => selectNotificationsByType(state, 'error'));
+  const errors = useAppSelector(state =>
+    selectNotificationsByType(state, 'error')
+  );
 
   return (
     <div>
@@ -264,21 +294,25 @@ function MyComponent() {
 ## 🔍 Best Practices
 
 ### **1. Action Naming**
+
 - Use descriptive action names
 - Follow the pattern: `slice/actionName`
 - Use constants for action types
 
 ### **2. State Updates**
+
 - Use Redux Toolkit's `createSlice` for immutable updates
 - Keep state normalized
 - Use selectors for computed values
 
 ### **3. Performance**
+
 - Use `useAppSelector` for typed selectors
 - Memoize selectors when necessary
 - Avoid unnecessary re-renders
 
 ### **4. Error Handling**
+
 - Use error notifications for user feedback
 - Log errors for debugging
 - Provide fallback states
@@ -286,6 +320,7 @@ function MyComponent() {
 ## 🚀 Adding New Slices
 
 ### **1. Create Action File**
+
 ```typescript
 // actions/newSliceActions.ts
 export const NEW_SLICE_TYPES = {
@@ -299,6 +334,7 @@ export const newSliceAction = (payload: any) => ({
 ```
 
 ### **2. Create Slice File**
+
 ```typescript
 // slices/newSlice.ts
 import { createSlice } from '@reduxjs/toolkit';
@@ -318,6 +354,7 @@ export default newSlice.reducer;
 ```
 
 ### **3. Update Store**
+
 ```typescript
 // store.tsx
 import newSliceReducer from './slices/newSlice';
@@ -331,6 +368,7 @@ export const store = configureStore({
 ```
 
 ### **4. Export from Index**
+
 ```typescript
 // index.ts
 export * from './actions/newSliceActions';
@@ -340,11 +378,13 @@ export * from './slices/newSlice';
 ## 🔧 Configuration
 
 ### **Store Configuration**
+
 - **DevTools**: Enabled in development
 - **Serializable Check**: Configured for notification timestamps
 - **Middleware**: Default Redux Toolkit middleware
 
 ### **Notification Configuration**
+
 - **Default Duration**: 5000ms (5 seconds)
 - **Max Notifications**: 5
 - **Auto-cleanup**: Oldest notifications removed when limit exceeded

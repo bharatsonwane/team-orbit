@@ -44,18 +44,21 @@ backend/
 ## 🎨 Features
 
 ### Authentication & Authorization
+
 - JWT-based authentication
 - Role-based access control
 - Password hashing with bcrypt
 - Secure session management
 
 ### Real-time Communication
+
 - Socket.IO integration
 - Chat functionality
 - Real-time notifications
 - Room-based messaging
 
 ### API Features
+
 - RESTful API design
 - OpenAPI/Swagger documentation
 - Request validation with Zod
@@ -63,6 +66,7 @@ backend/
 - CORS and security headers
 
 ### Database
+
 - PostgreSQL integration
 - Database migrations
 - Seed data management
@@ -71,33 +75,39 @@ backend/
 ## 🛠️ Development
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL 12+
 - npm or yarn
 
 ### Installation
+
 ```bash
 cd backend
 npm install
 ```
 
 ### Environment Setup
+
 ```bash
 cp env.example .env
 # Edit .env with your configuration
 ```
 
 ### Development Server
+
 ```bash
 npm run dev
 ```
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Database Setup
+
 ```bash
 # Run migrations
 npm run migrate
@@ -111,15 +121,18 @@ npm run seed
 Comprehensive documentation is available in the `docs/` directory:
 
 ### 🚀 Setup & Configuration
+
 - [Project Setup](./docs/setup/SETUP.md) - Complete setup guide from scratch
 - [Development Guidelines](./docs/development/DEVELOPMENT.md) - Development best practices
 
 ### 🎨 API & Architecture
+
 - [API Documentation](./docs/api/API.md) - Complete API reference
 - [Architecture Guide](./docs/architecture/ARCHITECTURE.md) - System architecture
 - [Database Schema](./docs/api/DATABASE.md) - Database design and relationships
 
 ### 🚀 Deployment
+
 - [Deployment Guide](./docs/deployment/DEPLOYMENT.md) - Production deployment guide
 
 **📖 [View All Documentation](./docs/index.md)**  
@@ -128,29 +141,34 @@ Comprehensive documentation is available in the `docs/` directory:
 ## 🎯 Available Endpoints
 
 ### Authentication
+
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/profile` - Get user profile
 
 ### Users
+
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
 - `PUT /api/users/:id` - Update user
 - `DELETE /api/users/:id` - Delete user
 
 ### Chat
+
 - `GET /api/chat/messages` - Get messages
 - `POST /api/chat/messages` - Send message
 - `GET /api/chat/rooms` - Get chat rooms
 
 ### Health & Documentation
+
 - `GET /health` - Health check
 - `GET /docs` - API documentation
 
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 # Server
 API_PORT=5000
@@ -172,6 +190,7 @@ CORS_ORIGIN=http://localhost:5173
 ```
 
 ### Database Configuration
+
 - PostgreSQL connection with connection pooling
 - Environment-based configuration
 - Migration and seed management

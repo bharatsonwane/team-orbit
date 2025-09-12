@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import logger from "../utils/logger";
+import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
 
 interface CustomResponse extends Response {
   success: (data: any) => void;
@@ -13,10 +13,14 @@ interface CustomResponse extends Response {
   The error method will send the status code and the error message in the response body.
  */
 
-const responseHandler = (req: Request, res: CustomResponse, next: NextFunction): void => {
+const responseHandler = (
+  req: Request,
+  res: CustomResponse,
+  next: NextFunction
+): void => {
   res.success = (data: any): void => {
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data,
     });
   };
@@ -24,8 +28,8 @@ const responseHandler = (req: Request, res: CustomResponse, next: NextFunction):
   res.error = (err: Error & { statusCode?: number }): void => {
     logger.error(err.stack);
     res.status(err.statusCode || 500).json({
-      status: "error",
-      message: err.message || "Internal Server Error",
+      status: 'error',
+      message: err.message || 'Internal Server Error',
     });
   };
 

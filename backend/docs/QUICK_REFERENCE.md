@@ -5,6 +5,7 @@ Quick commands and common tasks for the Lokvani backend project.
 ## 🚀 Common Commands
 
 ### Development
+
 ```bash
 # Start development server
 npm run dev
@@ -20,6 +21,7 @@ npm run clean
 ```
 
 ### Database
+
 ```bash
 # Run migrations
 npm run migrate
@@ -32,6 +34,7 @@ npm run migrate && npm run seed
 ```
 
 ### Testing
+
 ```bash
 # Run tests (when implemented)
 npm test
@@ -64,6 +67,7 @@ backend/
 ## 🎯 API Endpoints
 
 ### Authentication
+
 ```bash
 POST /api/auth/login
 POST /api/auth/register
@@ -72,6 +76,7 @@ GET  /api/auth/profile
 ```
 
 ### Users
+
 ```bash
 GET    /api/users
 GET    /api/users/:id
@@ -80,6 +85,7 @@ DELETE /api/users/:id
 ```
 
 ### Chat
+
 ```bash
 GET  /api/chat/messages
 POST /api/chat/messages
@@ -87,6 +93,7 @@ GET  /api/chat/rooms
 ```
 
 ### System
+
 ```bash
 GET /health          # Health check
 GET /docs           # API documentation
@@ -96,6 +103,7 @@ GET /test           # Test endpoint
 ## 🔧 Environment Variables
 
 ### Required
+
 ```env
 # Server
 API_PORT=5000
@@ -114,6 +122,7 @@ JWT_EXPIRES_IN=24h
 ```
 
 ### Optional
+
 ```env
 # CORS
 CORS_ORIGIN=http://localhost:5173
@@ -125,121 +134,132 @@ LOG_LEVEL=info
 ## 🎨 Code Patterns
 
 ### Controller Pattern
+
 ```typescript
 // src/controllers/user.controller.ts
-import { Request, Response } from 'express'
-import { userService } from '../services/user.service'
+import { Request, Response } from 'express';
+import { userService } from '../services/user.service';
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const user = await userService.findById(id)
-    res.success(user)
+    const { id } = req.params;
+    const user = await userService.findById(id);
+    res.success(user);
   } catch (error) {
-    res.error(error)
+    res.error(error);
   }
-}
+};
 ```
 
 ### Service Pattern
+
 ```typescript
 // src/services/user.service.ts
-import { userRepository } from '../database/repositories/user.repository'
+import { userRepository } from '../database/repositories/user.repository';
 
 export const userService = {
   async findById(id: string) {
-    return await userRepository.findById(id)
+    return await userRepository.findById(id);
   },
-  
+
   async create(userData: CreateUserDto) {
-    return await userRepository.create(userData)
-  }
-}
+    return await userRepository.create(userData);
+  },
+};
 ```
 
 ### Route Pattern
+
 ```typescript
 // src/routes/user.routes.ts
-import { Router } from 'express'
-import { getUserById, createUser } from '../controllers/user.controller'
+import { Router } from 'express';
+import { getUserById, createUser } from '../controllers/user.controller';
 
-const router = Router()
+const router = Router();
 
-router.get('/:id', getUserById)
-router.post('/', createUser)
+router.get('/:id', getUserById);
+router.post('/', createUser);
 
-export default router
+export default router;
 ```
 
 ### Middleware Pattern
+
 ```typescript
 // src/middleware/auth.middleware.ts
-import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '')
-  
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
   if (!token) {
-    return res.status(401).json({ error: 'Access denied' })
+    return res.status(401).json({ error: 'Access denied' });
   }
-  
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    req.user = decoded
-    next()
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    req.user = decoded;
+    next();
   } catch (error) {
-    res.status(400).json({ error: 'Invalid token' })
+    res.status(400).json({ error: 'Invalid token' });
   }
-}
+};
 ```
 
 ## 🗄️ Database Operations
 
 ### Migration
+
 ```typescript
 // src/database/migrations/001_create_users.ts
-import { Migration } from '../migrate'
+import { Migration } from '../migrate';
 
 export const up = async (migration: Migration) => {
   await migration.createTable('users', {
     id: 'SERIAL PRIMARY KEY',
     email: 'VARCHAR(255) UNIQUE NOT NULL',
     password: 'VARCHAR(255) NOT NULL',
-    created_at: 'TIMESTAMP DEFAULT NOW()'
-  })
-}
+    created_at: 'TIMESTAMP DEFAULT NOW()',
+  });
+};
 
 export const down = async (migration: Migration) => {
-  await migration.dropTable('users')
-}
+  await migration.dropTable('users');
+};
 ```
 
 ### Repository Pattern
+
 ```typescript
 // src/database/repositories/user.repository.ts
-import { db } from '../db'
+import { db } from '../db';
 
 export const userRepository = {
   async findById(id: string) {
-    const result = await db.query('SELECT * FROM users WHERE id = $1', [id])
-    return result.rows[0]
+    const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    return result.rows[0];
   },
-  
+
   async create(userData: CreateUserDto) {
-    const { email, password } = userData
+    const { email, password } = userData;
     const result = await db.query(
       'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
       [email, password]
-    )
-    return result.rows[0]
-  }
-}
+    );
+    return result.rows[0];
+  },
+};
 ```
 
 ## 🔍 Common Issues
 
 ### Database Connection
+
 ```bash
 # Check PostgreSQL is running
 pg_ctl status
@@ -252,6 +272,7 @@ psql -U postgres -d lokvani -c "SELECT 1"
 ```
 
 ### Port Already in Use
+
 ```bash
 # Find process using port 5000
 lsof -i :5000
@@ -261,6 +282,7 @@ kill -9 <PID>
 ```
 
 ### TypeScript Errors
+
 ```bash
 # Check TypeScript configuration
 npx tsc --noEmit

@@ -1,6 +1,6 @@
-import express from "express";
+import express from 'express';
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   UserSchema,
   UserLoginSchema,
@@ -8,8 +8,8 @@ import {
   UserSignupSchema,
   UserUpdateSchema,
   updateUserPasswordDoc,
-} from "../schemas/user.schema";
-import { idValidation } from "../schemas/common.schema";
+} from '../schemas/user.schema';
+import { idValidation } from '../schemas/common.schema';
 import {
   createUserProfile,
   getUserById,
@@ -19,47 +19,47 @@ import {
   signoutUser,
   updateUserPassword,
   updateUserProfile,
-} from "../controllers/user.controller";
-import RouteRegistrar from "../middleware/RouteRegistrar";
-import { authRoleMiddleware } from "../middleware/authRoleMiddleware";
+} from '../controllers/user.controller';
+import RouteRegistrar from '../middleware/RouteRegistrar';
+import { authRoleMiddleware } from '../middleware/authRoleMiddleware';
 
 const router = express.Router();
 
 const registrar = new RouteRegistrar(router, {
-  basePath: "/api/user",
-  tags: ["User"],
+  basePath: '/api/user',
+  tags: ['User'],
 });
 
 // /**@description user login  */
-registrar.post("/login", {
+registrar.post('/login', {
   requestSchema: { bodySchema: UserLoginSchema },
   responseSchemas: [{ statusCode: 200, schema: UserSchema }],
   controller: postUserLogin,
 });
 
 /**@description user signup  */
-registrar.post("/signup", {
+registrar.post('/signup', {
   requestSchema: { bodySchema: UserSignupSchema },
   responseSchemas: [{ statusCode: 200, schema: UserSignupSchema }],
   controller: postUserSignup,
 });
 
 /**@description get all users  */
-registrar.get("/list", {
+registrar.get('/list', {
   openApiDoc: getUserDoc,
   middleware: [authRoleMiddleware()],
   controller: getUsers,
 });
 
 /**@description Create User */
-registrar.post("/create-user", {
+registrar.post('/create-user', {
   requestSchema: { bodySchema: UserSchema },
   responseSchemas: [{ statusCode: 200, schema: UserSchema }],
   controller: createUserProfile,
 });
 
 /**@description update user password  */
-registrar.put("/:id/update-password/", {
+registrar.put('/:id/update-password/', {
   openApiDoc: updateUserPasswordDoc,
   requestSchema: {
     paramsSchema: { id: idValidation },
@@ -70,14 +70,14 @@ registrar.put("/:id/update-password/", {
 });
 
 /**@description get user by id  */
-registrar.get("/:id", {
+registrar.get('/:id', {
   requestSchema: { paramsSchema: { id: idValidation } },
   middleware: [authRoleMiddleware()],
   controller: getUserById,
 });
 
 /**@description update user by id  */
-registrar.put("/:id", {
+registrar.put('/:id', {
   requestSchema: {
     paramsSchema: { id: idValidation },
     bodySchema: UserUpdateSchema,
@@ -90,7 +90,7 @@ registrar.put("/:id", {
 /**@description user signout */
 
 /**@description signout user */
-registrar.post("/signout", {
+registrar.post('/signout', {
   controller: signoutUser,
 });
 

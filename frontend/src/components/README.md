@@ -21,29 +21,33 @@ src/components/
 ## 🎨 Component Categories
 
 ### UI Components (`ui/`)
+
 - **Source:** shadcn/ui component library
 - **Purpose:** Reusable, accessible UI components
 - **Examples:** Button, Input, Card, Label, Form
 
 ### Theme Components
+
 - **`theme-provider.tsx`** - Theme context and state management
 - **`theme-toggle.tsx`** - Interactive theme switcher
 
 ## 🚀 Usage
 
 ### Importing Components
+
 ```typescript
 // UI components
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
 
 // Custom components
-import { ThemeProvider } from "@/components/theme-provider"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeToggle } from '@/components/theme-toggle';
 ```
 
 ### Component Development
+
 - Follow TypeScript interfaces for props
 - Use theme-aware CSS classes
 - Include proper accessibility attributes
@@ -65,6 +69,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ## 🎨 Theming
 
 All components support the theme system:
+
 - Use CSS variables for colors
 - Test in both light and dark modes
 - Follow theme-aware class patterns

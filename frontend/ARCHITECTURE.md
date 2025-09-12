@@ -53,6 +53,7 @@ src/
 ## 🔄 Provider Hierarchy
 
 ### 1. **main.tsx** - Root Level
+
 ```typescript
 <StrictMode>
   <Router>
@@ -66,6 +67,7 @@ src/
 ```
 
 **Benefits:**
+
 - Centralized provider setup
 - Router available throughout the app
 - Easy to use routing hooks anywhere
@@ -74,6 +76,7 @@ src/
 - Better testing isolation
 
 ### 2. **App.tsx** - Routing Level
+
 ```typescript
 <Routes>
   {/* Route components */}
@@ -81,6 +84,7 @@ src/
 ```
 
 **Benefits:**
+
 - Focused on routing logic
 - Can use routing hooks (useLocation, useNavigate, etc.)
 - Clean component structure
@@ -90,21 +94,25 @@ src/
 ## 🎯 Data Flow
 
 ### Authentication Flow
+
 ```
 User Action → AuthContext → API Call → State Update → Route Guard → Page Render
 ```
 
 ### Theme Flow
+
 ```
 Theme Toggle → ThemeProvider → CSS Variables → Component Re-render
 ```
 
 ### Route Protection Flow
+
 ```
 Route Access → RouteGuard → AuthContext → Role Check → Allow/Deny
 ```
 
 ### Router Hook Usage
+
 ```
 Any Component → useLocation/useNavigate → Router Context → Navigation/State
 ```
@@ -112,6 +120,7 @@ Any Component → useLocation/useNavigate → Router Context → Navigation/Stat
 ## 🔧 Router Hook Benefits
 
 ### Available Throughout the App
+
 With `Router` in `main.tsx`, you can now use React Router hooks anywhere in the application:
 
 ```typescript
@@ -121,15 +130,15 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
-  
+
   // Can access current route information
   console.log('Current path:', location.pathname)
-  
+
   // Can navigate programmatically
   const handleNavigation = () => {
     navigate('/dashboard')
   }
-  
+
   return (
     <Routes>
       {/* Route components */}
@@ -139,6 +148,7 @@ function App() {
 ```
 
 ### Common Use Cases
+
 - **Global navigation** - Navigate from any component
 - **Route-based logic** - Show different content based on current route
 - **Analytics tracking** - Track page views and user navigation
@@ -148,16 +158,19 @@ function App() {
 ## 🛡️ Security Layers
 
 ### 1. **Route Level Protection**
+
 - RouteGuardRenderer checks authentication
 - Role-based access control
 - Automatic redirects
 
 ### 2. **Component Level Protection**
+
 - useAuth hook for role checking
 - Conditional rendering based on permissions
 - Secure API calls
 
 ### 3. **API Level Protection**
+
 - JWT token authentication
 - Role-based endpoint access
 - Error handling and feedback
@@ -165,6 +178,7 @@ function App() {
 ## 🎨 Theme System
 
 ### CSS Variables Approach
+
 ```css
 :root {
   --background: 0 0% 100%;
@@ -178,6 +192,7 @@ function App() {
 ```
 
 ### Theme Provider Features
+
 - System preference detection
 - Persistent theme storage
 - Smooth transitions
@@ -186,45 +201,50 @@ function App() {
 ## 🔧 Type Safety
 
 ### TypeScript Integration
+
 - Strict type checking enabled
 - Interface definitions for all data structures
 - Type-only imports where required
 - No any types used
 
 ### Key Type Definitions
+
 ```typescript
 interface User {
-  id: number
-  email: string
-  first_name: string
-  last_name: string
-  role: UserRole
-  created_at: string
-  updated_at: string
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Route {
-  path: string
-  element: React.ReactNode
-  authRoles: UserRole[]
-  title?: string
-  description?: string
+  path: string;
+  element: React.ReactNode;
+  authRoles: UserRole[];
+  title?: string;
+  description?: string;
 }
 ```
 
 ## 🚀 Performance Considerations
 
 ### Code Splitting
+
 - Route-based lazy loading (ready to implement)
 - Component-level code splitting
 - Bundle size optimization
 
 ### State Management
+
 - React Context for global state
 - Local state for component-specific data
 - Efficient re-rendering with proper dependencies
 
 ### Caching
+
 - JWT token caching in localStorage
 - Theme preference caching
 - API response caching (when implemented)
@@ -232,16 +252,19 @@ interface Route {
 ## 🧪 Testing Strategy
 
 ### Unit Testing
+
 - Individual component testing
 - Hook testing with React Testing Library
 - Type safety validation
 
 ### Integration Testing
+
 - Provider integration testing
 - Route protection testing
 - Authentication flow testing
 
 ### E2E Testing
+
 - Complete user journey testing
 - Cross-browser compatibility
 - Accessibility testing
@@ -249,11 +272,13 @@ interface Route {
 ## 📱 Responsive Design
 
 ### Mobile-First Approach
+
 - Tailwind CSS responsive utilities
 - Flexible grid layouts
 - Touch-friendly interfaces
 
 ### Breakpoints
+
 ```css
 sm: 640px   /* Small devices */
 md: 768px   /* Medium devices */
@@ -264,6 +289,7 @@ xl: 1280px  /* Extra large devices */
 ## 🔍 Development Workflow
 
 ### 1. **Adding New Routes**
+
 ```typescript
 // 1. Create page component
 export default function NewPage() {
@@ -286,6 +312,7 @@ const mainRouteList: Route[] = [
 ```
 
 ### 2. **Adding New Providers**
+
 ```typescript
 // In main.tsx
 <StrictMode>
@@ -300,37 +327,43 @@ const mainRouteList: Route[] = [
 ```
 
 ### 3. **Adding New Types**
+
 ```typescript
 // In types/auth.ts or new type file
 export interface NewType {
-  property: string
-  value: number
+  property: string;
+  value: number;
 }
 ```
 
 ## 🎯 Best Practices
 
 ### 1. **Provider Management**
+
 - Keep providers in main.tsx
 - Use context for global state only
 - Avoid prop drilling
 
 ### 2. **Route Organization**
+
 - Group routes by access level
 - Use descriptive route paths
 - Include route metadata
 
 ### 3. **Component Structure**
+
 - Keep components focused and small
 - Use TypeScript for type safety
 - Follow consistent naming conventions
 
 ### 4. **State Management**
+
 - Use local state for component-specific data
 - Use context for global application state
 - Avoid unnecessary re-renders
 
 ### 5. **Error Handling**
+
 - Provide user-friendly error messages
 - Handle network errors gracefully
 - Log errors for debugging

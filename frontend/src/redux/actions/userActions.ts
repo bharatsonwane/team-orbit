@@ -1,6 +1,6 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import getAxios from "../../utils/axiosApi";
-import { envVariable } from "../../config/envVariable";
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import getAxios from '../../utils/axiosApi';
+import { envVariable } from '../../config/envVariable';
 
 // User interface
 export interface User {
@@ -8,7 +8,7 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: "USER" | "ADMIN" | "SUPER";
+  role: 'USER' | 'ADMIN' | 'SUPER';
   created_at: string;
   updated_at: string;
 }
@@ -31,12 +31,12 @@ export interface LoginResponse {
 
 // Login action
 export const loginAction = createAsyncThunk(
-  "user/login",
+  'user/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       // Make login API call
       const response = await getAxios().post<LoginResponse>(
-        "api/user/login",
+        'api/user/login',
         credentials
       );
 
@@ -50,7 +50,7 @@ export const loginAction = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Network error. Please try again."
+          'Network error. Please try again.'
       );
     }
   }

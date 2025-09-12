@@ -42,12 +42,14 @@ frontend/
 ## 🎨 Features
 
 ### Authentication
+
 - **Login Page** - Email/password authentication
 - **Signup Page** - User registration with validation
 - **Form Validation** - Real-time validation with error messages
 - **Loading States** - User feedback during form submission
 
 ### Theming
+
 - **Dark/Light Mode** - Complete theme switching
 - **System Detection** - Follows OS preference
 - **CSS Variables** - Theme-aware color system
@@ -55,6 +57,7 @@ frontend/
 - **Persistent Storage** - Remembers user preference
 
 ### UI/UX
+
 - **Responsive Design** - Works on all screen sizes
 - **Accessible Components** - ARIA labels and keyboard navigation
 - **Modern Design** - Clean, professional interface
@@ -63,27 +66,33 @@ frontend/
 ## 🛠️ Development
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or pnpm
 
 ### Installation
+
 ```bash
 cd frontend
 npm install
 ```
 
 ### Development Server
+
 ```bash
 npm run dev
 ```
+
 Opens at `http://localhost:5173`
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Preview
+
 ```bash
 npm run preview
 ```
@@ -93,16 +102,19 @@ npm run preview
 Comprehensive documentation is available in the `docs/` directory:
 
 ### 🚀 Setup & Configuration
+
 - [Project Setup](./docs/setup/SETUP.md) - Complete setup guide from scratch
 - [Development Guidelines](./docs/development/DEVELOPMENT.md) - Development best practices
 
-### 🎨 Features & Components  
+### 🎨 Features & Components
+
 - [Theming System](./docs/features/THEMING.md) - Dark/light mode theming guide
 - [Authentication](./docs/features/AUTHENTICATION.md) - Login/signup implementation
 - [Routing & Navigation](./docs/features/ROUTING.md) - React Router setup
 - [Components](./docs/components/COMPONENTS.md) - Component library documentation
 
 ### 🚀 Deployment
+
 - [Deployment Guide](./docs/deployment/DEPLOYMENT.md) - Production deployment guide
 
 **📖 [View All Documentation](./docs/index.md)**  
@@ -118,18 +130,22 @@ Comprehensive documentation is available in the `docs/` directory:
 ## 🔧 Configuration
 
 ### shadcn/ui
+
 Configured with:
+
 - Style: `new-york`
 - Base color: `neutral`
 - CSS variables: `true`
 - TypeScript: `true`
 
 ### TypeScript
+
 - Path aliases: `@/*` → `./src/*`
 - Strict mode enabled
 - Modern ES2022 target
 
 ### Vite
+
 - React plugin
 - Tailwind CSS plugin
 - Path resolution for aliases

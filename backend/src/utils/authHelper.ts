@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { envVariable } from "../config/envVariable";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { envVariable } from '../config/envVariable';
 
 // JWT token payload interface
 interface JwtPayload {
@@ -13,12 +13,17 @@ export const getHashPassword = async (password: string): Promise<string> => {
   return hashedPassword;
 };
 
-export const validatePassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+export const validatePassword = async (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
   const isPasswordValid = await bcrypt.compare(password, hashedPassword);
   return isPasswordValid;
 };
 
-export const createJwtToken = async (tokenDataObject: JwtPayload): Promise<string> => {
+export const createJwtToken = async (
+  tokenDataObject: JwtPayload
+): Promise<string> => {
   const jwtToken = jwt.sign({ ...tokenDataObject }, envVariable.JWT_SECRET, {
     expiresIn: 24 * 60 * 60, // 24 hours
   });

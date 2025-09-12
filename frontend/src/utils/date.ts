@@ -1,5 +1,5 @@
 // Date utility functions using datejs
-import Date from "datejs";
+import Date from 'datejs';
 
 // Extend Date prototype with datejs functionality
 // This allows us to use datejs methods on Date objects
@@ -12,11 +12,11 @@ import Date from "datejs";
  */
 export const formatDate = (date: Date | string, format?: string): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (format) {
     return Date.parse(dateObj.toString()).toString(format);
   }
-  
+
   return Date.parse(dateObj.toString()).toString('MMMM d, yyyy');
 };
 
@@ -38,7 +38,7 @@ export const getRelativeTime = (date: Date | string): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
   const diff = now.getTime() - dateObj.getTime();
-  
+
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -46,7 +46,7 @@ export const getRelativeTime = (date: Date | string): string => {
   const weeks = Math.floor(days / 7);
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
-  
+
   if (seconds < 60) return 'just now';
   if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
   if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
@@ -73,7 +73,10 @@ export const addTime = (date: Date | string, timeExpression: string): Date => {
  * @param timeExpression - Natural language time expression (e.g., "2 days", "1 week", "3 months")
  * @returns New Date object
  */
-export const subtractTime = (date: Date | string, timeExpression: string): Date => {
+export const subtractTime = (
+  date: Date | string,
+  timeExpression: string
+): Date => {
   const baseDate = typeof date === 'string' ? new Date(date) : date;
   return Date.parse(baseDate.toString()).add(`-${timeExpression}`);
 };
@@ -157,7 +160,10 @@ export const dateFormats = {
  * @param format - Predefined format key
  * @returns Formatted date string
  */
-export const formatWithPredefined = (date: Date | string, format: keyof typeof dateFormats): string => {
+export const formatWithPredefined = (
+  date: Date | string,
+  format: keyof typeof dateFormats
+): string => {
   return formatDate(date, dateFormats[format]);
 };
 

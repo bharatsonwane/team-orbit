@@ -5,18 +5,21 @@ Comprehensive development guidelines and best practices for the Lokvani backend.
 ## 🎯 Development Principles
 
 ### 1. Code Quality
+
 - **TypeScript First:** Use TypeScript for all new code
 - **Type Safety:** Define interfaces for all data structures
 - **Error Handling:** Comprehensive error handling and logging
 - **Code Reviews:** All code must be reviewed before merging
 
 ### 2. Architecture Patterns
+
 - **Layered Architecture:** Controllers → Services → Repositories
 - **Dependency Injection:** Inject dependencies rather than importing directly
 - **Single Responsibility:** Each module has one reason to change
 - **Open/Closed Principle:** Open for extension, closed for modification
 
 ### 3. Testing Strategy
+
 - **Unit Tests:** Test individual functions and methods
 - **Integration Tests:** Test component interactions
 - **E2E Tests:** Test complete user workflows
@@ -25,6 +28,7 @@ Comprehensive development guidelines and best practices for the Lokvani backend.
 ## 🏗️ Project Structure
 
 ### Directory Organization
+
 ```
 src/
 ├── config/              # Configuration files
@@ -45,6 +49,7 @@ src/
 ```
 
 ### File Naming Conventions
+
 - **Controllers:** `*.controller.ts` (e.g., `user.controller.ts`)
 - **Services:** `*.service.ts` (e.g., `user.service.ts`)
 - **Routes:** `*.routes.ts` (e.g., `user.routes.ts`)
@@ -55,6 +60,7 @@ src/
 ## 🔧 Development Workflow
 
 ### 1. Setting Up Development Environment
+
 ```bash
 # Clone repository
 git clone <repository-url>
@@ -76,6 +82,7 @@ npm run dev
 ```
 
 ### 2. Daily Development Workflow
+
 ```bash
 # Pull latest changes
 git pull origin main
@@ -96,6 +103,7 @@ git push origin feature/new-feature
 ```
 
 ### 3. Code Quality Checks
+
 ```bash
 # Type checking
 npx tsc --noEmit
@@ -115,65 +123,74 @@ npm run build
 ### TypeScript Guidelines
 
 #### Interface Definitions
+
 ```typescript
 // Define clear interfaces for all data structures
 interface User {
-  id: number
-  email: string
-  first_name: string
-  last_name: string
-  role: UserRole
-  created_at: Date
-  updated_at: Date
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: UserRole;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface CreateUserDto {
-  email: string
-  password: string
-  first_name: string
-  last_name: string
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
 }
 
 interface UpdateUserDto {
-  first_name?: string
-  last_name?: string
-  email?: string
+  first_name?: string;
+  last_name?: string;
+  email?: string;
 }
 ```
 
 #### Type Safety
+
 ```typescript
 // Use strict typing
 const getUserById = async (id: string): Promise<User | null> => {
   try {
-    const user = await userRepository.findById(id)
-    return user
+    const user = await userRepository.findById(id);
+    return user;
   } catch (error) {
-    logger.error('Error fetching user:', error)
-    throw new Error('Failed to fetch user')
+    logger.error('Error fetching user:', error);
+    throw new Error('Failed to fetch user');
   }
-}
+};
 
 // Use type guards
 const isUser = (obj: any): obj is User => {
-  return obj && typeof obj.id === 'number' && typeof obj.email === 'string'
-}
+  return obj && typeof obj.id === 'number' && typeof obj.email === 'string';
+};
 ```
 
 #### Error Handling
+
 ```typescript
 // Custom error classes
 class ValidationError extends Error {
-  constructor(message: string, public field: string) {
-    super(message)
-    this.name = 'ValidationError'
+  constructor(
+    message: string,
+    public field: string
+  ) {
+    super(message);
+    this.name = 'ValidationError';
   }
 }
 
 class DatabaseError extends Error {
-  constructor(message: string, public originalError: Error) {
-    super(message)
-    this.name = 'DatabaseError'
+  constructor(
+    message: string,
+    public originalError: Error
+  ) {
+    super(message);
+    this.name = 'DatabaseError';
   }
 }
 
@@ -183,148 +200,151 @@ export const userService = {
     try {
       // Validate input
       if (!userData.email || !userData.password) {
-        throw new ValidationError('Email and password are required', 'email')
+        throw new ValidationError('Email and password are required', 'email');
       }
 
       // Check if user exists
-      const existingUser = await userRepository.findByEmail(userData.email)
+      const existingUser = await userRepository.findByEmail(userData.email);
       if (existingUser) {
-        throw new ValidationError('User already exists', 'email')
+        throw new ValidationError('User already exists', 'email');
       }
 
       // Create user
-      const hashedPassword = await bcrypt.hash(userData.password, 10)
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
       const user = await userRepository.create({
         ...userData,
-        password: hashedPassword
-      })
+        password: hashedPassword,
+      });
 
-      return user
+      return user;
     } catch (error) {
       if (error instanceof ValidationError) {
-        throw error
+        throw error;
       }
-      logger.error('Error creating user:', error)
-      throw new DatabaseError('Failed to create user', error as Error)
+      logger.error('Error creating user:', error);
+      throw new DatabaseError('Failed to create user', error as Error);
     }
-  }
-}
+  },
+};
 ```
 
 ### Controller Patterns
 
 #### Standard Controller Structure
+
 ```typescript
 // src/controllers/user.controller.ts
-import { Request, Response } from 'express'
-import { userService } from '../services/user.service'
-import { logger } from '../utils/logger'
+import { Request, Response } from 'express';
+import { userService } from '../services/user.service';
+import { logger } from '../utils/logger';
 
 export const userController = {
   async getUsers(req: Request, res: Response) {
     try {
-      const users = await userService.getAllUsers()
-      res.success(users)
+      const users = await userService.getAllUsers();
+      res.success(users);
     } catch (error) {
-      logger.error('Error fetching users:', error)
-      res.error(error)
+      logger.error('Error fetching users:', error);
+      res.error(error);
     }
   },
 
   async getUserById(req: Request, res: Response) {
     try {
-      const { id } = req.params
-      const user = await userService.getUserById(id)
-      
+      const { id } = req.params;
+      const user = await userService.getUserById(id);
+
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: { message: 'User not found' }
-        })
+          error: { message: 'User not found' },
+        });
       }
 
-      res.success(user)
+      res.success(user);
     } catch (error) {
-      logger.error('Error fetching user:', error)
-      res.error(error)
+      logger.error('Error fetching user:', error);
+      res.error(error);
     }
   },
 
   async createUser(req: Request, res: Response) {
     try {
-      const userData = req.body
-      const user = await userService.createUser(userData)
-      res.status(201).success(user)
+      const userData = req.body;
+      const user = await userService.createUser(userData);
+      res.status(201).success(user);
     } catch (error) {
-      logger.error('Error creating user:', error)
-      res.error(error)
+      logger.error('Error creating user:', error);
+      res.error(error);
     }
-  }
-}
+  },
+};
 ```
 
 #### Request Validation
+
 ```typescript
 // Use Zod schemas for validation
-import { z } from 'zod'
+import { z } from 'zod';
 
 const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   first_name: z.string().min(1),
-  last_name: z.string().min(1)
-})
+  last_name: z.string().min(1),
+});
 
 export const createUser = async (req: Request, res: Response) => {
   try {
     // Validate request body
-    const validatedData = createUserSchema.parse(req.body)
-    
-    const user = await userService.createUser(validatedData)
-    res.status(201).success(user)
+    const validatedData = createUserSchema.parse(req.body);
+
+    const user = await userService.createUser(validatedData);
+    res.status(201).success(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         success: false,
         error: {
           message: 'Validation error',
-          details: error.errors
-        }
-      })
+          details: error.errors,
+        },
+      });
     }
-    res.error(error)
+    res.error(error);
   }
-}
+};
 ```
 
 ### Service Layer Patterns
 
 #### Service Structure
+
 ```typescript
 // src/services/user.service.ts
-import { userRepository } from '../database/repositories/user.repository'
-import { logger } from '../utils/logger'
+import { userRepository } from '../database/repositories/user.repository';
+import { logger } from '../utils/logger';
 
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     try {
-      return await userRepository.findAll()
+      return await userRepository.findAll();
     } catch (error) {
-      logger.error('Error fetching all users:', error)
-      throw new Error('Failed to fetch users')
+      logger.error('Error fetching all users:', error);
+      throw new Error('Failed to fetch users');
     }
   },
 
   async getUserById(id: string): Promise<User | null> {
     try {
       if (!id) {
-        throw new Error('User ID is required')
+        throw new Error('User ID is required');
       }
-      
-      return await userRepository.findById(id)
+
+      return await userRepository.findById(id);
     } catch (error) {
-      logger.error('Error fetching user by ID:', error)
-      throw new Error('Failed to fetch user')
+      logger.error('Error fetching user by ID:', error);
+      throw new Error('Failed to fetch user');
     }
   },
 
@@ -332,164 +352,171 @@ export const userService = {
     try {
       // Business logic validation
       if (userData.email.includes('admin')) {
-        throw new Error('Admin emails not allowed')
+        throw new Error('Admin emails not allowed');
       }
 
       // Check if user exists
-      const existingUser = await userRepository.findByEmail(userData.email)
+      const existingUser = await userRepository.findByEmail(userData.email);
       if (existingUser) {
-        throw new Error('User already exists')
+        throw new Error('User already exists');
       }
 
       // Hash password
-      const hashedPassword = await bcrypt.hash(userData.password, 10)
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
 
       // Create user
       const user = await userRepository.create({
         ...userData,
-        password: hashedPassword
-      })
+        password: hashedPassword,
+      });
 
-      logger.info('User created successfully:', { userId: user.id })
-      return user
+      logger.info('User created successfully:', { userId: user.id });
+      return user;
     } catch (error) {
-      logger.error('Error creating user:', error)
-      throw error
+      logger.error('Error creating user:', error);
+      throw error;
     }
-  }
-}
+  },
+};
 ```
 
 ### Repository Patterns
 
 #### Repository Structure
+
 ```typescript
 // src/database/repositories/user.repository.ts
-import { db } from '../db'
-import { User, CreateUserDto, UpdateUserDto } from '../../types/user.types'
+import { db } from '../db';
+import { User, CreateUserDto, UpdateUserDto } from '../../types/user.types';
 
 export const userRepository = {
   async findAll(): Promise<User[]> {
     try {
-      const result = await db.query('SELECT * FROM users WHERE is_active = true')
-      return result.rows
+      const result = await db.query(
+        'SELECT * FROM users WHERE is_active = true'
+      );
+      return result.rows;
     } catch (error) {
-      throw new Error('Failed to fetch users from database')
+      throw new Error('Failed to fetch users from database');
     }
   },
 
   async findById(id: string): Promise<User | null> {
     try {
-      const result = await db.query('SELECT * FROM users WHERE id = $1', [id])
-      return result.rows[0] || null
+      const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+      return result.rows[0] || null;
     } catch (error) {
-      throw new Error('Failed to fetch user from database')
+      throw new Error('Failed to fetch user from database');
     }
   },
 
   async findByEmail(email: string): Promise<User | null> {
     try {
-      const result = await db.query('SELECT * FROM users WHERE email = $1', [email])
-      return result.rows[0] || null
+      const result = await db.query('SELECT * FROM users WHERE email = $1', [
+        email,
+      ]);
+      return result.rows[0] || null;
     } catch (error) {
-      throw new Error('Failed to fetch user by email from database')
+      throw new Error('Failed to fetch user by email from database');
     }
   },
 
   async create(userData: CreateUserDto): Promise<User> {
     try {
-      const { email, password, first_name, last_name } = userData
+      const { email, password, first_name, last_name } = userData;
       const result = await db.query(
         'INSERT INTO users (email, password, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING *',
         [email, password, first_name, last_name]
-      )
-      return result.rows[0]
+      );
+      return result.rows[0];
     } catch (error) {
-      throw new Error('Failed to create user in database')
+      throw new Error('Failed to create user in database');
     }
   },
 
   async update(id: string, userData: UpdateUserDto): Promise<User> {
     try {
-      const fields = Object.keys(userData)
-      const values = Object.values(userData)
-      const setClause = fields.map((field, index) => `${field} = $${index + 2}`).join(', ')
-      
+      const fields = Object.keys(userData);
+      const values = Object.values(userData);
+      const setClause = fields
+        .map((field, index) => `${field} = $${index + 2}`)
+        .join(', ');
+
       const result = await db.query(
         `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *`,
         [id, ...values]
-      )
-      return result.rows[0]
+      );
+      return result.rows[0];
     } catch (error) {
-      throw new Error('Failed to update user in database')
+      throw new Error('Failed to update user in database');
     }
   },
 
   async delete(id: string): Promise<void> {
     try {
-      await db.query('UPDATE users SET is_active = false WHERE id = $1', [id])
+      await db.query('UPDATE users SET is_active = false WHERE id = $1', [id]);
     } catch (error) {
-      throw new Error('Failed to delete user from database')
+      throw new Error('Failed to delete user from database');
     }
-  }
-}
+  },
+};
 ```
 
 ## 🧪 Testing Guidelines
 
 ### Unit Testing
+
 ```typescript
 // tests/unit/services/user.service.test.ts
-import { userService } from '../../../src/services/user.service'
-import { userRepository } from '../../../src/database/repositories/user.repository'
+import { userService } from '../../../src/services/user.service';
+import { userRepository } from '../../../src/database/repositories/user.repository';
 
 // Mock the repository
-jest.mock('../../../src/database/repositories/user.repository')
+jest.mock('../../../src/database/repositories/user.repository');
 
 describe('User Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+  });
 
   describe('getUserById', () => {
     it('should return user when found', async () => {
-      const mockUser = { id: 1, email: 'test@example.com' }
-      ;(userRepository.findById as jest.Mock).mockResolvedValue(mockUser)
+      const mockUser = { id: 1, email: 'test@example.com' };
+      (userRepository.findById as jest.Mock).mockResolvedValue(mockUser);
 
-      const result = await userService.getUserById('1')
+      const result = await userService.getUserById('1');
 
-      expect(result).toEqual(mockUser)
-      expect(userRepository.findById).toHaveBeenCalledWith('1')
-    })
+      expect(result).toEqual(mockUser);
+      expect(userRepository.findById).toHaveBeenCalledWith('1');
+    });
 
     it('should return null when user not found', async () => {
-      ;(userRepository.findById as jest.Mock).mockResolvedValue(null)
+      (userRepository.findById as jest.Mock).mockResolvedValue(null);
 
-      const result = await userService.getUserById('999')
+      const result = await userService.getUserById('999');
 
-      expect(result).toBeNull()
-    })
-  })
-})
+      expect(result).toBeNull();
+    });
+  });
+});
 ```
 
 ### Integration Testing
+
 ```typescript
 // tests/integration/api/users.test.ts
-import request from 'supertest'
-import app from '../../../src/server'
+import request from 'supertest';
+import app from '../../../src/server';
 
 describe('Users API', () => {
   describe('GET /api/users', () => {
     it('should return all users', async () => {
-      const response = await request(app)
-        .get('/api/users')
-        .expect(200)
+      const response = await request(app).get('/api/users').expect(200);
 
-      expect(response.body.success).toBe(true)
-      expect(Array.isArray(response.body.data)).toBe(true)
-    })
-  })
+      expect(response.body.success).toBe(true);
+      expect(Array.isArray(response.body.data)).toBe(true);
+    });
+  });
 
   describe('POST /api/users', () => {
     it('should create a new user', async () => {
@@ -497,74 +524,81 @@ describe('Users API', () => {
         email: 'test@example.com',
         password: 'password123',
         first_name: 'Test',
-        last_name: 'User'
-      }
+        last_name: 'User',
+      };
 
       const response = await request(app)
         .post('/api/users')
         .send(userData)
-        .expect(201)
+        .expect(201);
 
-      expect(response.body.success).toBe(true)
-      expect(response.body.data.email).toBe(userData.email)
-    })
-  })
-})
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.email).toBe(userData.email);
+    });
+  });
+});
 ```
 
 ## 🔒 Security Best Practices
 
 ### Input Validation
+
 ```typescript
 // Use Zod for schema validation
-import { z } from 'zod'
+import { z } from 'zod';
 
 const userSchema = z.object({
   email: z.string().email().max(255),
   password: z.string().min(8).max(100),
   first_name: z.string().min(1).max(100),
-  last_name: z.string().min(1).max(100)
-})
+  last_name: z.string().min(1).max(100),
+});
 
 // Validate all inputs
-const validatedData = userSchema.parse(req.body)
+const validatedData = userSchema.parse(req.body);
 ```
 
 ### Password Security
+
 ```typescript
 // Hash passwords with bcrypt
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 
 const hashPassword = async (password: string): Promise<string> => {
-  const saltRounds = 12
-  return await bcrypt.hash(password, saltRounds)
-}
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+};
 
-const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
-  return await bcrypt.compare(password, hash)
-}
+const verifyPassword = async (
+  password: string,
+  hash: string
+): Promise<boolean> => {
+  return await bcrypt.compare(password, hash);
+};
 ```
 
 ### SQL Injection Prevention
+
 ```typescript
 // Always use parameterized queries
 const getUserById = async (id: string) => {
   // ✅ Good - parameterized query
-  const result = await db.query('SELECT * FROM users WHERE id = $1', [id])
-  
+  const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+
   // ❌ Bad - string concatenation
   // const result = await db.query(`SELECT * FROM users WHERE id = ${id}`)
-  
-  return result.rows[0]
-}
+
+  return result.rows[0];
+};
 ```
 
 ## 📊 Logging and Monitoring
 
 ### Structured Logging
+
 ```typescript
 // src/utils/logger.ts
-import winston from 'winston'
+import winston from 'winston';
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -577,74 +611,80 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
     new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Console({
-      format: winston.format.simple()
-    })
-  ]
-})
+      format: winston.format.simple(),
+    }),
+  ],
+});
 
-export default logger
+export default logger;
 ```
 
 ### Logging Best Practices
+
 ```typescript
 // Log important events
-logger.info('User created successfully', { userId: user.id, email: user.email })
+logger.info('User created successfully', {
+  userId: user.id,
+  email: user.email,
+});
 
 // Log errors with context
-logger.error('Database connection failed', { 
-  error: error.message, 
+logger.error('Database connection failed', {
+  error: error.message,
   stack: error.stack,
-  database: process.env.DB_NAME 
-})
+  database: process.env.DB_NAME,
+});
 
 // Log API requests
 logger.info('API request', {
   method: req.method,
   url: req.url,
   userAgent: req.get('User-Agent'),
-  ip: req.ip
-})
+  ip: req.ip,
+});
 ```
 
 ## 🚀 Performance Optimization
 
 ### Database Optimization
+
 ```typescript
 // Use connection pooling
 const pool = new Pool({
   max: 20, // Maximum connections
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
-})
+  connectionTimeoutMillis: 2000,
+});
 
 // Use prepared statements
-const getUserById = pool.query('SELECT * FROM users WHERE id = $1')
+const getUserById = pool.query('SELECT * FROM users WHERE id = $1');
 
 // Implement pagination
 const getUsers = async (page: number = 1, limit: number = 10) => {
-  const offset = (page - 1) * limit
+  const offset = (page - 1) * limit;
   const result = await db.query(
     'SELECT * FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2',
     [limit, offset]
-  )
-  return result.rows
-}
+  );
+  return result.rows;
+};
 ```
 
 ### Memory Management
+
 ```typescript
 // Avoid memory leaks
 const processLargeDataset = async () => {
-  const stream = db.query('SELECT * FROM large_table')
-  
+  const stream = db.query('SELECT * FROM large_table');
+
   for await (const row of stream) {
     // Process row
-    processRow(row)
-    
+    processRow(row);
+
     // Don't accumulate in memory
     // Process and release
   }
-}
+};
 ```
 
 ## 📚 Additional Resources

@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { z } from "zod";
-import { StatusCodes } from "http-status-codes";
-import { ServiceResponse } from "../doc/serviceResponse";
+import { Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
+import { StatusCodes } from 'http-status-codes';
+import { ServiceResponse } from '../doc/serviceResponse';
 
 interface ValidationSchemas {
   paramsSchema?: Record<string, z.ZodSchema>;
@@ -14,12 +14,19 @@ interface ServiceResponseType {
   [key: string]: any;
 }
 
-export const handleServiceResponse = (serviceResponse: ServiceResponseType, response: Response): Response => {
+export const handleServiceResponse = (
+  serviceResponse: ServiceResponseType,
+  response: Response
+): Response => {
   return response.status(serviceResponse.statusCode).send(serviceResponse);
 };
 
 export const validateRequest =
-  ({ paramsSchema = {}, querySchema = null, bodySchema = null }: ValidationSchemas) =>
+  ({
+    paramsSchema = {},
+    querySchema = null,
+    bodySchema = null,
+  }: ValidationSchemas) =>
   (req: Request, res: Response, next: NextFunction): void => {
     try {
       if (Object.keys(paramsSchema)?.length > 0) {
@@ -39,7 +46,7 @@ export const validateRequest =
     } catch (err: any) {
       const errorMessage = `Invalid input: ${err.errors
         .map((e: any) => e.message)
-        .join(", ")}`;
+        .join(', ')}`;
       const statusCode = StatusCodes.BAD_REQUEST;
       const serviceResponse = ServiceResponse.failure(
         errorMessage,

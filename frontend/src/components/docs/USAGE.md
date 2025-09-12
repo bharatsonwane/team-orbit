@@ -5,6 +5,7 @@ Detailed usage examples and patterns for all components in the Lokvani frontend.
 ## 🎨 UI Components
 
 ### Button
+
 ```tsx
 import { Button } from "@/components/ui/button"
 
@@ -35,6 +36,7 @@ import { Button } from "@/components/ui/button"
 ```
 
 ### Input
+
 ```tsx
 import { Input } from "@/components/ui/input"
 
@@ -61,6 +63,7 @@ import { Input } from "@/components/ui/input"
 ```
 
 ### Card
+
 ```tsx
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -86,59 +89,60 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 ```
 
 ### Form Components
+
 ```tsx
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Form with validation
-<form onSubmit={handleSubmit} className="space-y-4">
-  <div className="space-y-2">
-    <Label htmlFor="name">Name</Label>
+<form onSubmit={handleSubmit} className='space-y-4'>
+  <div className='space-y-2'>
+    <Label htmlFor='name'>Name</Label>
     <Input
-      id="name"
+      id='name'
       value={name}
-      onChange={(e) => setName(e.target.value)}
+      onChange={e => setName(e.target.value)}
       required
     />
   </div>
-  <Button type="submit">Submit</Button>
-</form>
+  <Button type='submit'>Submit</Button>
+</form>;
 ```
 
 ## 🎨 Custom Components
 
 ### ThemeProvider
+
 ```tsx
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from '@/components/theme-provider';
 
 // Wrap your app
 function App() {
   return (
-    <ThemeProvider defaultTheme="system">
+    <ThemeProvider defaultTheme='system'>
       <YourApp />
     </ThemeProvider>
-  )
+  );
 }
 
 // Usage in components
-import { useTheme } from "@/components/theme-provider"
+import { useTheme } from '@/components/theme-provider';
 
 function MyComponent() {
-  const { theme, setTheme } = useTheme()
-  
+  const { theme, setTheme } = useTheme();
+
   return (
     <div>
       <p>Current theme: {theme}</p>
-      <button onClick={() => setTheme("dark")}>
-        Switch to Dark
-      </button>
+      <button onClick={() => setTheme('dark')}>Switch to Dark</button>
     </div>
-  )
+  );
 }
 ```
 
 ### ThemeToggle
+
 ```tsx
 import { ThemeToggle } from "@/components/theme-toggle"
 
@@ -160,6 +164,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ## 🎨 Styling Patterns
 
 ### Theme-Aware Styling
+
 ```tsx
 // Background and text colors
 <div className="bg-background text-foreground">
@@ -176,6 +181,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ```
 
 ### Responsive Design
+
 ```tsx
 // Responsive grid
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -188,6 +194,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ```
 
 ### Layout Patterns
+
 ```tsx
 // Page layout
 <div className="min-h-screen bg-background">
@@ -215,6 +222,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ## 🔧 Component Composition
 
 ### Building Complex Components
+
 ```tsx
 // Form component
 function UserForm({ user, onSubmit, onCancel }) {
@@ -224,72 +232,75 @@ function UserForm({ user, onSubmit, onCancel }) {
         <CardTitle>User Information</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" defaultValue={user?.firstName} />
+        <form onSubmit={onSubmit} className='space-y-4'>
+          <div className='grid grid-cols-2 gap-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='firstName'>First Name</Label>
+              <Input id='firstName' defaultValue={user?.firstName} />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" defaultValue={user?.lastName} />
+            <div className='space-y-2'>
+              <Label htmlFor='lastName'>Last Name</Label>
+              <Input id='lastName' defaultValue={user?.lastName} />
             </div>
           </div>
         </form>
       </CardContent>
       <CardFooter>
-        <Button onClick={onCancel} variant="outline">Cancel</Button>
-        <Button type="submit">Save</Button>
+        <Button onClick={onCancel} variant='outline'>
+          Cancel
+        </Button>
+        <Button type='submit'>Save</Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 ```
 
 ### Reusable Patterns
+
 ```tsx
 // Loading state
 function LoadingButton({ loading, children, ...props }) {
   return (
     <Button disabled={loading} {...props}>
-      {loading ? "Loading..." : children}
+      {loading ? 'Loading...' : children}
     </Button>
-  )
+  );
 }
 
 // Error display
 function ErrorMessage({ error }) {
-  if (!error) return null
-  
-  return (
-    <div className="text-sm text-destructive">
-      {error}
-    </div>
-  )
+  if (!error) return null;
+
+  return <div className='text-sm text-destructive'>{error}</div>;
 }
 ```
 
 ## 🎯 Best Practices
 
 ### 1. Component Design
+
 - Keep components small and focused
 - Use TypeScript interfaces for props
 - Include default values for optional props
 - Export as default for page components
 
 ### 2. Styling
+
 - Use theme-aware CSS classes
 - Follow responsive design patterns
 - Maintain consistent spacing
 - Test in both light and dark modes
 
 ### 3. Accessibility
+
 - Include proper ARIA labels
 - Support keyboard navigation
 - Ensure proper contrast ratios
 - Use semantic HTML elements
 
 ### 4. Performance
+
 - Use React.memo for expensive components
 - Avoid unnecessary re-renders
 - Optimize bundle size

@@ -13,7 +13,10 @@ export interface Notification {
 // Get notification action
 export const getNotificationAction = createAsyncThunk(
   'notification/getNotificationAction',
-  async (notification: Omit<Notification, 'id' | 'timestamp'>, { rejectWithValue }) => {
+  async (
+    notification: Omit<Notification, 'id' | 'timestamp'>,
+    { rejectWithValue }
+  ) => {
     try {
       // Generate unique ID
       const notificationId = `notification-${Date.now()}-${Math.random()
@@ -30,9 +33,7 @@ export const getNotificationAction = createAsyncThunk(
 
       return fullNotification;
     } catch (error: any) {
-      return rejectWithValue(
-        error.message || "Failed to create notification"
-      );
+      return rejectWithValue(error.message || 'Failed to create notification');
     }
   }
 );

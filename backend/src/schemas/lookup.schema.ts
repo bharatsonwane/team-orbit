@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { docRegistry } from "../doc/openAPIDocumentGenerator";
-import { createApiResponse } from "../doc/openAPIDocumentGenerator";
-import { idSchema } from "./common.schema";
+import { z } from 'zod';
+import { docRegistry } from '../doc/openAPIDocumentGenerator';
+import { createApiResponse } from '../doc/openAPIDocumentGenerator';
+import { idSchema } from './common.schema';
 
 const LookupSchema = z.object({
   id: z.number(),

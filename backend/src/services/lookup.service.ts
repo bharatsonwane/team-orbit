@@ -1,5 +1,5 @@
-import db from "../database/db";
-import { HttpError } from "../utils/httpError";
+import db from '../database/db';
+import { HttpError } from '../utils/httpError';
 
 interface LookupType {
   id: number;
@@ -44,7 +44,7 @@ export default class Lookup {
       } = row;
 
       // Find or create the LookupType entry
-      let lookupType = acc.find((item) => item.id === lookupTypeId);
+      let lookupType = acc.find(item => item.id === lookupTypeId);
       if (!lookupType) {
         lookupType = {
           id: lookupTypeId,
@@ -86,7 +86,7 @@ export default class Lookup {
     const results = await db.query(queryString);
 
     if (results.length === 0) {
-      throw new HttpError("Lookup Type not found", 404);
+      throw new HttpError('Lookup Type not found', 404);
     }
 
     const lookupType = results[0];
@@ -119,7 +119,7 @@ export default class Lookup {
     const results = await db.query(queryString);
 
     if (results.length === 0) {
-      throw new HttpError("Lookup Pending user_status not found.", 404);
+      throw new HttpError('Lookup Pending user_status not found.', 404);
     }
 
     return results[0].id;
@@ -134,7 +134,7 @@ export default class Lookup {
     const results = await db.query(queryString);
 
     if (results.length === 0) {
-      throw new HttpError("Lookup User user_role not found.", 404);
+      throw new HttpError('Lookup User user_role not found.', 404);
     }
 
     return results[0].id;

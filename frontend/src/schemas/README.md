@@ -14,12 +14,15 @@ src/schemas/
 ## 🛠️ Schema Files
 
 ### `auth.ts`
+
 Contains authentication-related Zod schemas and TypeScript types. Includes user schemas, login/register validation, and complex types that can't be easily expressed in Zod (like AuthState and Route interfaces).
 
 ### `validation.ts`
+
 Contains Zod validation schemas for form validation throughout the application. Provides reusable validation rules for forms, common field validations, and TypeScript type inference.
 
 **Features:**
+
 - ✅ **Form validation schemas** - Login, signup, and common field validations
 - ✅ **Reusable field schemas** - Email, password, name validation rules
 - ✅ **TypeScript integration** - Automatic type inference from schemas
@@ -29,10 +32,16 @@ Contains Zod validation schemas for form validation throughout the application. 
 ## 🚀 Usage
 
 ### Form Validation
+
 ```tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from '@/schemas/validation';
+import {
+  loginSchema,
+  signupSchema,
+  type LoginFormData,
+  type SignupFormData,
+} from '@/schemas/validation';
 
 // Login form
 function LoginForm() {
@@ -56,7 +65,7 @@ function LoginForm() {
       <input {...register('password')} />
       {errors.password && <span>{errors.password.message}</span>}
 
-      <button type="submit">Login</button>
+      <button type='submit'>Login</button>
     </form>
   );
 }
@@ -92,13 +101,14 @@ function SignupForm() {
       <input {...register('confirmPassword')} />
       {errors.confirmPassword && <span>{errors.confirmPassword.message}</span>}
 
-      <button type="submit">Sign Up</button>
+      <button type='submit'>Sign Up</button>
     </form>
   );
 }
 ```
 
 ### Using Individual Validation Schemas
+
 ```tsx
 import { emailSchema, passwordSchema, nameSchema } from '@/schemas/validation';
 import { z } from 'zod';
@@ -116,37 +126,44 @@ type CustomFormData = z.infer<typeof customSchema>;
 ### Available Schemas
 
 #### **Complete Form Schemas:**
+
 - `loginSchema` - Email and password validation
 - `signupSchema` - First name, last name, email, password, and confirm password validation
 
 #### **Individual Field Schemas:**
+
 - `emailSchema` - Email format validation
 - `passwordSchema` - Strong password validation (uppercase, lowercase, number, min 6 chars)
 - `nameSchema` - Name validation (min 2 characters)
 
 #### **TypeScript Types:**
+
 - `LoginFormData` - Inferred type from loginSchema
 - `SignupFormData` - Inferred type from signupSchema
 
 ## 📝 Schema Details
 
 ### Email Schema
+
 - ✅ **Required field** - Email cannot be empty
 - ✅ **Valid format** - Must be a valid email address
 - ✅ **Custom error messages** - User-friendly error messages
 
 ### Password Schema
+
 - ✅ **Required field** - Password cannot be empty
 - ✅ **Minimum length** - At least 6 characters
 - ✅ **Complexity requirements** - Must contain uppercase, lowercase, and number
 - ✅ **Custom error messages** - Clear validation feedback
 
 ### Name Schema
+
 - ✅ **Required field** - Name cannot be empty
 - ✅ **Minimum length** - At least 2 characters
 - ✅ **Custom error messages** - User-friendly validation
 
 ### Signup Schema
+
 - ✅ **All field validations** - First name, last name, email, password
 - ✅ **Password confirmation** - Ensures passwords match
 - ✅ **Cross-field validation** - Validates password confirmation matches password
@@ -154,16 +171,19 @@ type CustomFormData = z.infer<typeof customSchema>;
 ## 🔧 Integration
 
 ### React Hook Form + Zod Resolver
+
 ```bash
 npm install react-hook-form @hookform/resolvers zod
 ```
 
 ### TypeScript Support
+
 The schemas provide automatic TypeScript type inference, ensuring type safety throughout your forms.
 
 ## 📚 Related Documentation
 
 For more information about form handling and validation:
+
 - [React Hook Form Documentation](https://react-hook-form.com/)
 - [Zod Documentation](https://zod.dev/)
 - [@hookform/resolvers Documentation](https://github.com/react-hook-form/resolvers)

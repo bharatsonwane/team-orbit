@@ -5,6 +5,7 @@ This document describes all the components used in the Lokvani frontend applicat
 ## 📦 shadcn/ui Components
 
 ### Button
+
 **File:** `src/components/ui/button.tsx`
 
 A versatile button component with multiple variants and sizes.
@@ -31,22 +32,24 @@ import { Button } from "@/components/ui/button"
 ```
 
 ### Input
+
 **File:** `src/components/ui/input.tsx`
 
 Form input component with theme support.
 
 ```tsx
-import { Input } from "@/components/ui/input"
+import { Input } from '@/components/ui/input';
 
-<Input 
-  type="email" 
-  placeholder="Enter email"
+<Input
+  type='email'
+  placeholder='Enter email'
   value={email}
-  onChange={(e) => setEmail(e.target.value)}
-/>
+  onChange={e => setEmail(e.target.value)}
+/>;
 ```
 
 ### Label
+
 **File:** `src/components/ui/label.tsx`
 
 Accessible label component for form inputs.
@@ -59,12 +62,20 @@ import { Label } from "@/components/ui/label"
 ```
 
 ### Card
+
 **File:** `src/components/ui/card.tsx`
 
 Container component for grouping related content.
 
 ```tsx
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 <Card>
   <CardHeader>
@@ -77,64 +88,75 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
   <CardFooter>
     <Button>Action</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 ### Dropdown Menu
+
 **File:** `src/components/ui/dropdown-menu.tsx`
 
 Dropdown menu component for the theme toggle.
 
 ```tsx
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
-    <Button variant="outline">Open</Button>
+    <Button variant='outline'>Open</Button>
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     <DropdownMenuItem>Option 1</DropdownMenuItem>
     <DropdownMenuItem>Option 2</DropdownMenuItem>
   </DropdownMenuContent>
-</DropdownMenu>
+</DropdownMenu>;
 ```
 
 ## 🎨 Custom Components
 
 ### ThemeProvider
+
 **File:** `src/components/theme-provider.tsx`
 
 Custom theme context provider for managing theme state.
 
 ```tsx
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from '@/components/theme-provider';
 
 // Wrap your app
-<ThemeProvider defaultTheme="system">
+<ThemeProvider defaultTheme='system'>
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 **Props:**
+
 - `defaultTheme`: "light" | "dark" | "system"
 - `storageKey`: string (default: "vite-ui-theme")
 
 **Context Value:**
+
 - `theme`: Current theme
 - `setTheme`: Function to change theme
 
 ### ThemeToggle
+
 **File:** `src/components/theme-toggle.tsx`
 
 Interactive theme switcher component.
 
 ```tsx
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from '@/components/theme-toggle';
 
-<ThemeToggle />
+<ThemeToggle />;
 ```
 
 **Features:**
+
 - Sun/Moon icons with smooth transitions
 - Dropdown menu with Light/Dark/System options
 - Accessible with proper ARIA labels
@@ -143,22 +165,26 @@ import { ThemeToggle } from "@/components/theme-toggle"
 ## 📄 Page Components
 
 ### Home
+
 **File:** `src/pages/Home.tsx`
 
 Landing page with navigation to auth pages.
 
 **Features:**
+
 - Hero section with call-to-action
 - Feature cards showcasing capabilities
 - Navigation buttons to login/signup
 - Theme toggle in header
 
 ### Login
+
 **File:** `src/pages/Login.tsx`
 
 User authentication page.
 
 **Features:**
+
 - Email and password fields
 - Form validation
 - Loading states
@@ -166,15 +192,18 @@ User authentication page.
 - Redirect to dashboard on success
 
 **Form Fields:**
+
 - Email (required, email validation)
 - Password (required)
 
 ### Signup
+
 **File:** `src/pages/Signup.tsx`
 
 User registration page.
 
 **Features:**
+
 - Complete registration form
 - Real-time validation
 - Error handling with visual feedback
@@ -183,6 +212,7 @@ User registration page.
 - Redirect to dashboard on success
 
 **Form Fields:**
+
 - First Name (required)
 - Last Name (required)
 - Email (required, email validation)
@@ -190,11 +220,13 @@ User registration page.
 - Confirm Password (required, must match)
 
 ### Dashboard
+
 **File:** `src/pages/Dashboard.tsx`
 
 Demo page showcasing theme capabilities.
 
 **Features:**
+
 - Theme demonstration cards
 - Interactive elements showcase
 - Navigation menu
@@ -203,6 +235,7 @@ Demo page showcasing theme capabilities.
 ## 🎨 Styling Guidelines
 
 ### Theme-Aware Classes
+
 All components use theme-aware CSS classes:
 
 ```tsx
@@ -220,6 +253,7 @@ All components use theme-aware CSS classes:
 ```
 
 ### Responsive Design
+
 Components are built with mobile-first responsive design:
 
 ```tsx
@@ -234,6 +268,7 @@ Components are built with mobile-first responsive design:
 ```
 
 ### Accessibility
+
 All components follow accessibility best practices:
 
 - Proper ARIA labels
@@ -255,20 +290,20 @@ All components follow accessibility best practices:
 ### Example Component Structure
 
 ```tsx
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 
 interface MyComponentProps {
-  title: string
-  onAction?: () => void
+  title: string;
+  onAction?: () => void;
 }
 
 export default function MyComponent({ title, onAction }: MyComponentProps) {
   return (
-    <div className="bg-card text-card-foreground p-4 rounded-lg">
-      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+    <div className='bg-card text-card-foreground p-4 rounded-lg'>
+      <h2 className='text-lg font-semibold mb-2'>{title}</h2>
       <Button onClick={onAction}>Action</Button>
     </div>
-  )
+  );
 }
 ```
 

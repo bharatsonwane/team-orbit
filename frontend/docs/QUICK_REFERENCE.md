@@ -5,6 +5,7 @@ Quick commands and common tasks for the Lokvani frontend project.
 ## 🚀 Common Commands
 
 ### Development
+
 ```bash
 # Start development server
 npm run dev
@@ -20,6 +21,7 @@ npm run lint
 ```
 
 ### Adding Components
+
 ```bash
 # Add shadcn/ui component
 npx shadcn@latest add [component-name]
@@ -31,6 +33,7 @@ npx shadcn@latest add form
 ```
 
 ### Project Structure
+
 ```
 frontend/
 ├── docs/                    # Documentation
@@ -53,6 +56,7 @@ frontend/
 ## 🎨 Theme Development
 
 ### Theme Classes
+
 ```tsx
 // Background and text
 <div className="bg-background text-foreground">
@@ -65,80 +69,86 @@ frontend/
 ```
 
 ### Theme Toggle
+
 ```tsx
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from '@/components/theme-toggle';
 
 // Add to any page
-<div className="absolute top-4 right-4">
+<div className='absolute top-4 right-4'>
   <ThemeToggle />
-</div>
+</div>;
 ```
 
 ## 🔧 Component Development
 
 ### Creating New Components
+
 ```tsx
 // src/components/MyComponent.tsx
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 
 interface MyComponentProps {
-  title: string
-  onAction?: () => void
+  title: string;
+  onAction?: () => void;
 }
 
 export default function MyComponent({ title, onAction }: MyComponentProps) {
   return (
-    <div className="bg-card text-card-foreground p-4 rounded-lg">
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+    <div className='bg-card text-card-foreground p-4 rounded-lg'>
+      <h3 className='text-lg font-semibold mb-2'>{title}</h3>
       <Button onClick={onAction}>Action</Button>
     </div>
-  )
+  );
 }
 ```
 
 ### Creating New Pages
+
 ```tsx
 // src/pages/NewPage.tsx
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function NewPage() {
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="absolute top-4 right-4">
+    <div className='min-h-screen bg-background relative'>
+      <div className='absolute top-4 right-4'>
         <ThemeToggle />
       </div>
       {/* Page content */}
     </div>
-  )
+  );
 }
 ```
 
 ## 🛣️ Routing
 
 ### Adding New Routes
+
 ```tsx
 // src/App.tsx
-import NewPage from "./pages/NewPage"
+import NewPage from './pages/NewPage';
 
 // Add to Routes
-<Route path="/new-page" element={<NewPage />} />
+<Route path='/new-page' element={<NewPage />} />;
 ```
 
 ### Navigation
+
 ```tsx
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from 'react-router-dom';
 
 // Link component
-<Link to="/dashboard">Go to Dashboard</Link>
+<Link to='/dashboard'>Go to Dashboard</Link>;
 
 // Programmatic navigation
-const navigate = useNavigate()
-navigate("/dashboard")
+const navigate = useNavigate();
+navigate('/dashboard');
 ```
 
 ## 🎨 Styling Guidelines
 
 ### Responsive Design
+
 ```tsx
 // Mobile-first approach
 <div className="p-4 md:p-6 lg:p-8">
@@ -147,6 +157,7 @@ navigate("/dashboard")
 ```
 
 ### Spacing
+
 ```tsx
 // Consistent spacing
 <div className="space-y-4">  // Vertical spacing
@@ -158,16 +169,19 @@ navigate("/dashboard")
 ## 🔍 Common Issues
 
 ### Path Alias Not Working
+
 - Check `tsconfig.json` and `tsconfig.app.json`
 - Verify `vite.config.ts` has resolve alias
 - Restart dev server
 
 ### Theme Not Working
+
 - Ensure `ThemeProvider` wraps the app
 - Check CSS variables in `index.css`
 - Verify `useTheme` is used within provider
 
 ### Components Not Styled
+
 - Check Tailwind CSS configuration
 - Verify `@import "tailwindcss"` in `index.css`
 - Ensure correct class names

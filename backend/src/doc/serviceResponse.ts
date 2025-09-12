@@ -1,5 +1,5 @@
-import { StatusCodes } from "http-status-codes";
-import { z } from "zod";
+import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 
 class ServiceResponse {
   public success: boolean;
@@ -7,14 +7,23 @@ class ServiceResponse {
   public responseObject: any;
   public statusCode: number;
 
-  constructor(success: boolean, message: string, responseObject: any, statusCode: number) {
+  constructor(
+    success: boolean,
+    message: string,
+    responseObject: any,
+    statusCode: number
+  ) {
     this.success = success;
     this.message = message;
     this.responseObject = responseObject;
     this.statusCode = statusCode;
   }
 
-  static success(message: string, responseObject: any, statusCode: number = StatusCodes.OK): ServiceResponse {
+  static success(
+    message: string,
+    responseObject: any,
+    statusCode: number = StatusCodes.OK
+  ): ServiceResponse {
     return new ServiceResponse(true, message, responseObject, statusCode);
   }
 

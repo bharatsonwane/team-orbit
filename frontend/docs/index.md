@@ -5,6 +5,7 @@ Welcome to the comprehensive documentation for the Lokvani frontend application.
 ## 🚀 Quick Start
 
 **New to the project?** Start here:
+
 1. [Project Setup](./setup/SETUP.md) - Get the project running locally
 2. [Quick Reference](./QUICK_REFERENCE.md) - Common commands and patterns
 3. [Development Guidelines](./development/DEVELOPMENT.md) - Best practices
@@ -12,31 +13,37 @@ Welcome to the comprehensive documentation for the Lokvani frontend application.
 ## 📚 Complete Documentation
 
 ### Setup & Configuration
+
 - **[Project Setup](./setup/SETUP.md)** - Complete setup guide from scratch
 - **[Development Guidelines](./development/DEVELOPMENT.md)** - Development best practices and patterns
 
 ### Features & Components
+
 - **[Theming System](./features/THEMING.md)** - Dark/light mode theming implementation
 - **[Authentication](./features/AUTHENTICATION.md)** - Login/signup pages and user flows
 - **[Routing & Navigation](./features/ROUTING.md)** - React Router setup and navigation
 - **[Components](./components/COMPONENTS.md)** - Component library and usage
 
 ### Deployment & Operations
+
 - **[Deployment Guide](./deployment/DEPLOYMENT.md)** - Production deployment to various platforms
 
 ## 🎯 Common Tasks
 
 ### For Developers
+
 - **Adding new components** → [Components Guide](./components/COMPONENTS.md)
 - **Working with themes** → [Theming Guide](./features/THEMING.md)
 - **Creating new pages** → [Development Guide](./development/DEVELOPMENT.md)
 - **Setting up routing** → [Routing Guide](./features/ROUTING.md)
 
 ### For DevOps
+
 - **Deploying to production** → [Deployment Guide](./deployment/DEPLOYMENT.md)
 - **Environment configuration** → [Setup Guide](./setup/SETUP.md)
 
 ### For Contributors
+
 - **Understanding the codebase** → [Development Guide](./development/DEVELOPMENT.md)
 - **Component patterns** → [Components Guide](./components/COMPONENTS.md)
 - **Project setup** → [Setup Guide](./setup/SETUP.md)
@@ -81,4 +88,4 @@ When making changes to the project, please update the relevant documentation:
 
 ---
 
-*This documentation is maintained alongside the codebase. Please keep it updated when making changes to the project.*
+_This documentation is maintained alongside the codebase. Please keep it updated when making changes to the project._

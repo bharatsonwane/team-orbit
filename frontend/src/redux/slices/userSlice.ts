@@ -23,10 +23,10 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
-    logout: (state) => {
+    logout: state => {
       state.user = null;
       state.isAuthenticated = false;
       state.error = null;
@@ -39,10 +39,10 @@ const userSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Handle login action
     builder
-      .addCase(loginAction.pending, (state) => {
+      .addCase(loginAction.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -69,6 +69,8 @@ export default userSlice;
 
 // Selectors
 export const selectUser = (state: { user: UserState }) => state.user.user;
-export const selectIsAuthenticated = (state: { user: UserState }) => state.user.isAuthenticated;
-export const selectUserLoading = (state: { user: UserState }) => state.user.isLoading;
+export const selectIsAuthenticated = (state: { user: UserState }) =>
+  state.user.isAuthenticated;
+export const selectUserLoading = (state: { user: UserState }) =>
+  state.user.isLoading;
 export const selectUserError = (state: { user: UserState }) => state.user.error;

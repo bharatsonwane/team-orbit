@@ -1,24 +1,24 @@
-import { z } from "zod";
-import dotenv from "dotenv";
-import logger from "../utils/logger";
+import { z } from 'zod';
+import dotenv from 'dotenv';
+import logger from '../utils/logger';
 
 dotenv.config();
 
 const envVariableSchema = z.object({
   /* server */
-  NODE_ENV: z.enum(["development", "production", "test"]),
-  API_HOST: z.string().url({ message: "API_HOST must be a valid URL" }),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
+  API_HOST: z.string().url({ message: 'API_HOST must be a valid URL' }),
   API_PORT: z.number().int().positive(),
 
   /* database */
-  DB_HOST: z.string().min(3, "DB_HOST is mandatory"),
-  DB_USER: z.string().min(3, "DB_USER is mandatory"),
-  DB_PASSWORD: z.string().min(1, "DB_PASSWORD is mandatory"),
-  DB_NAME: z.string().min(1, "DB_NAME is mandatory"),
-  DB_PORT: z.number().min(1, "DB_PORT is mandatory"),
+  DB_HOST: z.string().min(3, 'DB_HOST is mandatory'),
+  DB_USER: z.string().min(3, 'DB_USER is mandatory'),
+  DB_PASSWORD: z.string().min(1, 'DB_PASSWORD is mandatory'),
+  DB_NAME: z.string().min(1, 'DB_NAME is mandatory'),
+  DB_PORT: z.number().min(1, 'DB_PORT is mandatory'),
 
   /* auth */
-  JWT_SECRET: z.string().min(6, "JWT_SECRET is mandatory"),
+  JWT_SECRET: z.string().min(6, 'JWT_SECRET is mandatory'),
 });
 
 // Type inference from the schema
@@ -27,7 +27,7 @@ type EnvVariable = z.infer<typeof envVariableSchema>;
 const getEnvVariable = (): EnvVariable => {
   try {
     // DEBUG LOG: show raw process.env values
-    console.log("Loaded ENV values:");
+    console.log('Loaded ENV values:');
     console.log({
       NODE_ENV: process.env.NODE_ENV,
       API_HOST: process.env.API_HOST,
@@ -41,7 +41,7 @@ const getEnvVariable = (): EnvVariable => {
     });
 
     const environmentVariable: EnvVariable = {
-      NODE_ENV: process.env.NODE_ENV as EnvVariable["NODE_ENV"],
+      NODE_ENV: process.env.NODE_ENV as EnvVariable['NODE_ENV'],
       API_HOST: process.env.API_HOST!,
       API_PORT: Number(process.env.API_PORT),
       DB_HOST: process.env.DB_HOST!,
@@ -56,7 +56,7 @@ const getEnvVariable = (): EnvVariable => {
     return environmentVariable;
   } catch (error) {
     logger.error(error);
-    throw new Error("Environment variable validation failed");
+    throw new Error('Environment variable validation failed');
   }
 };
 

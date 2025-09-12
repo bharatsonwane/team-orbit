@@ -12,6 +12,7 @@ Complete API reference for the Lokvani backend application.
 The Lokvani API is a RESTful API built with Express.js and TypeScript. It provides endpoints for user management, authentication, and real-time chat functionality.
 
 ### Features
+
 - JWT-based authentication
 - User management
 - Real-time chat with Socket.IO
@@ -30,6 +31,7 @@ Authorization: Bearer <your-jwt-token>
 ### Authentication Endpoints
 
 #### Login
+
 ```http
 POST /api/auth/login
 Content-Type: application/json
@@ -41,6 +43,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -58,6 +61,7 @@ Content-Type: application/json
 ```
 
 #### Register
+
 ```http
 POST /api/auth/register
 Content-Type: application/json
@@ -71,6 +75,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -88,12 +93,14 @@ Content-Type: application/json
 ```
 
 #### Logout
+
 ```http
 POST /api/auth/logout
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -102,12 +109,14 @@ Authorization: Bearer <token>
 ```
 
 #### Get Profile
+
 ```http
 GET /api/auth/profile
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -127,12 +136,14 @@ Authorization: Bearer <token>
 ### User Endpoints
 
 #### Get All Users
+
 ```http
 GET /api/users
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -150,12 +161,14 @@ Authorization: Bearer <token>
 ```
 
 #### Get User by ID
+
 ```http
 GET /api/users/:id
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -171,6 +184,7 @@ Authorization: Bearer <token>
 ```
 
 #### Update User
+
 ```http
 PUT /api/users/:id
 Authorization: Bearer <token>
@@ -183,6 +197,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -198,12 +213,14 @@ Content-Type: application/json
 ```
 
 #### Delete User
+
 ```http
 DELETE /api/users/:id
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -216,12 +233,14 @@ Authorization: Bearer <token>
 ### Chat Messages
 
 #### Get Messages
+
 ```http
 GET /api/chat/messages?roomId=1&limit=50&offset=0
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -239,6 +258,7 @@ Authorization: Bearer <token>
 ```
 
 #### Send Message
+
 ```http
 POST /api/chat/messages
 Authorization: Bearer <token>
@@ -252,6 +272,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -267,12 +288,14 @@ Content-Type: application/json
 ```
 
 #### Get Chat Rooms
+
 ```http
 GET /api/chat/rooms
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -290,11 +313,13 @@ Authorization: Bearer <token>
 ## 🔍 System Endpoints
 
 ### Health Check
+
 ```http
 GET /health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "OK",
@@ -304,6 +329,7 @@ GET /health
 ```
 
 ### API Documentation
+
 ```http
 GET /docs
 ```
@@ -311,11 +337,13 @@ GET /docs
 Returns the Swagger UI documentation interface.
 
 ### Test Endpoint
+
 ```http
 GET /test
 ```
 
 **Response:**
+
 ```text
 Chat backend is running.
 ```
@@ -323,6 +351,7 @@ Chat backend is running.
 ## 📊 Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -334,6 +363,7 @@ Chat backend is running.
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -349,14 +379,14 @@ Chat backend is running.
 
 ## 🚨 Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `VALIDATION_ERROR` | 400 | Input validation failed |
-| `UNAUTHORIZED` | 401 | Authentication required |
-| `FORBIDDEN` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `CONFLICT` | 409 | Resource already exists |
-| `INTERNAL_ERROR` | 500 | Internal server error |
+| Code               | HTTP Status | Description              |
+| ------------------ | ----------- | ------------------------ |
+| `VALIDATION_ERROR` | 400         | Input validation failed  |
+| `UNAUTHORIZED`     | 401         | Authentication required  |
+| `FORBIDDEN`        | 403         | Insufficient permissions |
+| `NOT_FOUND`        | 404         | Resource not found       |
+| `CONFLICT`         | 409         | Resource already exists  |
+| `INTERNAL_ERROR`   | 500         | Internal server error    |
 
 ## 🔒 Rate Limiting
 
@@ -371,6 +401,7 @@ The API implements rate limiting to prevent abuse:
 All requests are validated using Zod schemas:
 
 ### User Registration Schema
+
 ```typescript
 {
   email: string().email().required(),
@@ -381,6 +412,7 @@ All requests are validated using Zod schemas:
 ```
 
 ### Message Schema
+
 ```typescript
 {
   receiver_id: number().positive().required(),
@@ -392,27 +424,29 @@ All requests are validated using Zod schemas:
 ## 🔄 WebSocket Events
 
 ### Connection
+
 ```javascript
-const socket = io('http://localhost:5000')
+const socket = io('http://localhost:5000');
 
 // Join a room
-socket.emit('joinRoom', { userId: 1 })
+socket.emit('joinRoom', { userId: 1 });
 
 // Send a message
 socket.emit('sendMessage', {
   senderId: 1,
   receiverId: 2,
   message: 'Hello!',
-  mediaUrl: 'https://example.com/image.jpg'
-})
+  mediaUrl: 'https://example.com/image.jpg',
+});
 
 // Listen for messages
-socket.on('receiveMessage', (message) => {
-  console.log('New message:', message)
-})
+socket.on('receiveMessage', message => {
+  console.log('New message:', message);
+});
 ```
 
 ### Events
+
 - `joinRoom` - Join a chat room
 - `sendMessage` - Send a message
 - `receiveMessage` - Receive a message
@@ -423,6 +457,7 @@ socket.on('receiveMessage', (message) => {
 ### Using cURL
 
 #### Login
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -430,6 +465,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 ```
 
 #### Get Users
+
 ```bash
 curl -X GET http://localhost:5000/api/users \
   -H "Authorization: Bearer <your-token>"
@@ -456,35 +492,39 @@ The complete OpenAPI specification is available at `/docs` endpoint. It includes
 ### Adding New Endpoints
 
 1. **Create Controller**
+
 ```typescript
 // src/controllers/example.controller.ts
 export const getExample = async (req: Request, res: Response) => {
   try {
-    const data = await exampleService.getData()
-    res.success(data)
+    const data = await exampleService.getData();
+    res.success(data);
   } catch (error) {
-    res.error(error)
+    res.error(error);
   }
-}
+};
 ```
 
 2. **Create Route**
+
 ```typescript
 // src/routes/example.routes.ts
-import { getExample } from '../controllers/example.controller'
+import { getExample } from '../controllers/example.controller';
 
-router.get('/', getExample)
+router.get('/', getExample);
 ```
 
 3. **Add to Main Routes**
+
 ```typescript
 // src/routes/routes.ts
-import exampleRoutes from './example.routes'
+import exampleRoutes from './example.routes';
 
-app.use('/api/example', exampleRoutes)
+app.use('/api/example', exampleRoutes);
 ```
 
 4. **Update Documentation**
+
 - Add endpoint to OpenAPI specification
 - Update this documentation
 - Test the endpoint

@@ -7,6 +7,7 @@ Comprehensive deployment guide for the Lokvani backend to various platforms.
 The Lokvani backend can be deployed to various platforms including cloud providers, containerized environments, and traditional servers.
 
 ### Deployment Options
+
 - **Cloud Platforms:** AWS, Google Cloud, Azure, DigitalOcean
 - **Container Platforms:** Docker, Kubernetes
 - **Serverless:** AWS Lambda, Vercel Functions
@@ -15,6 +16,7 @@ The Lokvani backend can be deployed to various platforms including cloud provide
 ## 🏗️ Pre-deployment Checklist
 
 ### 1. Code Quality
+
 - [ ] All tests passing
 - [ ] TypeScript compilation successful
 - [ ] No linting errors
@@ -22,6 +24,7 @@ The Lokvani backend can be deployed to various platforms including cloud provide
 - [ ] Security audit passed
 
 ### 2. Environment Configuration
+
 - [ ] Production environment variables set
 - [ ] Database connection configured
 - [ ] JWT secrets generated
@@ -29,6 +32,7 @@ The Lokvani backend can be deployed to various platforms including cloud provide
 - [ ] Logging level set
 
 ### 3. Database Setup
+
 - [ ] Production database created
 - [ ] Migrations run successfully
 - [ ] Database indexes created
@@ -36,6 +40,7 @@ The Lokvani backend can be deployed to various platforms including cloud provide
 - [ ] Backup strategy implemented
 
 ### 4. Security
+
 - [ ] HTTPS enabled
 - [ ] Security headers configured
 - [ ] Rate limiting implemented
@@ -45,6 +50,7 @@ The Lokvani backend can be deployed to various platforms including cloud provide
 ## 🐳 Docker Deployment
 
 ### 1. Create Dockerfile
+
 ```dockerfile
 # Use Node.js LTS version
 FROM node:18-alpine
@@ -87,6 +93,7 @@ CMD ["npm", "start"]
 ```
 
 ### 2. Create Docker Compose
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
@@ -95,7 +102,7 @@ services:
   app:
     build: .
     ports:
-      - "5000:5000"
+      - '5000:5000'
     environment:
       - NODE_ENV=production
       - API_PORT=5000
@@ -118,7 +125,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     restart: unless-stopped
 
 volumes:
@@ -126,6 +133,7 @@ volumes:
 ```
 
 ### 3. Deploy with Docker
+
 ```bash
 # Build and start services
 docker-compose up -d
@@ -145,6 +153,7 @@ docker-compose logs -f app
 ### AWS Deployment
 
 #### 1. EC2 Instance Setup
+
 ```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
@@ -164,6 +173,7 @@ sudo apt install nginx -y
 ```
 
 #### 2. Application Setup
+
 ```bash
 # Clone repository
 git clone <repository-url>
@@ -186,27 +196,31 @@ npm run seed
 ```
 
 #### 3. PM2 Configuration
+
 ```javascript
 // ecosystem.config.js
 module.exports = {
-  apps: [{
-    name: 'lokvani-backend',
-    script: 'dist/server.js',
-    instances: 'max',
-    exec_mode: 'cluster',
-    env: {
-      NODE_ENV: 'production',
-      API_PORT: 5000
+  apps: [
+    {
+      name: 'lokvani-backend',
+      script: 'dist/server.js',
+      instances: 'max',
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        API_PORT: 5000,
+      },
+      error_file: './logs/err.log',
+      out_file: './logs/out.log',
+      log_file: './logs/combined.log',
+      time: true,
     },
-    error_file: './logs/err.log',
-    out_file: './logs/out.log',
-    log_file: './logs/combined.log',
-    time: true
-  }]
-}
+  ],
+};
 ```
 
 #### 4. Start with PM2
+
 ```bash
 # Start application
 pm2 start ecosystem.config.js
@@ -220,6 +234,7 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 ```
 
 #### 5. Nginx Configuration
+
 ```nginx
 # /etc/nginx/sites-available/lokvani
 server {
@@ -243,6 +258,7 @@ server {
 ### Google Cloud Platform
 
 #### 1. App Engine Deployment
+
 ```yaml
 # app.yaml
 runtime: nodejs18
@@ -269,6 +285,7 @@ handlers:
 ```
 
 #### 2. Deploy to App Engine
+
 ```bash
 # Install Google Cloud CLI
 curl https://sdk.cloud.google.com | bash
@@ -284,6 +301,7 @@ gcloud app deploy
 ### Azure Deployment
 
 #### 1. Azure App Service
+
 ```bash
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -309,6 +327,7 @@ az webapp deployment source config --name lokvani-backend --resource-group lokva
 ### AWS Lambda
 
 #### 1. Serverless Framework Setup
+
 ```bash
 # Install Serverless Framework
 npm install -g serverless
@@ -320,6 +339,7 @@ npm install aws-sdk
 ```
 
 #### 2. Serverless Configuration
+
 ```yaml
 # serverless.yml
 service: lokvani-backend
@@ -351,6 +371,7 @@ plugins:
 ```
 
 #### 3. Deploy to Lambda
+
 ```bash
 # Deploy to AWS
 serverless deploy
@@ -362,6 +383,7 @@ serverless deploy --stage production
 ## 🔧 Environment Configuration
 
 ### Production Environment Variables
+
 ```env
 # Server Configuration
 NODE_ENV=production
@@ -391,27 +413,29 @@ RATE_LIMIT_MAX_REQUESTS=100
 ```
 
 ### Environment-specific Configuration
+
 ```typescript
 // src/config/envVariable.ts
 const config = {
   development: {
     API_PORT: process.env.API_PORT || 5000,
     DB_HOST: process.env.DB_HOST || 'localhost',
-    LOG_LEVEL: 'debug'
+    LOG_LEVEL: 'debug',
   },
   production: {
     API_PORT: process.env.API_PORT || 5000,
     DB_HOST: process.env.DB_HOST,
-    LOG_LEVEL: 'info'
+    LOG_LEVEL: 'info',
   },
   test: {
     API_PORT: process.env.API_PORT || 5001,
     DB_HOST: process.env.DB_HOST || 'localhost',
-    LOG_LEVEL: 'error'
-  }
-}
+    LOG_LEVEL: 'error',
+  },
+};
 
-export const envVariable = config[process.env.NODE_ENV as keyof typeof config] || config.development
+export const envVariable =
+  config[process.env.NODE_ENV as keyof typeof config] || config.development;
 ```
 
 ## 🗄️ Database Deployment
@@ -419,6 +443,7 @@ export const envVariable = config[process.env.NODE_ENV as keyof typeof config] |
 ### PostgreSQL Setup
 
 #### 1. Production Database
+
 ```bash
 # Create production database
 sudo -u postgres createdb lokvani_production
@@ -430,6 +455,7 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE lokvani_production TO
 ```
 
 #### 2. Run Migrations
+
 ```bash
 # Set production environment
 export NODE_ENV=production
@@ -442,6 +468,7 @@ npm run seed
 ```
 
 #### 3. Database Backup
+
 ```bash
 # Create backup script
 #!/bin/bash
@@ -458,6 +485,7 @@ pg_dump -h localhost -U lokvani_user -d lokvani_production > backup_$DATE.sql
 ### SSL/TLS Setup
 
 #### 1. Let's Encrypt (Nginx)
+
 ```bash
 # Install Certbot
 sudo apt install certbot python3-certbot-nginx -y
@@ -471,42 +499,46 @@ sudo crontab -e
 ```
 
 #### 2. Security Headers
+
 ```typescript
 // src/server.ts
-import helmet from 'helmet'
+import helmet from 'helmet';
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"]
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}))
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  })
+);
 ```
 
 ### Rate Limiting
+
 ```typescript
 // src/middleware/rateLimiter.ts
-import rateLimit from 'express-rate-limit'
+import rateLimit from 'express-rate-limit';
 
 export const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
-  legacyHeaders: false
-})
+  legacyHeaders: false,
+});
 
 // Apply to all routes
-app.use(rateLimiter)
+app.use(rateLimiter);
 ```
 
 ## 📊 Monitoring and Logging
@@ -514,6 +546,7 @@ app.use(rateLimiter)
 ### Application Monitoring
 
 #### 1. PM2 Monitoring
+
 ```bash
 # Monitor application
 pm2 monit
@@ -526,34 +559,36 @@ pm2 restart lokvani-backend
 ```
 
 #### 2. Health Checks
+
 ```typescript
 // src/routes/health.ts
 export const healthCheck = async (req: Request, res: Response) => {
   try {
     // Check database connection
-    await db.query('SELECT 1')
-    
+    await db.query('SELECT 1');
+
     res.status(200).json({
       status: 'OK',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      database: 'connected'
-    })
+      database: 'connected',
+    });
   } catch (error) {
     res.status(503).json({
       status: 'ERROR',
       timestamp: new Date().toISOString(),
-      error: error.message
-    })
+      error: error.message,
+    });
   }
-}
+};
 ```
 
 ### Logging Configuration
+
 ```typescript
 // src/utils/logger.ts
-import winston from 'winston'
+import winston from 'winston';
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -563,27 +598,29 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ 
-      filename: 'logs/error.log', 
+    new winston.transports.File({
+      filename: 'logs/error.log',
       level: 'error',
       maxsize: 5242880, // 5MB
-      maxFiles: 5
+      maxFiles: 5,
     }),
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: 'logs/combined.log',
       maxsize: 5242880, // 5MB
-      maxFiles: 5
-    })
-  ]
-})
+      maxFiles: 5,
+    }),
+  ],
+});
 
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }))
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
 }
 
-export default logger
+export default logger;
 ```
 
 ## 🚨 Troubleshooting
@@ -591,6 +628,7 @@ export default logger
 ### Common Issues
 
 #### 1. Application Won't Start
+
 ```bash
 # Check logs
 pm2 logs lokvani-backend
@@ -603,6 +641,7 @@ pm2 restart lokvani-backend
 ```
 
 #### 2. Database Connection Issues
+
 ```bash
 # Test database connection
 psql -h localhost -U lokvani_user -d lokvani_production -c "SELECT 1"
@@ -615,6 +654,7 @@ sudo systemctl restart postgresql
 ```
 
 #### 3. Memory Issues
+
 ```bash
 # Check memory usage
 pm2 monit
@@ -629,6 +669,7 @@ free -h
 ### Performance Optimization
 
 #### 1. Database Optimization
+
 ```sql
 -- Create indexes for better performance
 CREATE INDEX idx_users_email ON users(email);
@@ -637,18 +678,19 @@ CREATE INDEX idx_chat_messages_sender_id ON chat_messages(sender_id);
 ```
 
 #### 2. Application Optimization
+
 ```typescript
 // Enable compression
-import compression from 'compression'
-app.use(compression())
+import compression from 'compression';
+app.use(compression());
 
 // Set cache headers
 app.use((req, res, next) => {
   if (req.path.startsWith('/static/')) {
-    res.setHeader('Cache-Control', 'public, max-age=31536000')
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
   }
-  next()
-})
+  next();
+});
 ```
 
 ## 📚 Additional Resources

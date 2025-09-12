@@ -1,10 +1,10 @@
-import { StatusCodes } from "http-status-codes";
-import { z } from "zod";
+import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
   extendZodWithOpenApi,
-} from "@asteasolutions/zod-to-openapi";
+} from '@asteasolutions/zod-to-openapi';
 
 interface ApiResponseConfig {
   schema: any;
@@ -43,7 +43,7 @@ export function createApiResponse(
     [statusCode]: {
       description,
       content: {
-        "application/json": {
+        'application/json': {
           schema: schema,
         },
       },
@@ -58,7 +58,7 @@ export function createApiResponses(configs: ApiResponseConfig[]) {
       responses[statusCode] = {
         description,
         content: {
-          "application/json": {
+          'application/json': {
             schema: schema,
           },
         },
@@ -71,12 +71,12 @@ export function createApiResponses(configs: ApiResponseConfig[]) {
 export const docRegistry = new OpenAPIRegistry();
 
 export const bearerAuth = docRegistry.registerComponent(
-  "securitySchemes",
-  "bearerAuth",
+  'securitySchemes',
+  'bearerAuth',
   {
-    type: "http",
-    scheme: "bearer",
-    bearerFormat: "JWT",
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
   }
 );
 
@@ -91,7 +91,7 @@ export const commonDocCreator = ({
   const paramsSchema = requestSchema?.paramsSchema;
   const bodySchema = requestSchema?.bodySchema;
   const querySchema = requestSchema?.querySchema;
-  const description = requestSchema?.description || "common document creator";
+  const description = requestSchema?.description || 'common document creator';
 
   const config: any = {
     method: method,
@@ -103,7 +103,7 @@ export const commonDocCreator = ({
         ? {
             description: description,
             content: {
-              "application/json": { schema: bodySchema },
+              'application/json': { schema: bodySchema },
             },
           }
         : undefined,
@@ -114,15 +114,15 @@ export const commonDocCreator = ({
   };
 
   // api request type which is not a get request
-  if (method === "post" || method === "put" || method === "patch") {
+  if (method === 'post' || method === 'put' || method === 'patch') {
     const responses: Record<string, any> = {};
     responseSchemas.forEach(
-      ({ schema, description = "Success", statusCode = StatusCodes.OK }) => {
+      ({ schema, description = 'Success', statusCode = StatusCodes.OK }) => {
         if (schema && statusCode !== undefined) {
           responses[statusCode] = {
             description,
             content: {
-              "application/json": {
+              'application/json': {
                 schema: schema,
               },
             },
@@ -147,14 +147,14 @@ export function generateOpenAPIDocument() {
   const generator = new OpenApiGeneratorV3(docRegistry.definitions);
 
   return generator.generateDocument({
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      version: "1.0.0",
-      title: "Swagger API",
+      version: '1.0.0',
+      title: 'Swagger API',
     },
     externalDocs: {
-      description: "View the raw OpenAPI Specification in JSON format",
-      url: "/docs/swagger.json",
+      description: 'View the raw OpenAPI Specification in JSON format',
+      url: '/docs/swagger.json',
     },
   });
 }

@@ -5,6 +5,7 @@ This document provides guidelines and best practices for developing the Lokvani 
 ## 🏗️ Architecture Overview
 
 ### Project Structure
+
 ```
 frontend/
 ├── src/
@@ -32,24 +33,28 @@ frontend/
 ## 🎯 Development Principles
 
 ### 1. Component-First Development
+
 - Build reusable, composable components
 - Use TypeScript for type safety
 - Follow single responsibility principle
 - Keep components small and focused
 
 ### 2. Theme-Aware Development
+
 - Always use theme-aware CSS classes
 - Test components in both light and dark modes
 - Use CSS variables for colors
 - Ensure proper contrast ratios
 
 ### 3. Accessibility First
+
 - Include proper ARIA labels
 - Support keyboard navigation
 - Ensure screen reader compatibility
 - Follow WCAG guidelines
 
 ### 4. Mobile-First Design
+
 - Start with mobile layout
 - Use responsive design patterns
 - Test on various screen sizes
@@ -58,6 +63,7 @@ frontend/
 ## 🛠️ Development Workflow
 
 ### 1. Setting Up Development Environment
+
 ```bash
 # Clone repository
 git clone <repository-url>
@@ -73,6 +79,7 @@ npm run dev
 ### 2. Creating New Components
 
 #### Component Structure
+
 ```typescript
 // src/components/MyComponent.tsx
 import { Button } from "@/components/ui/button"
@@ -83,10 +90,10 @@ interface MyComponentProps {
   variant?: "default" | "outline"
 }
 
-export default function MyComponent({ 
-  title, 
-  onAction, 
-  variant = "default" 
+export default function MyComponent({
+  title,
+  onAction,
+  variant = "default"
 }: MyComponentProps) {
   return (
     <div className="bg-card text-card-foreground p-4 rounded-lg border">
@@ -100,6 +107,7 @@ export default function MyComponent({
 ```
 
 #### Component Guidelines
+
 - Use TypeScript interfaces for props
 - Include default values for optional props
 - Use theme-aware CSS classes
@@ -109,6 +117,7 @@ export default function MyComponent({
 ### 3. Creating New Pages
 
 #### Page Structure
+
 ```typescript
 // src/pages/NewPage.tsx
 import { Link } from "react-router-dom"
@@ -139,6 +148,7 @@ export default function NewPage() {
 ```
 
 #### Page Guidelines
+
 - Include theme toggle in top right
 - Use consistent layout patterns
 - Include navigation elements
@@ -148,6 +158,7 @@ export default function NewPage() {
 ### 4. Adding New Routes
 
 #### Update App.tsx
+
 ```typescript
 // Add import
 import NewPage from "./pages/NewPage"
@@ -157,6 +168,7 @@ import NewPage from "./pages/NewPage"
 ```
 
 #### Add Navigation
+
 ```typescript
 // Add links where needed
 <Link to="/new-page">New Page</Link>
@@ -165,6 +177,7 @@ import NewPage from "./pages/NewPage"
 ## 🎨 Styling Guidelines
 
 ### 1. CSS Class Naming
+
 Use Tailwind CSS utility classes with theme-aware variants:
 
 ```typescript
@@ -183,6 +196,7 @@ Use Tailwind CSS utility classes with theme-aware variants:
 ```
 
 ### 2. Theme-Aware Styling
+
 Always use theme-aware classes:
 
 ```typescript
@@ -194,6 +208,7 @@ Always use theme-aware classes:
 ```
 
 ### 3. Responsive Design
+
 Use mobile-first responsive design:
 
 ```typescript
@@ -204,6 +219,7 @@ Use mobile-first responsive design:
 ```
 
 ### 4. Component Styling
+
 Use consistent spacing and sizing:
 
 ```typescript
@@ -220,47 +236,51 @@ Use consistent spacing and sizing:
 ## 🔧 TypeScript Guidelines
 
 ### 1. Interface Definitions
+
 Define clear interfaces for component props:
 
 ```typescript
 interface UserFormProps {
-  user: User
-  onSubmit: (user: User) => void
-  onCancel: () => void
-  isLoading?: boolean
-  errors?: Record<string, string>
+  user: User;
+  onSubmit: (user: User) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+  errors?: Record<string, string>;
 }
 ```
 
 ### 2. Type Safety
+
 Use TypeScript for type safety:
 
 ```typescript
 // Event handlers
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
+  e.preventDefault();
   // Handle form submission
-}
+};
 
 // State management
-const [user, setUser] = useState<User | null>(null)
-const [isLoading, setIsLoading] = useState<boolean>(false)
+const [user, setUser] = useState<User | null>(null);
+const [isLoading, setIsLoading] = useState<boolean>(false);
 ```
 
 ### 3. Generic Types
+
 Use generic types for reusable components:
 
 ```typescript
 interface ListProps<T> {
-  items: T[]
-  renderItem: (item: T) => React.ReactNode
-  onItemClick?: (item: T) => void
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  onItemClick?: (item: T) => void;
 }
 ```
 
 ## 🧪 Testing Guidelines
 
 ### 1. Component Testing
+
 Test component behavior and rendering:
 
 ```typescript
@@ -268,46 +288,49 @@ Test component behavior and rendering:
 describe('MyComponent', () => {
   it('renders with correct props', () => {
     // Test implementation
-  })
+  });
 
   it('handles user interactions', () => {
     // Test implementation
-  })
+  });
 
   it('applies theme classes correctly', () => {
     // Test implementation
-  })
-})
+  });
+});
 ```
 
 ### 2. Theme Testing
+
 Test components in both light and dark modes:
 
 ```typescript
 // Test theme switching
 it('switches theme correctly', () => {
   // Test theme switching behavior
-})
+});
 ```
 
 ### 3. Accessibility Testing
+
 Test accessibility features:
 
 ```typescript
 // Test keyboard navigation
 it('supports keyboard navigation', () => {
   // Test keyboard interactions
-})
+});
 
 // Test screen reader compatibility
 it('has proper ARIA labels', () => {
   // Test ARIA attributes
-})
+});
 ```
 
 ## 🚀 Performance Guidelines
 
 ### 1. Code Splitting
+
 Use dynamic imports for large components:
 
 ```typescript
@@ -320,15 +343,17 @@ const LazyComponent = lazy(() => import('./LazyComponent'))
 ```
 
 ### 2. Memoization
+
 Use React.memo for expensive components:
 
 ```typescript
 const ExpensiveComponent = React.memo(({ data }) => {
   // Component implementation
-})
+});
 ```
 
 ### 3. Bundle Optimization
+
 - Use tree shaking
 - Optimize imports
 - Remove unused dependencies
@@ -337,6 +362,7 @@ const ExpensiveComponent = React.memo(({ data }) => {
 ## 🔍 Code Quality
 
 ### 1. ESLint Configuration
+
 Follow ESLint rules for code quality:
 
 ```json
@@ -355,6 +381,7 @@ Follow ESLint rules for code quality:
 ```
 
 ### 2. Code Formatting
+
 Use consistent code formatting:
 
 ```typescript
@@ -365,6 +392,7 @@ Use consistent code formatting:
 ```
 
 ### 3. Documentation
+
 Document complex components and functions:
 
 ```typescript
@@ -376,30 +404,35 @@ Document complex components and functions:
  * @param children - Button content
  */
 interface ButtonProps {
-  variant?: "default" | "outline" | "secondary"
-  size?: "sm" | "default" | "lg"
-  onClick?: () => void
-  children: React.ReactNode
+  variant?: 'default' | 'outline' | 'secondary';
+  size?: 'sm' | 'default' | 'lg';
+  onClick?: () => void;
+  children: React.ReactNode;
 }
 ```
 
 ## 🐛 Debugging
 
 ### 1. Browser DevTools
+
 Use browser DevTools for debugging:
+
 - Console for errors and logs
 - Elements tab for DOM inspection
 - Network tab for API calls
 - Performance tab for optimization
 
 ### 2. React DevTools
+
 Use React DevTools for component debugging:
+
 - Component tree inspection
 - Props and state inspection
 - Performance profiling
 - Hook debugging
 
 ### 3. Common Issues
+
 - Check console for errors
 - Verify imports and exports
 - Check TypeScript errors

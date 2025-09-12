@@ -1,7 +1,7 @@
-import { Router, RequestHandler } from "express";
-import { validateRequest } from "./validationMiddleware";
-import { bearerAuth, docRegistry } from "../doc/openAPIDocumentGenerator";
-import { commonDocCreator } from "../doc/openAPIDocumentGenerator";
+import { Router, RequestHandler } from 'express';
+import { validateRequest } from './validationMiddleware';
+import { bearerAuth, docRegistry } from '../doc/openAPIDocumentGenerator';
+import { commonDocCreator } from '../doc/openAPIDocumentGenerator';
 
 interface RouteOptions {
   middleware?: RequestHandler[];
@@ -17,7 +17,7 @@ interface RouteOptions {
 
 interface OpenApiDocConfig {
   routePath: string;
-  method: "get" | "post" | "put" | "delete" | "patch";
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch';
   tags: string[];
   requestSchema?: any;
   responseSchemas?: any;
@@ -34,7 +34,10 @@ class RouteRegistrar {
   private basePath: string;
   private tags: string[];
 
-  constructor(router: Router, { basePath = "", tags = [] }: ConstructorOptions) {
+  constructor(
+    router: Router,
+    { basePath = '', tags = [] }: ConstructorOptions
+  ) {
     this.router = router;
     this.basePath = basePath;
     this.tags = tags;
@@ -43,19 +46,25 @@ class RouteRegistrar {
   registerRoute(
     method: string,
     path: string,
-    { middleware = [], controller, openApiDoc, requestSchema, responseSchemas }: RouteOptions
+    {
+      middleware = [],
+      controller,
+      openApiDoc,
+      requestSchema,
+      responseSchemas,
+    }: RouteOptions
   ): void {
     const fullRoutePath = `${this.basePath}${path}`;
 
-    const docFullPath = fullRoutePath.replace(/:\w+/g, "{id}");
+    const docFullPath = fullRoutePath.replace(/:\w+/g, '{id}');
     const middlewares: RequestHandler[] = [];
 
     const openApiDocConfig: OpenApiDocConfig = {
       routePath: docFullPath,
-      method: method as "get" | "post" | "put" | "delete" | "patch",
+      method: method as 'get' | 'post' | 'put' | 'delete' | 'patch',
       tags: this.tags,
       requestSchema,
-      responseSchemas
+      responseSchemas,
     };
 
     if (middleware?.length > 0) {
@@ -86,23 +95,23 @@ class RouteRegistrar {
   }
 
   get(path: string, options: RouteOptions): void {
-    this.registerRoute("get", path, options);
+    this.registerRoute('get', path, options);
   }
 
   post(path: string, options: RouteOptions): void {
-    this.registerRoute("post", path, options);
+    this.registerRoute('post', path, options);
   }
 
   put(path: string, options: RouteOptions): void {
-    this.registerRoute("put", path, options);
+    this.registerRoute('put', path, options);
   }
 
   delete(path: string, options: RouteOptions): void {
-    this.registerRoute("delete", path, options);
+    this.registerRoute('delete', path, options);
   }
 
   patch(path: string, options: RouteOptions): void {
-    this.registerRoute("patch", path, options);
+    this.registerRoute('patch', path, options);
   }
 }
 

@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import Chat from "../services/chat.service";
+import { Request, Response } from 'express';
+import Chat from '../services/chat.service';
 
 interface ChatMessageBody {
   text: string;
@@ -11,7 +11,10 @@ interface ChatMessageBody {
   reaction?: Record<string, any>;
 }
 
-export const sendMessage = async (req: Request<{}, {}, ChatMessageBody>, res: Response): Promise<void> => {
+export const sendMessage = async (
+  req: Request<{}, {}, ChatMessageBody>,
+  res: Response
+): Promise<void> => {
   try {
     const {
       text,
@@ -37,19 +40,22 @@ export const sendMessage = async (req: Request<{}, {}, ChatMessageBody>, res: Re
 
     res.status(201).json({
       success: true,
-      message: "Message sent",
+      message: 'Message sent',
       data: savedMessage,
     });
   } catch (error) {
-    console.error("Error sending message:", error);
+    console.error('Error sending message:', error);
     res.status(500).json({
       success: false,
-      message: "Error sending message",
+      message: 'Error sending message',
     });
   }
 };
 
-export const getMessagesByChatRoom = async (req: Request, res: Response): Promise<void> => {
+export const getMessagesByChatRoom = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { chatRoomId } = req.params as { chatRoomId: string };
     const messages = await Chat.getMessagesForRoom(chatRoomId);
@@ -58,10 +64,10 @@ export const getMessagesByChatRoom = async (req: Request, res: Response): Promis
       data: messages,
     });
   } catch (error) {
-    console.error("Error fetching messages:", error);
+    console.error('Error fetching messages:', error);
     res.status(500).json({
       success: false,
-      message: "Error fetching messages",
+      message: 'Error fetching messages',
     });
   }
 };

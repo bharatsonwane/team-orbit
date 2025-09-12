@@ -1,4 +1,4 @@
-import db from "../database/db";
+import db from '../database/db';
 
 interface ChatMessageData {
   text?: string | null;
@@ -51,7 +51,7 @@ export default class Chat {
     this.deliveredTo = Array.isArray(deliveredTo) ? deliveredTo : [];
     this.readBy = Array.isArray(readBy) ? readBy : [];
     this.reaction =
-      reaction && typeof reaction === "object" && !Array.isArray(reaction)
+      reaction && typeof reaction === 'object' && !Array.isArray(reaction)
         ? reaction
         : {};
   }
@@ -81,17 +81,17 @@ export default class Chat {
       JSON.stringify(this.reaction),
     ];
 
-    console.log("Inserting chat message with values:", values);
+    console.log('Inserting chat message with values:', values);
 
     try {
       const result = await db.query(query, values);
       if (!result || result.length === 0) {
-        throw new Error("No rows returned from insert");
+        throw new Error('No rows returned from insert');
       }
       return result[0] as ChatMessage;
     } catch (error) {
-      console.error("Error saving chat message:", error);
-      throw new Error("Failed to insert chat message");
+      console.error('Error saving chat message:', error);
+      throw new Error('Failed to insert chat message');
     }
   }
 
@@ -105,12 +105,17 @@ export default class Chat {
       const result = await db.query(query, [chatRoomId]);
       return result as ChatMessage[];
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      throw new Error("Failed to fetch messages for chat room");
+      console.error('Error fetching messages:', error);
+      throw new Error('Failed to fetch messages for chat room');
     }
   }
 
-  static async saveMessage(data: { senderId: string; receiverId: string; message: string; mediaUrl?: string }): Promise<ChatMessage> {
+  static async saveMessage(data: {
+    senderId: string;
+    receiverId: string;
+    message: string;
+    mediaUrl?: string;
+  }): Promise<ChatMessage> {
     // This method is used by the socket.io handler
     const chatMessage = new Chat({
       text: data.message,

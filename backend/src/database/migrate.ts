@@ -1,10 +1,10 @@
-import { Umzug } from "umzug";
-import fs from "fs/promises";
-import path from "path";
-import crypto from "crypto";
-import { pathToFileURL } from "url";
-import db from "./db";
-import logger from "../utils/logger";
+import { Umzug } from 'umzug';
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
+import { pathToFileURL } from 'url';
+import db from './db';
+import logger from '../utils/logger';
 
 // Use process.cwd() for current working directory
 const currentDir = process.cwd();
@@ -22,8 +22,8 @@ interface AppliedMigration {
 }
 
 const getFileMd5 = async (filePath: string): Promise<string> => {
-  const content = await fs.readFile(filePath, "utf8");
-  return crypto.createHash("md5").update(content).digest("hex");
+  const content = await fs.readFile(filePath, 'utf8');
+  return crypto.createHash('md5').update(content).digest('hex');
 };
 
 const extractVersion = (name: string): number | null => {
@@ -52,9 +52,14 @@ const loadTypeScriptMigration = async (filePath: string): Promise<any> => {
   }
 };
 
-export const runMigrationForSchema = async (schemaName: string = "public"): Promise<void> => {
+export const runMigrationForSchema = async (
+  schemaName: string = 'public'
+): Promise<void> => {
   const client = await db.getDbClient();
-  const migrationDir = path.join(currentDir, `src/database/migrations/${schemaName}`);
+  const migrationDir = path.join(
+    currentDir,
+    `src/database/migrations/${schemaName}`
+  );
 
   // 🔧 Ensure migration directory exists
   await fs.mkdir(migrationDir, { recursive: true });
@@ -76,8 +81,8 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
 
   const files = await fs.readdir(migrationDir);
   const allMigrations: MigrationFile[] = files
-    .filter((f) => f.endsWith(".js") || f.endsWith(".ts") || f.endsWith(".sql"))
-    .map((name) => ({
+    .filter(f => f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.sql'))
+    .map(name => ({
       name,
       version: extractVersion(name),
       fullPath: path.join(migrationDir, name),
@@ -85,16 +90,16 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
     .filter((m): m is MigrationFile => m.version !== null)
     .sort((a, b) => a.version - b.version);
 
-  const { rows: applied } = await client.query(
+  const { rows: applied } = (await client.query(
     `SELECT version, name, md5 FROM migrations ORDER BY version::int`
-  ) as { rows: AppliedMigration[] };
+  )) as { rows: AppliedMigration[] };
 
-  const appliedVersions = applied.map((r) => parseInt(r.version, 10));
+  const appliedVersions = applied.map(r => parseInt(r.version, 10));
   const lastAppliedVersion = appliedVersions.at(-1) ?? 0;
   const expectedNextVersion = lastAppliedVersion + 1;
 
   const pendingMigrations = allMigrations.filter(
-    (m) => !appliedVersions.includes(m.version)
+    m => !appliedVersions.includes(m.version)
   );
 
   // 🚫 Prevent version skipping
@@ -113,11 +118,11 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
       name,
       path: fullPath,
       up: async () => {
-        await client.query("BEGIN");
+        await client.query('BEGIN');
         // 🔐 Wrap each migration file in a transaction
         try {
-          if (name.endsWith(".sql")) {
-            const sql = await fs.readFile(fullPath, "utf8");
+          if (name.endsWith('.sql')) {
+            const sql = await fs.readFile(fullPath, 'utf8');
             await client.query(sql);
           } else {
             // For TypeScript/JavaScript files, use our custom loader
@@ -126,17 +131,21 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
               if (migration.up && typeof migration.up === 'function') {
                 await migration.up(client);
               } else {
-                throw new Error(`Migration file ${name} does not export an 'up' function`);
+                throw new Error(
+                  `Migration file ${name} does not export an 'up' function`
+                );
               }
             } catch (importError) {
               logger.error(`Failed to import migration ${name}:`, importError);
-              throw new Error(`Failed to import migration ${name}: ${importError}`);
+              throw new Error(
+                `Failed to import migration ${name}: ${importError}`
+              );
             }
           }
-          await client.query("COMMIT");
+          await client.query('COMMIT');
           logger.info(`✅ Applied migration: ${name}`);
         } catch (err) {
-          await client.query("ROLLBACK");
+          await client.query('ROLLBACK');
           logger.error(`❌ Migration failed and rolled back: ${name}`, err);
           throw err;
         }
@@ -156,19 +165,19 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
               );
             }
           } catch (err: any) {
-            if (err.code === "ENOENT") {
+            if (err.code === 'ENOENT') {
               throw new Error(`❌ Applied migration missing: ${recordedName}`);
             }
             throw err;
           }
         }
-        return applied.map((r) => r.name);
+        return applied.map(r => r.name);
       },
       logMigration: async (migration: any) => {
         const { name, path: migrationPath } = migration;
         const version = extractVersion(name);
         if (version === null) return;
-        
+
         const md5 = await getFileMd5(migrationPath);
         await client.query(
           `INSERT INTO migrations(version, name, md5) VALUES ($1, $2, $3)`,
@@ -177,34 +186,34 @@ export const runMigrationForSchema = async (schemaName: string = "public"): Prom
       },
       unlogMigration: async (migrationName: string | { name: string }) => {
         const name =
-          typeof migrationName === "object"
+          typeof migrationName === 'object'
             ? migrationName.name
             : migrationName;
         const version = extractVersion(name);
         if (version === null) return;
-        
+
         await client.query(`DELETE FROM migrations WHERE version = $1`, [
           version.toString(),
         ]);
       },
     },
     logger: {
-      info: (msg: any) => logger.info("ℹ️", msg),
-      warn: (msg: any) => logger.warn("⚠️", msg),
-      error: (msg: any) => logger.error("❌", msg),
-      debug: (msg: any) => logger.info("🔍", msg),
+      info: (msg: any) => logger.info('ℹ️', msg),
+      warn: (msg: any) => logger.warn('⚠️', msg),
+      error: (msg: any) => logger.error('❌', msg),
+      debug: (msg: any) => logger.info('🔍', msg),
     },
   });
 
   await umzug.up();
-  await client.query("COMMIT");
+  await client.query('COMMIT');
   await client.query(`RESET search_path`);
   logger.info(`✅ Migrations completed for schema: ${schemaName}`);
 };
 
 const main = async (): Promise<void> => {
   try {
-    await runMigrationForSchema("public");
+    await runMigrationForSchema('public');
 
     // const client = await db.getDbClient();
     // const { rows: tenants } = await client.query(
@@ -224,11 +233,11 @@ const main = async (): Promise<void> => {
     // }
 
     await db.shutdown();
-    logger.info("✅ All migrations completed");
+    logger.info('✅ All migrations completed');
   } catch (error) {
-    logger.error("❌ Migration process failed:", error);
+    logger.error('❌ Migration process failed:', error);
   } finally {
-    logger.info("Migration script exiting...");
+    logger.info('Migration script exiting...');
     process.exit();
   }
 };

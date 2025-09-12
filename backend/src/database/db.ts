@@ -1,6 +1,6 @@
-import pg from "pg";
-import { envVariable } from "../config/envVariable";
-import logger from "../utils/logger";
+import pg from 'pg';
+import { envVariable } from '../config/envVariable';
+import logger from '../utils/logger';
 
 const { Pool, Client } = pg;
 type PoolClient = pg.PoolClient;
@@ -32,8 +32,8 @@ class Database {
       });
 
       // Handle pool errors
-      this.pool.on("error", (err: Error, client: PoolClient) => {
-        logger.error("Unexpected error on idle client", err);
+      this.pool.on('error', (err: Error, client: PoolClient) => {
+        logger.error('Unexpected error on idle client', err);
       });
     }
     return this.pool;
@@ -59,14 +59,14 @@ class Database {
       const result = await pool.query(text, params);
       return result.rows;
     } catch (error) {
-      logger.error("Database Query Error:", error);
+      logger.error('Database Query Error:', error);
       throw error;
     } finally {
       pool.release(true); // true parameter forces the release even if there's an error
     }
   }
 
-  async getSchemaPool(schemaName: string = "public"): Promise<PoolClient> {
+  async getSchemaPool(schemaName: string = 'public'): Promise<PoolClient> {
     const pool = await this.getDbPool().connect();
     try {
       await pool.query(`SET search_path TO ${schemaName}`);
@@ -78,26 +78,28 @@ class Database {
     }
   }
 
-  async transaction(schemaName: string = "public"): Promise<TransactionHandlers> {
+  async transaction(
+    schemaName: string = 'public'
+  ): Promise<TransactionHandlers> {
     const pool = await this.getDbPool().connect();
     try {
       await pool.query(`SET search_path TO ${schemaName}, public`);
-      await pool.query("BEGIN");
+      await pool.query('BEGIN');
 
       const commit = async (): Promise<void> => {
-        await pool.query("COMMIT");
+        await pool.query('COMMIT');
         pool.release(true);
       };
 
       const rollback = async (): Promise<void> => {
-        await pool.query("ROLLBACK");
+        await pool.query('ROLLBACK');
         pool.release(true);
       };
 
       return { pool, commit, rollback };
     } catch (error) {
       pool.release(true);
-      logger.error("Transaction Error:", error);
+      logger.error('Transaction Error:', error);
       throw error;
     }
   }
@@ -112,9 +114,9 @@ class Database {
         await this.pool.end();
         this.pool = null;
       }
-      logger.info("Database connections closed successfully");
+      logger.info('Database connections closed successfully');
     } catch (error) {
-      logger.error("Error during database shutdown:", error);
+      logger.error('Error during database shutdown:', error);
       throw error;
     }
   }
@@ -124,12 +126,12 @@ class Database {
 const db = new Database();
 
 // Handle process termination
-process.on("SIGINT", async () => {
+process.on('SIGINT', async () => {
   try {
     await db.shutdown();
     process.exit(0);
   } catch (error) {
-    logger.error("Error during shutdown:", error);
+    logger.error('Error during shutdown:', error);
     process.exit(1);
   }
 });

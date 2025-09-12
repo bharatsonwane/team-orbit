@@ -14,6 +14,7 @@ This project uses shadcn/ui theming with full dark/light mode support.
 ## Configuration
 
 ### components.json
+
 ```json
 {
   "tailwind": {
@@ -24,7 +25,9 @@ This project uses shadcn/ui theming with full dark/light mode support.
 ```
 
 ### CSS Variables
+
 The theme uses CSS variables defined in `src/index.css`:
+
 - Light theme variables in `:root`
 - Dark theme variables in `.dark`
 - All shadcn/ui color tokens are properly configured
@@ -32,33 +35,36 @@ The theme uses CSS variables defined in `src/index.css`:
 ## Usage
 
 ### Theme Toggle Component
+
 ```tsx
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from '@/components/theme-toggle';
 
 // Use in your components
-<ThemeToggle />
+<ThemeToggle />;
 ```
 
 ### Custom Theme Hook
+
 ```tsx
-import { useTheme } from "@/hooks/use-theme"
+import { useTheme } from '@/hooks/use-theme';
 
 function MyComponent() {
-  const { theme, setTheme, resolvedTheme, mounted } = useTheme()
-  
-  if (!mounted) return null // Prevent hydration mismatch
-  
+  const { theme, setTheme, resolvedTheme, mounted } = useTheme();
+
+  if (!mounted) return null; // Prevent hydration mismatch
+
   return (
     <div>
       Current theme: {resolvedTheme}
-      <button onClick={() => setTheme("dark")}>Dark</button>
-      <button onClick={() => setTheme("light")}>Light</button>
+      <button onClick={() => setTheme('dark')}>Dark</button>
+      <button onClick={() => setTheme('light')}>Light</button>
     </div>
-  )
+  );
 }
 ```
 
 ### Theme-Aware Classes
+
 ```tsx
 // These classes automatically adapt to the current theme
 <div className="bg-background text-foreground">
@@ -75,6 +81,7 @@ function MyComponent() {
 ## Color Tokens
 
 All shadcn/ui color tokens are available:
+
 - `background`, `foreground`
 - `card`, `card-foreground`
 - `popover`, `popover-foreground`
