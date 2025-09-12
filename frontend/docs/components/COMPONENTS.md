@@ -1,39 +1,26 @@
 # Components Documentation
 
-This document describes all the components used in the Lokvani frontend application.
+Complete component library documentation for the Lokvani frontend application.
 
 ## 📦 shadcn/ui Components
 
-### Button
+The application includes all shadcn/ui components for comprehensive UI development.
 
-**File:** `src/components/ui/button.tsx`
+### Core Components
 
-A versatile button component with multiple variants and sizes.
+#### Button
+
+Versatile button component with multiple variants and sizes.
 
 ```tsx
 import { Button } from "@/components/ui/button"
 
-// Basic usage
 <Button>Click me</Button>
-
-// Variants
 <Button variant="outline">Outline</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="ghost">Ghost</Button>
-
-// Sizes
-<Button size="sm">Small</Button>
 <Button size="lg">Large</Button>
-<Button size="icon">Icon only</Button>
-
-// States
-<Button disabled>Disabled</Button>
-<Button loading>Loading</Button>
 ```
 
-### Input
-
-**File:** `src/components/ui/input.tsx`
+#### Input
 
 Form input component with theme support.
 
@@ -48,106 +35,195 @@ import { Input } from '@/components/ui/input';
 />;
 ```
 
-### Label
+#### Card
 
-**File:** `src/components/ui/label.tsx`
-
-Accessible label component for form inputs.
+Flexible card component for content organization.
 
 ```tsx
-import { Label } from "@/components/ui/label"
-
-<Label htmlFor="email">Email Address</Label>
-<Input id="email" />
-```
-
-### Card
-
-**File:** `src/components/ui/card.tsx`
-
-Container component for grouping related content.
-
-```tsx
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 <Card>
   <CardHeader>
     <CardTitle>Card Title</CardTitle>
-    <CardDescription>Card description</CardDescription>
   </CardHeader>
   <CardContent>
     <p>Card content goes here</p>
   </CardContent>
-  <CardFooter>
-    <Button>Action</Button>
-  </CardFooter>
 </Card>;
 ```
 
-### Dropdown Menu
+### Form Components
 
-**File:** `src/components/ui/dropdown-menu.tsx`
+#### Form
 
-Dropdown menu component for the theme toggle.
+React Hook Form integration with Zod validation.
 
 ```tsx
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from '@/components/ui/form';
 
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant='outline'>Open</Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent>
-    <DropdownMenuItem>Option 1</DropdownMenuItem>
-    <DropdownMenuItem>Option 2</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>;
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(onSubmit)}>
+    <FormField
+      control={form.control}
+      name='email'
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input {...field} />
+          </FormControl>
+        </FormItem>
+      )}
+    />
+  </form>
+</Form>;
+```
+
+### Layout Components
+
+#### Sheet
+
+Side panel component for navigation and content.
+
+```tsx
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+
+<Sheet>
+  <SheetTrigger>Open</SheetTrigger>
+  <SheetContent>
+    <p>Sheet content</p>
+  </SheetContent>
+</Sheet>;
+```
+
+#### Dialog
+
+Modal dialog component for overlays.
+
+```tsx
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+
+<Dialog>
+  <DialogTrigger>Open Dialog</DialogTrigger>
+  <DialogContent>
+    <p>Dialog content</p>
+  </DialogContent>
+</Dialog>;
+```
+
+### Navigation Components
+
+#### Navigation Menu
+
+Accessible navigation component.
+
+```tsx
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+} from '@/components/ui/navigation-menu';
+
+<NavigationMenu>
+  <NavigationMenuItem>
+    <NavigationMenuContent>
+      <p>Navigation content</p>
+    </NavigationMenuContent>
+  </NavigationMenuItem>
+</NavigationMenu>;
+```
+
+### Data Display Components
+
+#### Table
+
+Data table component with sorting and filtering.
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Name</TableHead>
+      <TableHead>Email</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>John Doe</TableCell>
+      <TableCell>john@example.com</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>;
+```
+
+#### Badge
+
+Small status and label component.
+
+```tsx
+import { Badge } from '@/components/ui/badge';
+
+<Badge>Default</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="destructive">Destructive</Badge>
+```
+
+### Feedback Components
+
+#### Alert
+
+Alert component for important messages.
+
+```tsx
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+<Alert>
+  <AlertDescription>This is an alert message</AlertDescription>
+</Alert>;
+```
+
+#### Progress
+
+Progress bar component.
+
+```tsx
+import { Progress } from '@/components/ui/progress';
+
+<Progress value={60} className='w-full' />;
 ```
 
 ## 🎨 Custom Components
 
-### ThemeProvider
+### Theme Provider
 
-**File:** `src/components/theme-provider.tsx`
-
-Custom theme context provider for managing theme state.
+Custom theme context provider for dark/light mode.
 
 ```tsx
 import { ThemeProvider } from '@/components/theme-provider';
 
-// Wrap your app
-<ThemeProvider defaultTheme='system'>
+<ThemeProvider defaultTheme='system' storageKey='lokvani-ui-theme'>
   <App />
 </ThemeProvider>;
 ```
 
-**Props:**
+### Theme Toggle
 
-- `defaultTheme`: "light" | "dark" | "system"
-- `storageKey`: string (default: "vite-ui-theme")
-
-**Context Value:**
-
-- `theme`: Current theme
-- `setTheme`: Function to change theme
-
-### ThemeToggle
-
-**File:** `src/components/theme-toggle.tsx`
-
-Interactive theme switcher component.
+Theme switching component.
 
 ```tsx
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -155,161 +231,55 @@ import { ThemeToggle } from '@/components/theme-toggle';
 <ThemeToggle />;
 ```
 
-**Features:**
+## 📚 Available Components
 
-- Sun/Moon icons with smooth transitions
-- Dropdown menu with Light/Dark/System options
-- Accessible with proper ARIA labels
-- Theme-aware styling
+### Complete shadcn/ui Library
 
-## 📄 Page Components
+- Accordion, Alert Dialog, Aspect Ratio, Avatar
+- Badge, Breadcrumb, Button, Calendar, Card
+- Carousel, Chart, Checkbox, Collapsible, Command
+- Context Menu, Dialog, Drawer, Dropdown Menu
+- Form, Hover Card, Input, Input OTP, Label
+- Menubar, Navigation Menu, Pagination, Popover
+- Progress, Radio Group, Resizable, Scroll Area
+- Select, Separator, Sheet, Sidebar, Skeleton
+- Slider, Sonner, Switch, Table, Tabs
+- Textarea, Toggle, Toggle Group, Tooltip
 
-### Home
+## 🚀 Usage Guidelines
 
-**File:** `src/pages/Home.tsx`
-
-Landing page with navigation to auth pages.
-
-**Features:**
-
-- Hero section with call-to-action
-- Feature cards showcasing capabilities
-- Navigation buttons to login/signup
-- Theme toggle in header
-
-### Login
-
-**File:** `src/pages/Login.tsx`
-
-User authentication page.
-
-**Features:**
-
-- Email and password fields
-- Form validation
-- Loading states
-- Navigation to signup
-- Redirect to dashboard on success
-
-**Form Fields:**
-
-- Email (required, email validation)
-- Password (required)
-
-### Signup
-
-**File:** `src/pages/Signup.tsx`
-
-User registration page.
-
-**Features:**
-
-- Complete registration form
-- Real-time validation
-- Error handling with visual feedback
-- Password confirmation
-- Navigation to login
-- Redirect to dashboard on success
-
-**Form Fields:**
-
-- First Name (required)
-- Last Name (required)
-- Email (required, email validation)
-- Password (required, min 6 characters)
-- Confirm Password (required, must match)
-
-### Dashboard
-
-**File:** `src/pages/Dashboard.tsx`
-
-Demo page showcasing theme capabilities.
-
-**Features:**
-
-- Theme demonstration cards
-- Interactive elements showcase
-- Navigation menu
-- Theme information display
-
-## 🎨 Styling Guidelines
-
-### Theme-Aware Classes
-
-All components use theme-aware CSS classes:
+### Component Structure
 
 ```tsx
-// Background and text colors
-<div className="bg-background text-foreground">
-<div className="bg-card text-card-foreground">
-<div className="text-muted-foreground">
-
-// Border and accent colors
-<div className="border border-border">
-<div className="bg-accent text-accent-foreground">
-
-// Interactive states
-<button className="hover:bg-accent focus:ring-ring">
-```
-
-### Responsive Design
-
-Components are built with mobile-first responsive design:
-
-```tsx
-// Responsive grid
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-// Responsive text
-<h1 className="text-2xl md:text-4xl lg:text-6xl">
-
-// Responsive spacing
-<div className="p-4 md:p-6 lg:p-8">
-```
-
-### Accessibility
-
-All components follow accessibility best practices:
-
-- Proper ARIA labels
-- Keyboard navigation support
-- Focus management
-- Screen reader compatibility
-- Color contrast compliance
-
-## 🔧 Component Development
-
-### Creating New Components
-
-1. **Use TypeScript** - All components should be typed
-2. **Follow Naming** - Use PascalCase for component names
-3. **Export Default** - Use default exports for page components
-4. **Theme Support** - Use theme-aware classes
-5. **Accessibility** - Include proper ARIA attributes
-
-### Example Component Structure
-
-```tsx
-import { Button } from '@/components/ui/button';
-
-interface MyComponentProps {
-  title: string;
-  onAction?: () => void;
+interface ComponentProps {
+  children?: React.ReactNode;
+  className?: string;
+  variant?: 'default' | 'secondary' | 'destructive';
 }
 
-export default function MyComponent({ title, onAction }: MyComponentProps) {
+export default function Component({
+  children,
+  className,
+  variant = 'default',
+}: ComponentProps) {
   return (
-    <div className='bg-card text-card-foreground p-4 rounded-lg'>
-      <h2 className='text-lg font-semibold mb-2'>{title}</h2>
-      <Button onClick={onAction}>Action</Button>
+    <div className={cn('base-styles', variantStyles[variant], className)}>
+      {children}
     </div>
   );
 }
 ```
 
-## 📚 Resources
+### Best Practices
+
+1. Use TypeScript interfaces for all props
+2. Include className prop for styling flexibility
+3. Provide sensible defaults for optional props
+4. Use cn() utility for conditional classes
+5. Follow shadcn/ui patterns for consistency
+
+## 📚 Related Documentation
 
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [Radix UI Documentation](https://www.radix-ui.com/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/)
-- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
