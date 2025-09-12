@@ -1,29 +1,43 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useAuth } from "../contexts/AuthContext"
 
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const { login, isAuthenticated, error, clearError } = useAuth()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard")
+    }
+  }, [isAuthenticated, navigate])
+
+  // Clear error when component mounts
+  useEffect(() => {
+    clearError()
+  }, [clearError])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    console.log("Login attempt:", { email, password })
-    setIsLoading(false)
-    
-    // Redirect to dashboard after successful login
-    navigate("/dashboard")
+    try {
+      await login({ email, password })
+      // Navigation will be handled by useEffect
+    } catch (error) {
+      // Error is handled by the auth context
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -42,6 +56,11 @@ export default function Login() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

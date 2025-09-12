@@ -2,8 +2,15 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useAuth } from "../contexts/AuthContext"
 
 export default function Dashboard() {
+  const { user, logout, hasAdminAccess, hasSuperAccess } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -13,7 +20,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Button asChild variant="outline">
-              <Link to="/">Home</Link>
+              <Link to="/profile">Profile</Link>
+            </Button>
+            <Button onClick={handleLogout} variant="outline">
+              Logout
             </Button>
           </div>
         </div>
@@ -23,9 +33,12 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Welcome to your Dashboard</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-2">
+              Welcome back, {user?.first_name}!
+            </h2>
             <p className="text-muted-foreground">
-              This page demonstrates the theme system in action. Toggle between light and dark mode to see the changes.
+              You are logged in as <span className="font-semibold capitalize">{user?.role?.toLowerCase()}</span>.
+              This page demonstrates role-based access and the theme system.
             </p>
           </div>
 
@@ -73,11 +86,18 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button asChild variant="ghost" className="w-full justify-start">
-                  <Link to="/login">Login Page</Link>
+                  <Link to="/profile">Profile</Link>
                 </Button>
-                <Button asChild variant="ghost" className="w-full justify-start">
-                  <Link to="/signup">Signup Page</Link>
-                </Button>
+                {hasAdminAccess() && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <Link to="/admin">Admin Panel</Link>
+                  </Button>
+                )}
+                {hasSuperAccess() && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <Link to="/super-admin">Super Admin</Link>
+                  </Button>
+                )}
                 <Button asChild variant="ghost" className="w-full justify-start">
                   <Link to="/">Home Page</Link>
                 </Button>

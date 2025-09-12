@@ -1,10 +1,11 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useAuth } from "../contexts/AuthContext"
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,19 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
+  const { register, isAuthenticated, error, clearError } = useAuth()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard")
+    }
+  }, [isAuthenticated, navigate])
+
+  // Clear error when component mounts
+  useEffect(() => {
+    clearError()
+  }, [clearError])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -67,14 +81,19 @@ export default function Signup() {
 
     setIsLoading(true)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    console.log("Signup attempt:", formData)
-    setIsLoading(false)
-    
-    // Redirect to dashboard after successful signup
-    navigate("/dashboard")
+    try {
+      await register({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName
+      })
+      // Navigation will be handled by useEffect
+    } catch (error) {
+      // Error is handled by the auth context
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -93,6 +112,11 @@ export default function Signup() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First name</Label>

@@ -1,19 +1,25 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
-import Dashboard from "./pages/Dashboard"
+import { Routes, Route } from "react-router-dom"
+import RouteGuardRenderer from "./components/RouteGuard"
+import { mainRouteList } from "./utils/routes"
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <Routes>
+      {mainRouteList.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={
+            <RouteGuardRenderer
+              key={route.path}
+              authRoles={route.authRoles}
+            >
+              {route.element}
+            </RouteGuardRenderer>
+          }
+        />
+      ))}
+    </Routes>
   )
 }
 

@@ -1,12 +1,15 @@
-# Lib Directory
+# Utils Directory
 
 This directory contains utility functions, helpers, and shared logic for the Lokvani frontend application.
 
 ## 📁 Structure
 
 ```
-src/lib/
+src/utils/
 ├── utils.ts              # Utility functions (from shadcn/ui)
+├── routes.tsx            # Route configuration arrays
+├── logger.ts             # Logging utility
+├── README.md             # This file
 └── docs/                 # Library documentation
     ├── README.md
     └── UTILITIES.md
@@ -26,9 +29,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
+### `routes.tsx`
+Contains route configuration arrays for the application's routing system.
+
+### `logger.ts`
+Contains a logging utility class for development and production logging.
+
 ### Usage
 ```tsx
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 // Conditional classes
 <div className={cn(
