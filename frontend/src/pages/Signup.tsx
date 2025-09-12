@@ -1,24 +1,27 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "../contexts/AuthContext"
+import { signupSchema, type SignupFormData } from "../utils/validation"
 
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
   const navigate = useNavigate()
-  const { register, isAuthenticated, error, clearError } = useAuth()
+  const { register: registerUser, isAuthenticated, error, clearError, isLoading } = useAuth()
+
+  // React Hook Form setup with Zod resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+  })
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -32,67 +35,17 @@ export default function Signup() {
     clearError()
   }, [clearError])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }))
-    }
-  }
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required"
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required"
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      return
-    }
-
-    setIsLoading(true)
-    
+  const onSubmit = async (data: SignupFormData) => {
     try {
-      await register({
-        email: formData.email,
-        password: formData.password,
-        first_name: formData.firstName,
-        last_name: formData.lastName
+      await registerUser({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password
       })
       // Navigation will be handled by useEffect
     } catch (error) {
       // Error is handled by the auth context
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -105,91 +58,78 @@ export default function Signup() {
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Create account</CardTitle>
+          <CardTitle className="text-2xl text-center">Create an account</CardTitle>
           <CardDescription className="text-center">
-            Enter your information to create a new account
+            Enter your information to create your account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
                   id="firstName"
-                  name="firstName"
-                  type="text"
                   placeholder="John"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className={errors.firstName ? "border-destructive" : ""}
+                  {...register("firstName")}
                 />
                 {errors.firstName && (
-                  <p className="text-sm text-destructive">{errors.firstName}</p>
+                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last name</Label>
+                <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   id="lastName"
-                  name="lastName"
-                  type="text"
                   placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={errors.lastName ? "border-destructive" : ""}
+                  {...register("lastName")}
                 />
                 {errors.lastName && (
-                  <p className="text-sm text-destructive">{errors.lastName}</p>
+                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="m@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                className={errors.email ? "border-destructive" : ""}
+                {...register("email")}
               />
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
+                <p className="text-sm text-destructive">{errors.email.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={errors.password ? "border-destructive" : ""}
+                {...register("password")}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password}</p>
+                <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
                 id="confirmPassword"
-                name="confirmPassword"
                 type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={errors.confirmPassword ? "border-destructive" : ""}
+                {...register("confirmPassword")}
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
           </CardContent>

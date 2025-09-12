@@ -10,13 +10,13 @@ import { envVariable } from "../config/envVariable";
  * the second function handles when the request is invalid and throws an error.
 **/
 
-const getAxios = (specificBaseUrl?: string) => {
+const axiosApi = (specificBaseUrl?: string) => {
     const instance = axios.create();
 
     if (specificBaseUrl) {
         instance.defaults.baseURL = specificBaseUrl;
     } else {
-        instance.defaults.baseURL = envVariable.VITE_API_BASE_URL;
+        instance.defaults.baseURL = envVariable.API_BASE_URL;
     }
 
     // interceptors Request------------------------------------
@@ -24,7 +24,7 @@ const getAxios = (specificBaseUrl?: string) => {
         async (config) => {
             // let userToken = Cookies.get('authJwtToken');
             // let token = userToken ? JSON.parse(userToken) : '';
-            const token = localStorage.getItem(envVariable.VITE_JWT_STORAGE_KEY) || "";
+            const token = localStorage.getItem(envVariable.JWT_STORAGE_KEY) || "";
             const tenant_schema = localStorage.getItem("x-tenant-schema") || "";
 
             if (token) {
@@ -48,7 +48,7 @@ const getAxios = (specificBaseUrl?: string) => {
             if (error.response && error.response.status === 401) {
                 //dispatch action using store to show token expire popup-----
                 Cookies.remove('authJwtToken')
-                localStorage.removeItem(envVariable.VITE_JWT_STORAGE_KEY);
+                localStorage.removeItem(envVariable.JWT_STORAGE_KEY);
                 window.location.pathname = "/"
                 return Promise.reject(error);
             } else {
@@ -60,4 +60,4 @@ const getAxios = (specificBaseUrl?: string) => {
     return instance;
 }
 
-export default getAxios;
+export default axiosApi;

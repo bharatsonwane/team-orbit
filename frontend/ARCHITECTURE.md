@@ -29,7 +29,6 @@ src/
 ├── contexts/
 │   └── AuthContext.tsx         # Authentication context and hooks
 ├── components/
-│   ├── RouteGuard.tsx          # Route protection component
 │   ├── theme-provider.tsx      # Theme context provider
 │   └── theme-toggle.tsx        # Theme switching component
 ├── lib/
@@ -37,8 +36,8 @@ src/
 ├── utils/
 │   ├── routes.tsx              # Route configuration arrays
 │   ├── logger.ts               # Logging utility
-│   ├── api.ts                  # API service for HTTP requests
-│   └── axiosApi.ts             # Axios instance with interceptors
+│   ├── axiosApi.ts             # Axios instance with interceptors
+│   └── RouteGuard.tsx          # Route protection component
 ├── pages/                      # Page components
 │   ├── Home.tsx
 │   ├── Login.tsx

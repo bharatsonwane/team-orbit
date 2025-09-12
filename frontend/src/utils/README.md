@@ -8,8 +8,9 @@ This directory contains utility functions, helpers, and shared logic for the Lok
 src/utils/
 ├── routes.tsx            # Route configuration arrays
 ├── logger.ts             # Logging utility
-├── api.ts                # API service for HTTP requests
 ├── axiosApi.ts           # Axios instance with interceptors
+├── RouteGuard.tsx        # Route protection component
+├── validation.ts         # Zod validation schemas
 └── README.md             # This file
 ```
 
@@ -21,11 +22,14 @@ Contains route configuration arrays for the application's routing system. This f
 ### `logger.ts`
 Contains a logging utility class for development and production logging. Provides different log levels and automatically disables logging in production.
 
-### `api.ts`
-Contains a comprehensive API service class for making HTTP requests. Includes authentication, error handling, timeout management, and support for various HTTP methods and file operations.
-
 ### `axiosApi.ts`
 Contains an Axios instance factory with request/response interceptors. Handles automatic token injection, token expiration scenarios, and tenant schema headers.
+
+### `RouteGuard.tsx`
+Contains a route protection component that handles role-based access control. Provides authorization checks and renders access denied pages for unauthorized users.
+
+### `validation.ts`
+Contains Zod validation schemas for form validation throughout the application. Provides reusable validation rules for forms, common field validations, and TypeScript type inference.
 
 ## 🚀 Usage
 
@@ -52,32 +56,84 @@ logger.warn("Warning message")
 logger.error("Error message")
 ```
 
-### API Service
-```tsx
-import { apiService, get, post } from "@/utils/api"
-
-// Using the service instance
-const response = await apiService.get<User[]>('/users')
-const newUser = await apiService.post<User>('/users', userData)
-
-// Using individual methods
-const users = await get<User[]>('/users')
-const createdUser = await post<User>('/users', userData)
-```
-
 ### Axios API
 ```tsx
 import getAxios from "@/utils/axiosApi"
 
-// Create axios instance with interceptors
-const axiosInstance = getAxios()
+// Direct usage (recommended)
+const response = await getAxios().get('/users')
+const newUser = await getAxios().post('/users', userData)
 
-// Use for API calls
+// Or create instance for multiple calls
+const axiosInstance = getAxios()
 const response = await axiosInstance.get('/users')
 const newUser = await axiosInstance.post('/users', userData)
 
 // Create instance with custom base URL
 const customAxios = getAxios('https://api.example.com')
+```
+
+### Route Guard
+```tsx
+import RouteGuardRenderer from "@/utils/RouteGuard"
+
+// Use in App.tsx for route protection
+<Routes>
+  {mainRouteList.map((route) => (
+    <Route
+      key={route.path}
+      path={route.path}
+      element={
+        <RouteGuardRenderer authRoles={route.authRoles}>
+          {route.element}
+        </RouteGuardRenderer>
+      }
+    />
+  ))}
+</Routes>
+```
+
+### Form Validation
+```tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from '@/utils/validation';
+
+// Login form
+function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginFormData) => {
+    console.log('Login data:', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email')} />
+      {errors.email && <span>{errors.email.message}</span>}
+      
+      <input {...register('password')} />
+      {errors.password && <span>{errors.password.message}</span>}
+      
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+
+// Using individual validation schemas
+import { emailSchema, passwordSchema, nameSchema } from '@/utils/validation';
+
+const customSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+});
 ```
 
 ## 📚 Documentation

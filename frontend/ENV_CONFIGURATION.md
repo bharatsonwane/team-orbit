@@ -23,19 +23,19 @@ env.example               # Example environment file
 ## 🔧 **Environment Variables**
 
 ### **Required Variables:**
-- `VITE_APP_NAME` - Application name
-- `VITE_APP_VERSION` - Application version  
-- `VITE_APP_ENV` - Environment (development/production/test)
-- `VITE_API_BASE_URL` - Backend API base URL
-- `VITE_JWT_STORAGE_KEY` - Local storage key for JWT tokens
+- `APP_NAME` - Application name
+- `APP_VERSION` - Application version  
+- `APP_ENV` - Environment (development/production/test)
+- `API_BASE_URL` - Backend API base URL
+- `JWT_STORAGE_KEY` - Local storage key for JWT tokens
 
 ### **Optional Variables:**
-- `VITE_API_TIMEOUT` - API request timeout (default: 10000ms)
-- `VITE_TOKEN_EXPIRY_BUFFER` - Token expiry buffer (default: 300000ms)
-- `VITE_ENABLE_DEV_TOOLS` - Enable development tools (default: false)
-- `VITE_ENABLE_ANALYTICS` - Enable analytics (default: false)
-- `VITE_ENABLE_ERROR_REPORTING` - Enable error reporting (default: false)
-- `VITE_GOOGLE_ANALYTICS_ID` - Google Analytics tracking ID (optional)
+- `API_TIMEOUT` - API request timeout (default: 10000ms)
+- `TOKEN_EXPIRY_BUFFER` - Token expiry buffer (default: 300000ms)
+- `ENABLE_DEV_TOOLS` - Enable development tools (default: false)
+- `ENABLE_ANALYTICS` - Enable analytics (default: false)
+- `ENABLE_ERROR_REPORTING` - Enable error reporting (default: false)
+- `GOOGLE_ANALYTICS_ID` - Google Analytics tracking ID (optional)
 - `VITE_SENTRY_DSN` - Sentry error tracking DSN (optional)
 
 ## 🚀 **Implementation Details**
@@ -46,8 +46,8 @@ import { z } from "zod";
 import { logger } from "../utils/logger";
 
 const envVariableSchema = z.object({
-  VITE_APP_NAME: z.string().min(1, "VITE_APP_NAME is mandatory"),
-  VITE_API_BASE_URL: z.string().url({ message: "VITE_API_BASE_URL must be a valid URL" }),
+  APP_NAME: z.string().min(1, "APP_NAME is mandatory"),
+  API_BASE_URL: z.string().url({ message: "API_BASE_URL must be a valid URL" }),
   // ... other variables
 });
 
@@ -59,11 +59,11 @@ export const envVariable = getEnvVariable();
 import { envVariable } from "../config/envVariable";
 
 class ApiService {
-  private baseURL = envVariable.VITE_API_BASE_URL;
-  private timeout = envVariable.VITE_API_TIMEOUT;
+  private baseURL = envVariable.API_BASE_URL;
+  private timeout = envVariable.API_TIMEOUT;
   
   private getAuthToken(): string | null {
-    return localStorage.getItem(envVariable.VITE_JWT_STORAGE_KEY);
+    return localStorage.getItem(envVariable.JWT_STORAGE_KEY);
   }
   
   // ... API methods using environment variables
@@ -76,7 +76,7 @@ import { envVariable } from '../config/envVariable'
 import { apiService } from '../utils/api'
 
 // Using environment variables for token storage
-localStorage.setItem(envVariable.VITE_JWT_STORAGE_KEY, token)
+localStorage.setItem(envVariable.JWT_STORAGE_KEY, token)
 
 // Using API service for requests
 const response = await apiService.post('/auth/login', credentials)
@@ -85,8 +85,8 @@ const response = await apiService.post('/auth/login', credentials)
 ## 🔄 **Updates Made**
 
 ### **AuthContext Updates:**
-- ✅ Replaced hardcoded API URLs with `envVariable.VITE_API_BASE_URL`
-- ✅ Replaced hardcoded token storage key with `envVariable.VITE_JWT_STORAGE_KEY`
+- ✅ Replaced hardcoded API URLs with `envVariable.API_BASE_URL`
+- ✅ Replaced hardcoded token storage key with `envVariable.JWT_STORAGE_KEY`
 - ✅ Integrated with new API service for cleaner HTTP requests
 - ✅ Improved error handling with typed responses
 
@@ -108,12 +108,12 @@ cp env.example .env.local
 ### **2. Configure Variables**
 Edit `.env.local`:
 ```env
-VITE_APP_NAME=Lokvani
-VITE_APP_VERSION=1.0.0
-VITE_APP_ENV=development
-VITE_API_BASE_URL=http://localhost:3000/api
-VITE_JWT_STORAGE_KEY=lokvani_jwt_token
-VITE_ENABLE_DEV_TOOLS=true
+APP_NAME=Lokvani
+APP_VERSION=1.0.0
+APP_ENV=development
+API_BASE_URL=http://localhost:3000/api
+JWT_STORAGE_KEY=lokvani_jwt_token
+ENABLE_DEV_TOOLS=true
 ```
 
 ### **3. Restart Development Server**
@@ -155,8 +155,8 @@ npm run dev
 import { envVariable } from "@/config/envVariable"
 
 // Access configuration
-console.log(envVariable.VITE_APP_NAME)
-console.log(envVariable.VITE_API_BASE_URL)
+console.log(envVariable.APP_NAME)
+console.log(envVariable.API_BASE_URL)
 ```
 
 ### **API Service Usage**
@@ -173,7 +173,7 @@ const newUser = await apiService.post<User>('/users', userData)
 import { envVariable } from "@/config/envVariable"
 
 function DevTools() {
-  if (envVariable.VITE_ENABLE_DEV_TOOLS) {
+  if (envVariable.ENABLE_DEV_TOOLS) {
     return <DevToolsPanel />
   }
   return null

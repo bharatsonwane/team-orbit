@@ -1,14 +1,14 @@
-import type { Route, UserRole } from '../types/auth'
-import { roleKeys } from '../types/auth'
+import type { Route, UserRole } from '../../types/auth'
+import { roleKeys } from '../../types/auth'
 
 // Import pages
-import Home from '../pages/Home'
-import Login from '../pages/Login'
-import Signup from '../pages/Signup'
-import Dashboard from '../pages/Dashboard'
-import Profile from '../pages/Profile'
-import Admin from '../pages/Admin'
-import SuperAdmin from '../pages/SuperAdmin'
+import Home from '../../pages/Home'
+import Login from '../../pages/Login'
+import Signup from '../../pages/Signup'
+import Dashboard from '../../pages/Dashboard'
+import Profile from '../../pages/Profile'
+import Admin from '../../pages/Admin'
+import SuperAdmin from '../../pages/SuperAdmin'
 
 /**@description Public routes (no authentication required) */
 const publicRouteList: Route[] = [

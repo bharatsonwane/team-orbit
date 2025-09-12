@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom"
-import RouteGuardRenderer from "./components/RouteGuard"
-import { mainRouteList } from "./utils/routes"
+import RouteGuardRenderer from "./utils/route/RouteGuardRenderer"
+import { mainRouteList } from "./utils/route/routes"
 
 function App() {
   return (

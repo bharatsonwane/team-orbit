@@ -238,7 +238,7 @@ Create `.env.production`:
 ```env
 NODE_ENV=production
 VITE_API_URL=https://api.lokvani.com
-VITE_APP_NAME=Lokvani
+APP_NAME=Lokvani
 ```
 
 ### 2. Build-time Variables
@@ -246,7 +246,7 @@ Use Vite's environment variable system:
 ```typescript
 // Access in code
 const apiUrl = import.meta.env.VITE_API_URL
-const appName = import.meta.env.VITE_APP_NAME
+const appName = import.meta.env.APP_NAME
 ```
 
 ### 3. Runtime Configuration

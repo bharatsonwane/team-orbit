@@ -1,18 +1,27 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "../contexts/AuthContext"
+import { loginSchema, type LoginFormData } from "../utils/validation"
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const { login, isAuthenticated, error, clearError } = useAuth()
+  const { login, isAuthenticated, error, clearError, isLoading } = useAuth()
+
+  // React Hook Form setup with Zod resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -26,17 +35,12 @@ export default function Login() {
     clearError()
   }, [clearError])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      await login({ email, password })
+      await login(data)
       // Navigation will be handled by useEffect
     } catch (error) {
       // Error is handled by the auth context
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -54,7 +58,7 @@ export default function Login() {
             Enter your email and password to sign in to your account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
@@ -67,20 +71,22 @@ export default function Login() {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

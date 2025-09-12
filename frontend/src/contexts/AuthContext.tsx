@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { User, AuthState, LoginCredentials, RegisterData, AuthResponse, UserRole } from '../types/auth'
 import { envVariable } from '../config/envVariable'
-import { apiService } from '../utils/api'
+import getAxios from '../utils/axiosApi'
 
 // Auth context type
 interface AuthContextType extends AuthState {
@@ -27,16 +27,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Verify token with backend
   const verifyToken = React.useCallback(async () => {
     try {
-      const token = localStorage.getItem(envVariable.VITE_JWT_STORAGE_KEY)
+      const token = localStorage.getItem(envVariable.JWT_STORAGE_KEY)
       if (!token) return
 
-      const response = await apiService.get<{ data: User }>('/auth/profile')
-      setUser(response.data!.data)
+      const response = await getAxios().get<{ data: User }>('/auth/profile')
+      setUser(response.data.data)
       setIsAuthenticated(true)
       setIsLoading(false)
       setError(null)
     } catch (error) {
-      localStorage.removeItem(envVariable.VITE_JWT_STORAGE_KEY)
+      localStorage.removeItem(envVariable.JWT_STORAGE_KEY)
       setUser(null)
       setIsAuthenticated(false)
       setIsLoading(false)
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check for existing token on mount
   useEffect(() => {
-    const token = localStorage.getItem(envVariable.VITE_JWT_STORAGE_KEY)
+    const token = localStorage.getItem(envVariable.JWT_STORAGE_KEY)
     if (token) {
       // Verify token with backend
       verifyToken()
@@ -59,11 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null)
     
     try {
-      const response = await apiService.post<AuthResponse['data']>('/auth/login', credentials)
+      const response = await getAxios().post<AuthResponse>('/auth/login', credentials)
 
-      if (response.success) {
-        localStorage.setItem(envVariable.VITE_JWT_STORAGE_KEY, response.data!.token)
-        setUser(response.data!.user)
+      if (response.data.success) {
+        localStorage.setItem(envVariable.JWT_STORAGE_KEY, response.data.data!.token)
+        setUser(response.data.data!.user)
         setIsAuthenticated(true)
         setIsLoading(false)
         setError(null)
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null)
         setIsAuthenticated(false)
         setIsLoading(false)
-        setError(response.message || 'Login failed')
+        setError(response.data.message || 'Login failed')
       }
     } catch (error: any) {
       setUser(null)
@@ -87,11 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null)
     
     try {
-      const response = await apiService.post<AuthResponse['data']>('/auth/register', data)
+      const response = await getAxios().post<AuthResponse>('/auth/register', data)
 
-      if (response.success) {
-        localStorage.setItem(envVariable.VITE_JWT_STORAGE_KEY, response.data!.token)
-        setUser(response.data!.user)
+      if (response.data.success) {
+        localStorage.setItem(envVariable.JWT_STORAGE_KEY, response.data.data!.token)
+        setUser(response.data.data!.user)
         setIsAuthenticated(true)
         setIsLoading(false)
         setError(null)
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null)
         setIsAuthenticated(false)
         setIsLoading(false)
-        setError(response.message || 'Registration failed')
+        setError(response.data.message || 'Registration failed')
       }
     } catch (error: any) {
       setUser(null)
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem(envVariable.VITE_JWT_STORAGE_KEY)
+    localStorage.removeItem(envVariable.JWT_STORAGE_KEY)
     setUser(null)
     setIsAuthenticated(false)
     setIsLoading(false)
