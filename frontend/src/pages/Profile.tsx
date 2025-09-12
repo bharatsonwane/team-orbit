@@ -1,4 +1,4 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthService } from '@/contexts/authContext';
 import { ThemeToggle } from '../components/theme-toggle';
 import {
   Card,
@@ -10,7 +10,7 @@ import {
 import { Button } from '../components/ui/button';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthService();
 
   const handleLogout = () => {
     logout();

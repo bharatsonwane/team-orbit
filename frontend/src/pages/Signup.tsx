@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthService } from '@/contexts/authContext';
 import { signupSchema, type SignupFormData } from '../schemas/validation';
 
 export default function Signup() {
@@ -25,7 +25,7 @@ export default function Signup() {
     error,
     clearError,
     isLoading,
-  } = useAuth();
+  } = useAuthService();
 
   // React Hook Form setup with Zod resolver
   const {
@@ -51,8 +51,8 @@ export default function Signup() {
   const onSubmit = async (data: SignupFormData) => {
     try {
       await registerUser({
-        first_name: data.firstName,
-        last_name: data.lastName,
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
         password: data.password,
       });

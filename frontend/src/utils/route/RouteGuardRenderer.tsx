@@ -1,8 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAuthService } from '../../contexts/AuthContext';
-import type { Route as RouteType } from '../../schemas/auth';
-import { roleKeys } from '../../schemas/auth';
+import { useAuthService } from '@/contexts/authContext';
+import type { Route as RouteType } from '../../schemas/route';
+import { roleKeys } from '../constants';
+import { hasRoleAccess } from '../authHelper';
+import type { UserRole } from '../../schemas/user';
 
 interface RouteGuardRendererProps {
   children?: React.ReactNode;
@@ -15,32 +17,33 @@ const RouteGuardRenderer: React.FC<RouteGuardRendererProps> = ({
   authRoles = [],
   routes = [],
 }) => {
-  const { verifyUserRole, hasAdminAccess, hasCIMAccess, isAuthenticated } =
-    useAuthService();
+  const { user, isAuthenticated } = useAuthService();
 
   const checkUserAuthorization = (): boolean => {
-    if (authRoles.length > 0) {
-      if (!isAuthenticated) {
-        return false;
-      } else if (
-        authRoles.includes(roleKeys.SUPER) &&
-        verifyUserRole('SUPER')
-      ) {
-        return true;
-      } else if (authRoles.includes(roleKeys.ADMIN) && hasAdminAccess()) {
-        return true;
-      } else if (authRoles.includes(roleKeys.USER) && verifyUserRole('USER')) {
-        return true;
-      } else if (authRoles.includes('CIM') && hasCIMAccess()) {
-        return true;
-      } else if (authRoles.includes(roleKeys.ANY) && isAuthenticated) {
-        return true;
-      }
-    } else {
+    if (authRoles.length === 0) {
       // If no auth roles, return true (public route)
       return true;
     }
-    return false;
+
+    if (!isAuthenticated || !user) {
+      return false;
+    }
+
+    // Convert string roles to UserRole type
+    const allowedRoles = authRoles.filter(role =>
+      Object.values(roleKeys).includes(role as UserRole)
+    ) as UserRole[];
+
+    // Special case for ANY role
+    if (authRoles.includes(roleKeys.ANY)) {
+      return true;
+    }
+
+    // Use the new hasRoleAccess helper
+    return hasRoleAccess({
+      allowedRoles,
+      userRoles: [user.role],
+    });
   };
 
   const isAuthorized = checkUserAuthorization();

@@ -6,16 +6,21 @@ Validation schemas and type definitions for the Lokvani frontend application.
 
 ```
 src/schemas/
-├── auth.ts               # Authentication schemas and types
+├── user.ts               # User and authentication schemas
+├── route.ts              # Route configuration schemas
 ├── validation.ts         # Zod validation schemas for forms
 └── README.md             # This file
 ```
 
 ## 🛠️ Schema Files
 
-### `auth.ts`
+### `user.ts`
 
-Authentication-related Zod schemas and TypeScript types. Includes user schemas, login/register validation, and complex types like AuthState and Route interfaces.
+User and authentication-related Zod schemas and TypeScript types. Includes user schemas, login/register validation, and complex types like AuthState.
+
+### `route.ts`
+
+Route configuration schemas and TypeScript types. Includes Route interface for routing configuration and RouteConfig for array-based routing.
 
 ### `validation.ts`
 
@@ -30,6 +35,47 @@ Zod validation schemas for form validation throughout the application. Provides 
 - ✅ Password strength validation
 
 ## 🚀 Usage
+
+### Route Configuration
+
+```tsx
+import type { Route, RouteConfig } from '@/schemas/route';
+import type { UserRole } from '@/schemas/user';
+
+// Define routes with proper typing
+const routes: Route[] = [
+  {
+    path: '/dashboard',
+    element: <Dashboard />,
+    authRoles: ['USER', 'ADMIN'],
+    title: 'Dashboard',
+    description: 'User dashboard page',
+  },
+];
+
+// Route configuration for array-based routing
+const routeConfig: RouteConfig = {
+  routes,
+  fallback: <NotFound />,
+};
+```
+
+### User and Authentication
+
+```tsx
+import type { User, AuthState, LoginCredentials } from '@/schemas/user';
+
+// Use inferred types from Zod schemas
+const user: User = {
+  id: '123',
+  email: 'user@example.com',
+  first_name: 'John',
+  last_name: 'Doe',
+  role: 'USER',
+  created_at: '2023-01-01T00:00:00Z',
+  updated_at: '2023-01-01T00:00:00Z',
+};
+```
 
 ### Form Validation
 

@@ -23,7 +23,8 @@ src/
 ├── main.tsx                    # Application entry point with providers
 ├── App.tsx                     # Main app component with routing
 ├── types/
-│   └── auth.ts                 # TypeScript type definitions
+│   ├── user.ts                 # User and authentication types
+│   └── route.ts                # Route configuration types
 ├── config/
 │   └── envVariable.ts          # Environment variable validation
 ├── contexts/
@@ -329,7 +330,7 @@ const mainRouteList: Route[] = [
 ### 3. **Adding New Types**
 
 ```typescript
-// In types/auth.ts or new type file
+// In schemas/user.ts or schemas/route.ts
 export interface NewType {
   property: string;
   value: number;

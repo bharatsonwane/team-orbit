@@ -6,7 +6,7 @@ The Lokvani frontend has been successfully updated with a comprehensive array-ba
 
 ## ✅ What Has Been Implemented
 
-### 1. **Type System** (`src/types/auth.ts`)
+### 1. **Type System** (`src/schemas/user.ts` and `src/schemas/route.ts`)
 
 - **User Interface** - Complete user data structure
 - **UserRole Type** - SUPER, ADMIN, USER, GUEST roles
@@ -318,7 +318,7 @@ const makeAuthenticatedRequest = async (url: string) => {
 ## 📖 Documentation References
 
 - **Main Documentation** - `src/docs/ROUTING_SYSTEM.md`
-- **Type Definitions** - `src/types/auth.ts`
+- **Type Definitions** - `src/schemas/user.ts` and `src/schemas/route.ts`
 - **Component Documentation** - Individual component files
 - **Configuration Guide** - `src/utils/routes.tsx`
 

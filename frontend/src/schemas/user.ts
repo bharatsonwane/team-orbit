@@ -1,16 +1,14 @@
 import { z } from 'zod';
+import { roleKeys } from '@/utils/constants';
 
 // User role enum
-export const userRoleSchema = z.enum(['USER', 'ADMIN', 'SUPER']);
+export const userRoleSchema = z.enum([
+  roleKeys.USER,
+  roleKeys.ADMIN,
+  roleKeys.SUPER,
+  roleKeys.ANY,
+]);
 export type UserRole = z.infer<typeof userRoleSchema>;
-
-// Role keys for route protection
-export const roleKeys = {
-  USER: 'USER',
-  ADMIN: 'ADMIN',
-  SUPER: 'SUPER',
-  ANY: 'ANY' as const,
-} as const;
 
 // User schema
 export const userSchema = z.object({
@@ -56,20 +54,3 @@ export const authResponseSchema = z.object({
 });
 
 export type AuthResponse = z.infer<typeof authResponseSchema>;
-
-// Auth state interface (complex type that can't be easily expressed in Zod)
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-// Route interface (complex type for routing)
-export interface Route {
-  path: string;
-  element: React.ReactElement;
-  authRoles?: string[];
-  title?: string;
-  description?: string;
-}

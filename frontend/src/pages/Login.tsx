@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,24 +14,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { loginAction } from '../redux/actions/userActions';
-import {
-  selectIsAuthenticated,
-  selectUserLoading,
-  selectUserError,
-  clearError,
-} from '../redux/slices/userSlice';
 import { loginSchema, type LoginFormData } from '../schemas/validation';
-import type { AppDispatch } from '../redux/store';
+import { useAuthService } from '@/contexts/authContext';
+
 
 export default function Login() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
 
-  // Redux selectors
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isLoading = useSelector(selectUserLoading);
-  const error = useSelector(selectUserError);
+  const { login, isAuthenticated, isLoading, error, clearError } = useAuthService();
 
   // React Hook Form setup with Zod resolver
   const {
@@ -52,14 +41,15 @@ export default function Login() {
 
   // Clear error when component mounts
   useEffect(() => {
-    dispatch(clearError());
-  }, [dispatch]);
+    clearError();
+  }, [clearError]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await dispatch(loginAction(data));
+      await login(data);
       // Navigation will be handled by useEffect
     } catch (error) {
+      console.error(error);
       // Error is handled by Redux
     }
   };

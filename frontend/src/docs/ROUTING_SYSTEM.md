@@ -20,7 +20,8 @@ The Lokvani frontend uses a sophisticated routing system that combines React Rou
 ```
 src/
 ├── types/
-│   └── auth.ts                 # Authentication and routing types
+│   ├── user.ts                 # User and authentication types
+│   └── route.ts                # Route configuration types
 ├── contexts/
 │   └── AuthContext.tsx         # Authentication context and hooks
 ├── components/
@@ -156,25 +157,30 @@ interface RouteGuardRendererProps {
 
 ```typescript
 const checkUserAuthorization = (): boolean => {
-  if (authRoles.length > 0) {
-    if (!isAuthenticated) {
-      return false;
-    } else if (authRoles.includes(roleKeys.SUPER) && verifyUserRole('SUPER')) {
-      return true;
-    } else if (authRoles.includes(roleKeys.ADMIN) && hasAdminAccess()) {
-      return true;
-    } else if (authRoles.includes(roleKeys.USER) && verifyUserRole('USER')) {
-      return true;
-    } else if (authRoles.includes(roleKeys.CIM) && hasCIMAccess()) {
-      return true;
-    } else if (authRoles.includes(roleKeys.ANY) && isAuthenticated) {
-      return true;
-    }
-  } else {
+  if (authRoles.length === 0) {
     // If no auth roles, return true (public route)
     return true;
   }
-  return false;
+
+  if (!isAuthenticated || !user) {
+    return false;
+  }
+
+  // Convert string roles to UserRole type
+  const allowedRoles = authRoles.filter(role =>
+    Object.values(roleKeys).includes(role as UserRole)
+  ) as UserRole[];
+
+  // Special case for ANY role
+  if (authRoles.includes(roleKeys.ANY)) {
+    return true;
+  }
+
+  // Use the hasRoleAccess helper
+  return hasRoleAccess({
+    allowedRoles,
+    userRoles: [user.role],
+  });
 };
 ```
 
@@ -219,9 +225,6 @@ interface AuthContextType extends AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
-  verifyUserRole: (role: UserRole) => boolean;
-  hasAdminAccess: () => boolean;
-  hasSuperAccess: () => boolean;
 }
 ```
 
@@ -303,14 +306,15 @@ const mainRouteList: Route[] = [
 
 ```typescript
 // In a component
-const { hasAdminAccess, hasSuperAccess } = useAuth()
+const { user } = useAuthService()
+import { hasRoleAccess } from '@/utils/authHelper';
 
 return (
   <div>
-    {hasAdminAccess() && (
+    {hasRoleAccess({ allowedRoles: ['ADMIN', 'SUPER'], userRoles: [user.role] }) && (
       <Link to="/admin">Admin Panel</Link>
     )}
-    {hasSuperAccess() && (
+    {hasRoleAccess({ allowedRoles: ['SUPER'], userRoles: [user.role] }) && (
       <Link to="/super-admin">Super Admin</Link>
     )}
   </div>
@@ -522,14 +526,17 @@ test('login redirects to dashboard', async () => {
 
 ```typescript
 // Debug authentication state
-const { user, isAuthenticated, error } = useAuth();
+const { user, isAuthenticated, error } = useAuthService();
 console.log('Auth State:', { user, isAuthenticated, error });
 
 // Debug route access
-const { verifyUserRole, hasAdminAccess } = useAuth();
+import { hasRoleAccess } from '@/utils/authHelper';
 console.log('Role Check:', {
-  isSuper: verifyUserRole('SUPER'),
-  isAdmin: hasAdminAccess(),
+  isSuper: hasRoleAccess({ allowedRoles: ['SUPER'], userRoles: [user?.role] }),
+  isAdmin: hasRoleAccess({
+    allowedRoles: ['ADMIN', 'SUPER'],
+    userRoles: [user?.role],
+  }),
 });
 ```
 

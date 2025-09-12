@@ -1,5 +1,5 @@
-import type { Route, UserRole } from '../../schemas/auth';
-import { roleKeys } from '../../schemas/auth';
+import type { Route } from '../../schemas/route';
+import { roleKeys } from '../constants';
 
 // Import pages
 import Home from '../../pages/Home';
@@ -33,14 +33,14 @@ const userRouteList: Route[] = [
   {
     path: '/dashboard',
     element: <Dashboard />,
-    authRoles: ['ANY' as UserRole],
+    authRoles: [roleKeys.ANY],
     title: 'Dashboard',
     description: 'User dashboard',
   },
   {
     path: '/profile',
     element: <Profile />,
-    authRoles: ['ANY' as UserRole],
+    authRoles: [roleKeys.ANY],
     title: 'Profile',
     description: 'User profile management',
   },
@@ -77,7 +77,7 @@ const mainRouteList: Route[] = [
   {
     path: '/',
     element: <Home />,
-    authRoles: ['ANY' as UserRole],
+    authRoles: [roleKeys.ANY],
     title: 'Home',
     description: 'Application home page',
   },

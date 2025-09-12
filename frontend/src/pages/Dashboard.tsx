@@ -8,10 +8,26 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthService } from '../contexts/authContext';
+import { hasRoleAccess } from '../utils/authHelper';
 
 export default function Dashboard() {
-  const { user, logout, hasAdminAccess, hasSuperAccess } = useAuth();
+  const { user, logout } = useAuthService();
+
+  // Check user roles using the new authHelper
+  const isAdmin = user
+    ? hasRoleAccess({
+        allowedRoles: ['ADMIN', 'SUPER'],
+        userRoles: [user.role],
+      })
+    : false;
+
+  const isSuper = user
+    ? hasRoleAccess({
+        allowedRoles: ['SUPER'],
+        userRoles: [user.role],
+      })
+    : false;
 
   const handleLogout = () => {
     logout();
@@ -105,7 +121,7 @@ export default function Dashboard() {
                 >
                   <Link to='/profile'>Profile</Link>
                 </Button>
-                {hasAdminAccess() && (
+                {isAdmin && (
                   <Button
                     asChild
                     variant='ghost'
@@ -114,7 +130,7 @@ export default function Dashboard() {
                     <Link to='/admin'>Admin Panel</Link>
                   </Button>
                 )}
-                {hasSuperAccess() && (
+                {isSuper && (
                   <Button
                     asChild
                     variant='ghost'

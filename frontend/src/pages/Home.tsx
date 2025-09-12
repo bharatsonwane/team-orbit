@@ -8,11 +8,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthService } from '../contexts/authContext';
 import { useEffect } from 'react';
 
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthService();
   const navigate = useNavigate();
 
   // Redirect authenticated users to dashboard

@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import getAxios from '../../utils/axiosApi';
-import { envVariable } from '../../config/envVariable';
 
 // User interface
 export interface User {
@@ -29,23 +28,19 @@ export interface LoginResponse {
   message?: string;
 }
 
-// Login action
+// Login action - API call only
 export const loginAction = createAsyncThunk(
   'user/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      // Make login API call
+      // Make login API call only
       const response = await getAxios().post<LoginResponse>(
         'api/user/login',
         credentials
       );
 
-      localStorage.setItem(
-        envVariable.JWT_STORAGE_KEY,
-        response.data.data.token
-      );
-
-      return response.data.data;
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
