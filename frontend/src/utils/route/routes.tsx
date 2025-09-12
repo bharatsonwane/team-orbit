@@ -1,5 +1,5 @@
-import type { Route, UserRole } from '../../types/auth'
-import { roleKeys } from '../../types/auth'
+import type { Route, UserRole } from '../../schemas/auth'
+import { roleKeys } from '../../schemas/auth'
 
 // Import pages
 import Home from '../../pages/Home'

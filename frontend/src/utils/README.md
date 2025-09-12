@@ -10,7 +10,7 @@ src/utils/
 ├── logger.ts             # Logging utility
 ├── axiosApi.ts           # Axios instance with interceptors
 ├── RouteGuard.tsx        # Route protection component
-├── validation.ts         # Zod validation schemas
+├── date.ts               # Date utilities using datejs
 └── README.md             # This file
 ```
 
@@ -28,8 +28,10 @@ Contains an Axios instance factory with request/response interceptors. Handles a
 ### `RouteGuard.tsx`
 Contains a route protection component that handles role-based access control. Provides authorization checks and renders access denied pages for unauthorized users.
 
-### `validation.ts`
-Contains Zod validation schemas for form validation throughout the application. Provides reusable validation rules for forms, common field validations, and TypeScript type inference.
+**Note:** Validation schemas have been moved to `src/schemas/validation.ts` for better organization.
+
+### `date.ts`
+Contains date utility functions using datejs for natural language date parsing and manipulation. Provides easy-to-use functions for date formatting, parsing, and arithmetic operations.
 
 ## 🚀 Usage
 
@@ -97,7 +99,7 @@ import RouteGuardRenderer from "@/utils/RouteGuard"
 ```tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from '@/utils/validation';
+import { loginSchema, signupSchema, type LoginFormData, type SignupFormData } from '@/schemas/validation';
 
 // Login form
 function LoginForm() {
@@ -127,13 +129,58 @@ function LoginForm() {
 }
 
 // Using individual validation schemas
-import { emailSchema, passwordSchema, nameSchema } from '@/utils/validation';
+import { emailSchema, passwordSchema, nameSchema } from '@/schemas/validation';
 
 const customSchema = z.object({
   name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
 });
+```
+
+### Date Utilities
+```tsx
+import { 
+  formatDate, 
+  parseDate, 
+  getRelativeTime, 
+  addTime, 
+  subtractTime,
+  isToday,
+  isYesterday,
+  formatWithPredefined,
+  dateFormats 
+} from '@/utils/date';
+
+// Format dates
+const formatted = formatDate(new Date(), 'MMMM d, yyyy'); // "January 15, 2024"
+const shortFormat = formatWithPredefined(new Date(), 'short'); // "1/15/2024"
+
+// Parse natural language dates
+const parsed = parseDate('tomorrow'); // Date object for tomorrow
+const parsed2 = parseDate('next week'); // Date object for next week
+
+// Relative time
+const relative = getRelativeTime('2024-01-10'); // "5 days ago"
+
+// Date arithmetic
+const future = addTime(new Date(), '2 days'); // Date 2 days from now
+const past = subtractTime(new Date(), '1 week'); // Date 1 week ago
+
+// Date checks
+const today = isToday(new Date()); // true
+const yesterday = isYesterday('2024-01-14'); // true if yesterday
+
+// Using with components
+function DateDisplay({ date }: { date: string }) {
+  return (
+    <div>
+      <p>Formatted: {formatDate(date)}</p>
+      <p>Relative: {getRelativeTime(date)}</p>
+      <p>Is today: {isToday(date) ? 'Yes' : 'No'}</p>
+    </div>
+  );
+}
 ```
 
 ## 📚 Documentation

@@ -36,7 +36,7 @@ export const loginAction = createAsyncThunk(
     try {
       // Make login API call
       const response = await getAxios().post<LoginResponse>(
-        "/auth/login",
+        "api/user/login",
         credentials
       );
 

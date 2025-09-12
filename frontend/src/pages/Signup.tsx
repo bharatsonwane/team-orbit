@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "../contexts/AuthContext"
-import { signupSchema, type SignupFormData } from "../utils/validation"
+import { signupSchema, type SignupFormData } from "../schemas/validation"
 
 export default function Signup() {
   const navigate = useNavigate()

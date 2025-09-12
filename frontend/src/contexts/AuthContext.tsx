@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import type { User, AuthState, LoginCredentials, RegisterData, AuthResponse, UserRole } from '../types/auth'
+import type { User, AuthState, LoginCredentials, RegisterData, AuthResponse, UserRole } from '../schemas/auth'
 import { envVariable } from '../config/envVariable'
 import getAxios from '../utils/axiosApi'
 

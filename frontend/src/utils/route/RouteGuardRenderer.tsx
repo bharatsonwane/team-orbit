@@ -1,8 +1,8 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useAuthService } from '../../contexts/AuthContext'
-import type { Route as RouteType } from '../../types/auth'
-import { roleKeys } from '../../types/auth'
+import type { Route as RouteType } from '../../schemas/auth'
+import { roleKeys } from '../../schemas/auth'
 
 interface RouteGuardRendererProps {
   children?: React.ReactNode

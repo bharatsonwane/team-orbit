@@ -2,17 +2,25 @@ import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useAuth } from "../contexts/AuthContext"
-import { loginSchema, type LoginFormData } from "../utils/validation"
+import { loginAction } from "../redux/actions/userActions"
+import { selectIsAuthenticated, selectUserLoading, selectUserError, clearError } from "../redux/slices/userSlice"
+import { loginSchema, type LoginFormData } from "../schemas/validation"
+import type { AppDispatch } from "../redux/store"
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login, isAuthenticated, error, clearError, isLoading } = useAuth()
+  const dispatch = useDispatch<AppDispatch>()
+  
+  // Redux selectors
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+  const isLoading = useSelector(selectUserLoading)
+  const error = useSelector(selectUserError)
 
   // React Hook Form setup with Zod resolver
   const {
@@ -32,15 +40,15 @@ export default function Login() {
 
   // Clear error when component mounts
   useEffect(() => {
-    clearError()
-  }, [clearError])
+    dispatch(clearError())
+  }, [dispatch])
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data)
+      await dispatch(loginAction(data))
       // Navigation will be handled by useEffect
     } catch (error) {
-      // Error is handled by the auth context
+      // Error is handled by Redux
     }
   }
 
