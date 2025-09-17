@@ -53,7 +53,7 @@ const loadTypeScriptMigration = async (filePath: string): Promise<any> => {
 };
 
 export const runMigrationForSchema = async (
-  schemaName: string = 'public'
+  schemaName: string = 'main'
 ): Promise<void> => {
   const client = await db.getDbClient();
   const migrationDir = path.join(
@@ -213,9 +213,9 @@ export const runMigrationForSchema = async (
 
 const main = async (): Promise<void> => {
   try {
-    await runMigrationForSchema('public');
+    await runMigrationForSchema('main');
 
-    // const client = await db.getDbClient();
+    const client = await db.getDbClient();
     // const { rows: tenants } = await client.query(
     //   "SELECT id, name FROM common.tenants"
     // );

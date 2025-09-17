@@ -46,11 +46,11 @@ const server = http.createServer(app);
 //   });
 // });
 
-const PORT = envVariable.API_PORT || 5000;
+const PORT = envVariable.API_PORT || 4000;
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: '*', credentials: true }));
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -77,8 +77,6 @@ app.use(errorHandler);
 
 // Start server
 server.listen(PORT, () => {
-  logger.info(`🚀 Server running on port ${PORT}`);
-  logger.info(`📱 Frontend: http://localhost:3000`);
   logger.info(`🔧 Backend API: http://localhost:${PORT}/api`);
   logger.info(`📚 API Documentation: http://localhost:${PORT}/docs`);
 });

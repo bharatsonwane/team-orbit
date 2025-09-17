@@ -66,7 +66,7 @@ class Database {
     }
   }
 
-  async getSchemaPool(schemaName: string = 'public'): Promise<PoolClient> {
+  async getSchemaPool(schemaName: string = 'main'): Promise<PoolClient> {
     const pool = await this.getDbPool().connect();
     try {
       await pool.query(`SET search_path TO ${schemaName}`);
@@ -79,11 +79,11 @@ class Database {
   }
 
   async transaction(
-    schemaName: string = 'public'
+    schemaName: string = 'main'
   ): Promise<TransactionHandlers> {
     const pool = await this.getDbPool().connect();
     try {
-      await pool.query(`SET search_path TO ${schemaName}, public`);
+      await pool.query(`SET search_path TO ${schemaName}, main`);
       await pool.query('BEGIN');
 
       const commit = async (): Promise<void> => {
