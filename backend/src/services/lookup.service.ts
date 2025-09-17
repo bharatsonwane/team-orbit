@@ -1,5 +1,5 @@
-import db from '../database/db';
 import { HttpError } from '../utils/httpError';
+import { dbClientPool } from '../middleware/dbClientMiddleware';
 
 interface LookupType {
   id: number;
@@ -17,7 +17,9 @@ interface LookupItem {
 export default class Lookup {
   constructor(reqObj: any) {}
 
-  static async retrieveLookupList(): Promise<LookupType[]> {
+  static async retrieveLookupList(
+    dbClient: dbClientPool
+  ): Promise<LookupType[]> {
     // SQL Query to fetch all LookupTypes with their associated Lookups
     const queryString = `
      SELECT 
@@ -30,7 +32,7 @@ export default class Lookup {
    `;
 
     // Execute the queryString
-    const results = await db.query(queryString);
+    const results = (await dbClient.mainPool.query(queryString)).rows;
 
     // Group results by LookupType
     const groupedData = results.reduce((acc: LookupType[], row: any) => {
@@ -70,7 +72,10 @@ export default class Lookup {
     return groupedData;
   }
 
-  static async getLookupTypeById(id: number): Promise<LookupType> {
+  static async getLookupTypeById(
+    dbClient: dbClientPool,
+    id: number
+  ): Promise<LookupType> {
     const queryString = `
      SELECT 
        lt.id AS "lookupTypeId",
@@ -83,13 +88,14 @@ export default class Lookup {
     `;
 
     // Execute the queryString
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows;
 
-    if (results.length === 0) {
+    if (response.length === 0) {
       throw new HttpError('Lookup Type not found', 404);
     }
 
-    const lookupType = results[0];
+    const lookupType = response[0];
 
     const data: LookupType = {
       id: lookupType.lookupTypeId,
@@ -98,7 +104,7 @@ export default class Lookup {
     };
 
     // Add Lookup entry if it exists
-    results.forEach((row: any) => {
+    response.forEach((row: any) => {
       if (row.lookupId) {
         data.lookups.push({
           id: row.lookupId,
@@ -109,34 +115,36 @@ export default class Lookup {
     return data;
   }
 
-  static async getUserStatusPendingId(): Promise<number> {
+  static async getUserStatusPendingId(dbClient: dbClientPool): Promise<number> {
     const queryString = `
       SELECT l.id 
       FROM lookup l
       INNER JOIN lookup_type lt ON l."lookupTypeId" = lt.id
       WHERE l.label = 'Pending' AND lt.name = 'userStatus';
     `;
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows;
 
-    if (results.length === 0) {
+    if (response.length === 0) {
       throw new HttpError('Lookup Pending user_status not found.', 404);
     }
 
-    return results[0].id;
+    return response[0].id;
   }
 
-  static async getUserRoleUserId(): Promise<number> {
+  static async getUserRoleUserId(dbClient: dbClientPool): Promise<number> {
     const queryString = `
       SELECT l.id
       FROM lookup l
       INNER JOIN lookup_type lt ON l."lookupTypeId" = lt.id
       WHERE l.label = 'Standard' AND lt.name = 'userRole';`;
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows;
 
-    if (results.length === 0) {
+    if (response.length === 0) {
       throw new HttpError('Lookup User user_role not found.', 404);
     }
 
-    return results[0].id;
+    return response[0].id;
   }
 }

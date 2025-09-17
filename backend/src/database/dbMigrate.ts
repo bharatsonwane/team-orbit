@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import { pathToFileURL } from 'url';
-import db from './db';
+import db, { schemaNames } from './db';
 import logger from '../utils/logger';
 
 // Use process.cwd() for current working directory
@@ -64,13 +64,17 @@ class DatabaseMigrationManager {
   /**
    * Setup schema and migration table
    */
-  private async runMigrationForSchema(
-    schemaName: string = 'main'
-  ): Promise<void> {
+  private async runMigrationForSchema({
+    schemaName,
+    schemaFolderName,
+  }: {
+    schemaName: string;
+    schemaFolderName: string;
+  }): Promise<void> {
     const client = await db.getDbClient();
     const migrationDir = path.join(
       currentDir,
-      `src/database/migrations/${schemaName}`
+      `src/database/migrations/${schemaFolderName}`
     );
 
     // 🔧 Ensure migration directory exists
@@ -230,24 +234,30 @@ class DatabaseMigrationManager {
 
   public async handleMigration(): Promise<void> {
     try {
-      await this.runMigrationForSchema('main');
+      await this.runMigrationForSchema({
+        schemaName: schemaNames.main,
+        schemaFolderName: schemaNames.main,
+      });
 
       const client = await db.getDbClient();
-      // const { rows: tenants } = await client.query(
-      //   "SELECT id, name FROM common.tenants"
-      // );
+      const { rows: tenants } = await client.query(
+        'SELECT id, name FROM common.tenants'
+      );
 
-      // for (const tenant of tenants) {
-      //   const schemaName = `tenant_${tenant.id}`;
-      //   logger.info(`ℹ️ Running migration for: ${tenant.name} (${schemaName})`);
-      //   try {
-      //     await runMigrationForSchema(schemaName);
-      //   } catch (err) {
-      //     logger.error(
-      //       `❌ Failed to migrate ${tenant.name} (${schemaName}). Skipping.`
-      //     );
-      //   }
-      // }
+      for (const tenant of tenants) {
+        const schemaName = `tenant_${tenant.id}`;
+        logger.info(`ℹ️ Running migration for: ${tenant.name} (${schemaName})`);
+        try {
+          await this.runMigrationForSchema({
+            schemaName: schemaName,
+            schemaFolderName: schemaNames.tenantSchemaFolderName(tenant.id),
+          });
+        } catch (err) {
+          logger.error(
+            `❌ Failed to migrate ${tenant.name} (${schemaName}). Skipping.`
+          );
+        }
+      }
 
       await db.shutdown();
       logger.info('✅ All migrations completed');

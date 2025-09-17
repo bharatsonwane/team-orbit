@@ -36,7 +36,7 @@ export const sendMessage = async (
       reaction: reaction || {},
     });
 
-    const savedMessage = await chatMessage.saveMessage();
+    const savedMessage = await chatMessage.saveMessage(req.db);
 
     res.status(201).json({
       success: true,
@@ -58,7 +58,8 @@ export const getMessagesByChatRoom = async (
 ): Promise<void> => {
   try {
     const { chatRoomId } = req.params as { chatRoomId: string };
-    const messages = await Chat.getMessagesForRoom(chatRoomId);
+
+    const messages = await Chat.getMessagesForRoom(req.db, chatRoomId);
     res.status(200).json({
       success: true,
       data: messages,

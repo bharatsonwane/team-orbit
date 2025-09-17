@@ -106,8 +106,10 @@ src/
 ├── utils/               # Utility functions
 │   ├── logger.ts
 │   └── helpers.ts
-├── doc/                 # API documentation
-│   └── openApiRoutes.ts
+├── openApiDocs/         # OpenAPI documentation system
+│   ├── openApiRoutes.ts
+│   ├── openAPIDocumentGenerator.ts
+│   └── serviceResponse.ts
 └── server.ts            # Application entry point
 ```
 

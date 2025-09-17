@@ -4,7 +4,7 @@ Complete API reference for the Lokvani backend application.
 
 ## 🌐 Base URL
 
-- **Development:** `http://localhost:5000`
+- **Development:** `http://localhost:4000`
 - **Production:** `https://api.lokvani.com`
 
 ## 📚 API Overview
@@ -228,6 +228,140 @@ Authorization: Bearer <token>
 }
 ```
 
+## 📋 Lookup Endpoints
+
+### Lookup Data Management
+
+The lookup endpoints provide access to reference data used throughout the application, such as user roles, statuses, and other categorized data.
+
+#### Get All Lookup Data
+
+```http
+GET /api/lookup/list
+Authorization: Bearer <token>
+```
+
+**Description:** Retrieves all lookup types with their associated lookup values, organized hierarchically.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "userRole",
+      "lookups": [
+        {
+          "id": 1,
+          "label": "Standard",
+          "lookupTypeId": 1
+        },
+        {
+          "id": 2,
+          "label": "Admin",
+          "lookupTypeId": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "userStatus",
+      "lookups": [
+        {
+          "id": 3,
+          "label": "Active",
+          "lookupTypeId": 2
+        },
+        {
+          "id": 4,
+          "label": "Pending",
+          "lookupTypeId": 2
+        },
+        {
+          "id": 5,
+          "label": "Inactive",
+          "lookupTypeId": 2
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Get Lookup Type by ID
+
+```http
+GET /api/lookup/:id
+Authorization: Bearer <token>
+```
+
+**Description:** Retrieves a specific lookup type and its associated values by ID.
+
+**Parameters:**
+- `id` (number): The lookup type ID
+
+**Example:**
+```http
+GET /api/lookup/1
+Authorization: Bearer <token>
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "userRole",
+    "lookups": [
+      {
+        "id": 1,
+        "label": "Standard"
+      },
+      {
+        "id": 2,
+        "label": "Admin"
+      }
+    ]
+  }
+}
+```
+
+**Error Responses:**
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Lookup Type not found"
+  }
+}
+```
+
+### Lookup Data Structure
+
+#### LookupType Interface
+```typescript
+interface LookupType {
+  id: number;
+  name: string;
+  lookups: LookupItem[];
+}
+```
+
+#### LookupItem Interface
+```typescript
+interface LookupItem {
+  id: number;
+  label: string;
+  name?: string;
+  lookupTypeId?: number;
+}
+```
+
 ## 💬 Chat Endpoints
 
 ### Chat Messages
@@ -426,7 +560,7 @@ All requests are validated using Zod schemas:
 ### Connection
 
 ```javascript
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:4000');
 
 // Join a room
 socket.emit('joinRoom', { userId: 1 });
@@ -459,7 +593,7 @@ socket.on('receiveMessage', message => {
 #### Login
 
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
 ```
@@ -467,7 +601,21 @@ curl -X POST http://localhost:5000/api/auth/login \
 #### Get Users
 
 ```bash
-curl -X GET http://localhost:5000/api/users \
+curl -X GET http://localhost:4000/api/users \
+  -H "Authorization: Bearer <your-token>"
+```
+
+#### Get Lookup Data
+
+```bash
+curl -X GET http://localhost:4000/api/lookup/list \
+  -H "Authorization: Bearer <your-token>"
+```
+
+#### Get Specific Lookup Type
+
+```bash
+curl -X GET http://localhost:4000/api/lookup/1 \
   -H "Authorization: Bearer <your-token>"
 ```
 
@@ -479,13 +627,30 @@ curl -X GET http://localhost:5000/api/users \
 
 ## 📚 OpenAPI Specification
 
-The complete OpenAPI specification is available at `/docs` endpoint. It includes:
+The Lokvani backend features a comprehensive OpenAPI documentation system built with Zod schemas and the ServiceResponse pattern, located in `src/openApiDocs/`.
 
-- All endpoint definitions
-- Request/response schemas
-- Authentication requirements
-- Example requests and responses
-- Interactive testing interface
+### OpenAPI Endpoints
+
+- **Interactive Documentation:** `http://localhost:4000/docs` - Swagger UI interface
+- **JSON Specification:** `http://localhost:4000/docs/swagger.json` - Raw OpenAPI spec
+
+### Features
+
+- **Schema-driven Documentation:** Auto-generated from Zod validation schemas
+- **ServiceResponse Integration:** Standardized response format across all endpoints
+- **Interactive Testing:** Test endpoints directly from the documentation
+- **JWT Authentication:** Built-in bearer token support
+- **Real-time Validation:** Request/response validation against schemas
+- **Code Generation:** Export for client SDK generation
+
+### OpenAPI Architecture
+
+The documentation system includes:
+- **openApiRoutes.ts:** Swagger UI routes and JSON endpoint
+- **openAPIDocumentGenerator.ts:** Document generation utilities and registry
+- **serviceResponse.ts:** Service response class and schemas
+
+For detailed information about the OpenAPI system, see [OpenAPI Documentation](./OPENAPI.md).
 
 ## 🔧 Development
 

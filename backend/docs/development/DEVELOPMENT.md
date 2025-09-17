@@ -44,7 +44,10 @@ src/
 │   └── seed/           # Database seeding
 ├── types/               # TypeScript type definitions
 ├── utils/               # Utility functions
-├── doc/                 # API documentation
+├── openApiDocs/         # OpenAPI documentation system
+│   ├── openApiRoutes.ts          # Swagger UI routes
+│   ├── openAPIDocumentGenerator.ts # Document generation utilities
+│   └── serviceResponse.ts        # Service response schemas
 └── server.ts            # Application entry point
 ```
 
@@ -687,10 +690,345 @@ const processLargeDataset = async () => {
 };
 ```
 
+## 🏗️ New Architecture Patterns
+
+### Class-based Services
+
+The Lokvani backend has migrated to class-based services for better organization:
+
+```typescript
+// src/services/lookup.service.ts
+export default class Lookup {
+  constructor(reqObj: any) {}
+
+  static async retrieveLookupList(): Promise<LookupType[]> {
+    const queryString = `
+      SELECT 
+        lt.id AS "lookupTypeId",
+        lt.name AS "lookupTypeName",
+        l.id AS "lookupId",
+        l.label AS "lookupLabel"
+      FROM lookup_type lt
+      LEFT JOIN lookup l ON lt.id = l."lookupTypeId"
+    `;
+
+    const results = (await mainPool.query(queryString)).rows;
+    // Process and return grouped data...
+    return groupedData;
+  }
+}
+```
+
+### Database Client Middleware
+
+Automatic database connection injection:
+
+```typescript
+// Request object gets enhanced with database connections
+interface Request {
+  db: {
+    mainPool: PoolClient;
+    tenantPool?: PoolClient;
+  }
+}
+
+// Usage in controllers
+export const getLookupList = async (req: Request, res: Response) => {
+  const results = await req.db.mainPool.query('SELECT * FROM lookup_type');
+  res.success(results.rows);
+};
+```
+
+### Migration System (Class-based)
+
+```typescript
+export class MigrationManager {
+  private currentDir: string;
+  private dbClient: any;
+
+  async runMigrationForSchema(schemaName: string = 'main'): Promise<void> {
+    await this.initializeClient();
+    await this.setupSchema(schemaName);
+    
+    const allMigrations = await this.getMigrationFiles(schemaName);
+    const applied = await this.getAppliedMigrations();
+    
+    // Run pending migrations...
+  }
+}
+```
+
+### ServiceResponse Pattern
+
+Standardized service responses using the ServiceResponse class:
+
+```typescript
+// src/openApiDocs/serviceResponse.ts
+import { ServiceResponse } from '../openApiDocs/serviceResponse';
+import { StatusCodes } from 'http-status-codes';
+
+// In service layer
+export class UserService {
+  static async getAllUsers(): Promise<ServiceResponse> {
+    try {
+      const users = await userRepository.findAll();
+      return ServiceResponse.success(
+        'Users retrieved successfully',
+        users,
+        StatusCodes.OK
+      );
+    } catch (error) {
+      return ServiceResponse.failure(
+        'Failed to retrieve users',
+        { error: error.message },
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+}
+
+// In controller layer
+export const getUsers = async (req: Request, res: Response) => {
+  const serviceResponse = await UserService.getAllUsers();
+  
+  res.status(serviceResponse.statusCode).json({
+    success: serviceResponse.success,
+    message: serviceResponse.message,
+    data: serviceResponse.responseObject,
+    timestamp: new Date().toISOString(),
+    path: req.path,
+  });
+};
+```
+
+### Response Handler Middleware (Alternative)
+
+Extended Response interface for middleware-based responses:
+
+```typescript
+// Extended Response interface
+interface Response {
+  success(data?: any, message?: string): Response;
+  error(error: any, statusCode?: number): Response;
+}
+
+// Usage in controllers
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const serviceResponse = await UserService.getAllUsers();
+    if (serviceResponse.success) {
+      res.success(serviceResponse.responseObject, serviceResponse.message);
+    } else {
+      res.error(serviceResponse, serviceResponse.statusCode);
+    }
+  } catch (error) {
+    res.error(error);
+  }
+};
+```
+
+## 🔧 Development Best Practices (Updated)
+
+### 1. Service Layer Patterns
+
+Use class-based services for better organization:
+
+```typescript
+export default class UserService {
+  static async getAllUsers(): Promise<User[]> {
+    // Implementation
+  }
+
+  static async getUserById(id: string): Promise<User | null> {
+    // Implementation
+  }
+}
+```
+
+### 2. Database Access Patterns
+
+Leverage the database middleware:
+
+```typescript
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    // Use injected database connection
+    const result = await req.db.mainPool.query(
+      'SELECT * FROM users WHERE id = $1', 
+      [req.params.id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'User not found' }
+      });
+    }
+
+    res.success(result.rows[0]);
+  } catch (error) {
+    res.error(error);
+  }
+};
+```
+
+### 3. Error Handling Patterns
+
+Use the standardized error response:
+
+```typescript
+// Custom error classes
+export class HttpError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 500
+  ) {
+    super(message);
+    this.name = 'HttpError';
+  }
+}
+
+// Usage in services
+if (!user) {
+  throw new HttpError('User not found', 404);
+}
+```
+
+### 4. OpenAPI Documentation Patterns
+
+Document endpoints using the OpenAPI system:
+
+```typescript
+// src/routes/user.routes.ts
+import { commonDocCreator, bearerAuth } from '../openApiDocs/openAPIDocumentGenerator';
+import { ServiceResponseSchema } from '../openApiDocs/serviceResponse';
+
+// Define schemas
+const createUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  first_name: z.string().min(1),
+  last_name: z.string().min(1)
+});
+
+const userResponseSchema = ServiceResponseSchema(z.object({
+  id: z.number(),
+  email: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
+}));
+
+// Document the endpoint
+commonDocCreator({
+  routePath: '/api/users',
+  method: 'post',
+  tags: ['User Management'],
+  requestSchema: {
+    bodySchema: createUserSchema,
+    description: 'Create a new user account',
+  },
+  responseSchemas: [
+    {
+      schema: userResponseSchema,
+      description: 'User created successfully',
+      statusCode: 201,
+    },
+    {
+      schema: ServiceResponseSchema(z.object({ error: z.string() })),
+      description: 'Validation failed',
+      statusCode: 400,
+    },
+  ],
+  security: [{ [bearerAuth.name]: [] }],
+});
+
+// Apply validation and define route
+router.post('/users', 
+  validateRequest(createUserSchema), 
+  createUser
+);
+```
+
+### 5. Validation Patterns
+
+Use Zod schemas with middleware:
+
+```typescript
+// Define schema with OpenAPI metadata
+const createUserSchema = z.object({
+  email: z.string().email().openapi({ 
+    description: 'User email address',
+    example: 'user@example.com' 
+  }),
+  password: z.string().min(8).openapi({ 
+    description: 'User password (minimum 8 characters)',
+    example: 'password123' 
+  }),
+  first_name: z.string().min(1).openapi({ 
+    description: 'User first name',
+    example: 'John' 
+  }),
+  last_name: z.string().min(1).openapi({ 
+    description: 'User last name',
+    example: 'Doe' 
+  }),
+});
+
+// Apply to routes
+router.post('/users', 
+  validateRequest(createUserSchema), 
+  createUser
+);
+```
+
+## 🧪 Testing Patterns (Updated)
+
+### Testing Class-based Services
+
+```typescript
+describe('Lookup Service', () => {
+  describe('retrieveLookupList', () => {
+    it('should return grouped lookup data', async () => {
+      // Mock database response
+      const mockResults = [
+        { lookupTypeId: 1, lookupTypeName: 'userRole', lookupId: 1, lookupLabel: 'Admin' }
+      ];
+      
+      jest.spyOn(db, 'query').mockResolvedValue({ rows: mockResults });
+      
+      const result = await Lookup.retrieveLookupList();
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('userRole');
+      expect(result[0].lookups).toHaveLength(1);
+    });
+  });
+});
+```
+
+### Testing Middleware
+
+```typescript
+describe('Database Client Middleware', () => {
+  it('should inject database connections', async () => {
+    const req = {} as Request;
+    const res = {} as Response;
+    const next = jest.fn();
+
+    await dbClientMiddleware(req, res, next);
+
+    expect(req.db).toBeDefined();
+    expect(req.db.mainPool).toBeDefined();
+    expect(next).toHaveBeenCalled();
+  });
+});
+```
+
 ## 📚 Additional Resources
 
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Express.js Best Practices](https://expressjs.com/en/advanced/best-practice-performance.html)
-- [Node.js Security Best Practices](https://nodejs.org/en/docs/guides/security/)
-- [PostgreSQL Best Practices](https://www.postgresql.org/docs/current/performance-tips.html)
-- [Testing Best Practices](https://github.com/goldbergyoni/javascript-testing-best-practices)
+- [🏗️ Middleware Architecture](../architecture/MIDDLEWARE.md) - Comprehensive middleware documentation
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/) - TypeScript best practices
+- [Express.js Best Practices](https://expressjs.com/en/advanced/best-practice-performance.html) - Express optimization
+- [Node.js Security Best Practices](https://nodejs.org/en/docs/guides/security/) - Security guidelines
+- [PostgreSQL Best Practices](https://www.postgresql.org/docs/current/performance-tips.html) - Database optimization
+- [Testing Best Practices](https://github.com/goldbergyoni/javascript-testing-best-practices) - Testing strategies

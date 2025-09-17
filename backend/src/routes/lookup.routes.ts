@@ -5,7 +5,7 @@ import {
   getLookupTypeById,
 } from '../controllers/lookup.controller';
 import RouteRegistrar from '../middleware/RouteRegistrar';
-import { LookupListSchema, LookupTypeSchema } from '../schemas/lookup.schema';
+import { lookupListSchema, lookupTypeSchema } from '../schemas/lookup.schema';
 import { idValidation } from '../schemas/common.schema';
 
 const router = express.Router();
@@ -15,7 +15,7 @@ const registrar = new RouteRegistrar(router, {
 });
 
 registrar.get('/list', {
-  responseSchemas: [{ statusCode: 200, schema: LookupListSchema }],
+  responseSchemas: [{ statusCode: 200, schema: lookupListSchema }],
   controller: retrieveLookupList,
 });
 
@@ -23,7 +23,7 @@ registrar.get('/type/:id', {
   requestSchema: {
     paramsSchema: { id: idValidation },
   },
-  responseSchemas: [{ statusCode: 200, schema: LookupTypeSchema }],
+  responseSchemas: [{ statusCode: 200, schema: lookupTypeSchema }],
   controller: getLookupTypeById,
 });
 

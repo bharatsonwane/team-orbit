@@ -1,17 +1,19 @@
 import { z } from 'zod';
-import { docRegistry } from '../doc/openAPIDocumentGenerator';
-import { createApiResponse } from '../doc/openAPIDocumentGenerator';
+import { docRegistry } from '../openApiDocs/openAPIDocumentGenerator';
+import { createApiResponse } from '../openApiDocs/openAPIDocumentGenerator';
 import { idSchema } from './common.schema';
 
-const LookupSchema = z.object({
+const lookupSchema = z.object({
   id: z.number(),
   label: z.string(),
 });
 
-export const LookupTypeSchema = z.object({
+export type LookupSchema = z.infer<typeof lookupSchema>;
+
+export const lookupTypeSchema = z.object({
   id: z.number(),
   name: z.string(),
-  lookups: z.array(LookupSchema),
+  lookups: z.array(lookupSchema),
 });
 
-export const LookupListSchema = z.array(LookupTypeSchema);
+export const lookupListSchema = z.array(lookupTypeSchema);

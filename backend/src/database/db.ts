@@ -7,6 +7,12 @@ type PoolClient = pg.PoolClient;
 type PoolType = typeof Pool;
 type ClientType = typeof Client;
 
+export const schemaNames = {
+  main: 'main',
+  tenantSchemaName: (tenantId: string) => `tenant_${tenantId}`,
+  tenantSchemaFolderName: (tenantId: string) => `tenant_${tenantId}`,
+};
+
 interface TransactionHandlers {
   pool: PoolClient;
   commit: () => Promise<void>;
@@ -66,7 +72,9 @@ class Database {
     }
   }
 
-  async getSchemaPool(schemaName: string = 'main'): Promise<PoolClient> {
+  async getSchemaPool(
+    schemaName: string = schemaNames.main
+  ): Promise<PoolClient> {
     const pool = await this.getDbPool().connect();
     try {
       await pool.query(`SET search_path TO ${schemaName}`);
@@ -79,11 +87,11 @@ class Database {
   }
 
   async transaction(
-    schemaName: string = 'main'
+    schemaName: string = schemaNames.main
   ): Promise<TransactionHandlers> {
     const pool = await this.getDbPool().connect();
     try {
-      await pool.query(`SET search_path TO ${schemaName}, main`);
+      await pool.query(`SET search_path TO ${schemaName}, ${schemaNames.main}`);
       await pool.query('BEGIN');
 
       const commit = async (): Promise<void> => {

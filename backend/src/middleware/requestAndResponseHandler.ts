@@ -13,7 +13,7 @@ interface CustomResponse extends Response {
   The error method will send the status code and the error message in the response body.
  */
 
-const responseHandler = (
+export const responseHandler = (
   req: Request,
   res: CustomResponse,
   next: NextFunction
@@ -36,4 +36,3 @@ const responseHandler = (
   next();
 };
 
-export default responseHandler;

@@ -1,4 +1,4 @@
-import db from '../database/db';
+import { dbClientPool } from '../middleware/dbClientMiddleware';
 
 interface ChatMessageData {
   text?: string | null;
@@ -56,7 +56,7 @@ export default class Chat {
         : {};
   }
 
-  async saveMessage(): Promise<ChatMessage> {
+  async saveMessage(dbClient: dbClientPool): Promise<ChatMessage> {
     const query = `
       INSERT INTO chat_message (
         text,
@@ -84,38 +84,44 @@ export default class Chat {
     console.log('Inserting chat message with values:', values);
 
     try {
-      const result = await db.query(query, values);
-      if (!result || result.length === 0) {
+      const result = await dbClient.mainPool.query(query, values);
+      if (!result || result.rows.length === 0) {
         throw new Error('No rows returned from insert');
       }
-      return result[0] as ChatMessage;
+      return result.rows[0] as ChatMessage;
     } catch (error) {
       console.error('Error saving chat message:', error);
       throw new Error('Failed to insert chat message');
     }
   }
 
-  static async getMessagesForRoom(chatRoomId: string): Promise<ChatMessage[]> {
+  static async getMessagesForRoom(
+    dbClient: dbClientPool,
+    chatRoomId: string
+  ): Promise<ChatMessage[]> {
     const query = `
       SELECT * FROM chat_message
       WHERE "chatRoomId" = $1
       ORDER BY "createdAt" ASC;
     `;
     try {
-      const result = await db.query(query, [chatRoomId]);
-      return result as ChatMessage[];
+      const result = await dbClient.mainPool.query(query, [chatRoomId]);
+      return result.rows as ChatMessage[];
     } catch (error) {
       console.error('Error fetching messages:', error);
       throw new Error('Failed to fetch messages for chat room');
     }
   }
 
-  static async saveMessage(data: {
-    senderId: string;
-    receiverId: string;
-    message: string;
-    mediaUrl?: string;
-  }): Promise<ChatMessage> {
+  static async saveMessage(
+    dbClient: dbClientPool,
+    data: {
+      senderId: string;
+      receiverId: string;
+      message: string;
+      mediaUrl?: string;
+    }
+  ): Promise<ChatMessage> {
     // This method is used by the socket.io handler
     const chatMessage = new Chat({
       text: data.message,
@@ -127,6 +133,6 @@ export default class Chat {
       reaction: {},
     });
 
-    return await chatMessage.saveMessage();
+    return await chatMessage.saveMessage(dbClient);
   }
 }

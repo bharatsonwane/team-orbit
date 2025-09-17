@@ -1,4 +1,4 @@
-import db from '../database/db';
+import { dbClientPool } from '../middleware/dbClientMiddleware';
 
 interface UserData {
   id?: number | null;
@@ -107,7 +107,7 @@ export default class User {
     this.updatedAt = new Date().toISOString();
   }
 
-  async signupUser(): Promise<UserProfile> {
+  async signupUser(dbClient: dbClientPool): Promise<UserProfile> {
     /* insert user */
     const userSignupQuery = `
         INSERT INTO user_profile (
@@ -132,12 +132,14 @@ export default class User {
                 NOW()
         )
         RETURNING *;`;
-    const results = await db.query(userSignupQuery);
-    const response = results[0] as UserProfile;
+    const results = await dbClient.mainPool.query(userSignupQuery);
+    const response = results.rows[0] as UserProfile;
     return response;
   }
 
-  async getUserByEmailOrPhone(): Promise<UserProfile | undefined> {
+  async getUserByEmailOrPhone(
+    dbClient: dbClientPool
+  ): Promise<UserProfile | undefined> {
     const queryString = `
         SELECT 
         up.id,
@@ -169,13 +171,13 @@ export default class User {
         lookup url ON up."userRoleLookupId" = usl.id
       WHERE email = '${this.email}' OR phone = '${this.phone}';`;
 
-    const results = await db.query(queryString);
-    const response = results[0] as UserProfile | undefined;
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows[0] as UserProfile | undefined;
 
     return response;
   }
 
-  async getUserById(): Promise<UserProfile | undefined> {
+  async getUserById(dbClient: dbClientPool): Promise<UserProfile | undefined> {
     const queryString = `
     SELECT 
     up.id,
@@ -206,13 +208,13 @@ export default class User {
     lookup url ON up."userRoleLookupId" = usl.id
   WHERE up.id = ${this.id};`;
 
-    const results = await db.query(queryString);
-    const response = results[0] as UserProfile | undefined;
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows[0] as UserProfile | undefined;
 
     return response;
   }
 
-  static async getUsers(): Promise<UserProfile[]> {
+  static async getUsers(dbClient: dbClientPool): Promise<UserProfile[]> {
     const queryString = `
         SELECT 
           up.id,
@@ -242,12 +244,12 @@ export default class User {
       LEFT JOIN 
         lookup url ON up."userRoleLookupId" = usl.id;`;
 
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
 
-    return results as UserProfile[];
+    return results.rows as UserProfile[];
   }
 
-  async updateUserInfo(): Promise<UserProfile> {
+  async updateUserInfo(dbClient: dbClientPool): Promise<UserProfile> {
     const acceptedKeys = [
       'title',
       'firstName',
@@ -280,24 +282,24 @@ export default class User {
       UPDATE user_profile
       SET ${setQueryString}
       WHERE id = ${this.id} RETURNING *;`;
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
 
-    delete (results[0] as any).password;
-    return results[0] as UserProfile;
+    delete (results.rows[0] as any).password;
+    return results.rows[0] as UserProfile;
   }
 
-  async updateUserPassword(): Promise<UserProfile> {
+  async updateUserPassword(dbClient: dbClientPool): Promise<UserProfile> {
     const queryString = `
       UPDATE user_profile
       SET password = '${this.hashPassword}'
       WHERE id = ${this.id} RETURNING *;`;
-    const results = await db.query(queryString);
+    const results = await dbClient.mainPool.query(queryString);
 
-    delete (results[0] as any).password;
-    return results[0] as UserProfile;
+    delete (results.rows[0] as any).password;
+    return results.rows[0] as UserProfile;
   }
 
-  async createUserInfo(): Promise<UserProfile> {
+  async createUserInfo(dbClient: dbClientPool): Promise<UserProfile> {
     const acceptedKeys = [
       'title',
       'firstName',
@@ -337,8 +339,8 @@ export default class User {
     RETURNING *;
   `;
 
-    const results = await db.query(queryString);
-    const response = results[0] as UserProfile;
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows[0] as UserProfile;
     delete (response as any).password;
 
     return response;

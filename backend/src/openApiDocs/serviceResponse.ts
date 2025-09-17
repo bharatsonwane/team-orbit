@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-class ServiceResponse {
+export class ServiceResponse {
   public success: boolean;
   public message: string;
   public responseObject: any;
@@ -36,12 +36,10 @@ class ServiceResponse {
   }
 }
 
-const ServiceResponseSchema = (dataSchema: z.ZodSchema) =>
+export const ServiceResponseSchema = (dataSchema: z.ZodSchema) =>
   z.object({
     success: z.boolean(),
     message: z.string(),
     responseObject: dataSchema.optional(),
     statusCode: z.number(),
   });
-
-export { ServiceResponse, ServiceResponseSchema };

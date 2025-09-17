@@ -6,6 +6,8 @@ export const idValidation = z
   .transform(Number)
   .refine(num => num > 0, 'ID must be a positive number');
 
+export type IdSchema = z.infer<typeof idSchema>;
+
 export const idSchema = z.object({
   params: z.object({ id: idValidation }),
 });

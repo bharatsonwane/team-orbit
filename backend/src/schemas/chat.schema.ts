@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {
   createApiResponse,
   docRegistry,
-} from '../doc/openAPIDocumentGenerator';
+} from '../openApiDocs/openAPIDocumentGenerator';
 import { ChatMessageSchema } from './user.schema';
 
 interface SendMessageDocConfig {

@@ -23,7 +23,7 @@ export const postUserLogin = async (
       dob: '',
       phone: '',
     });
-    const userData = await user.getUserByEmailOrPhone();
+    const userData = await user.getUserByEmailOrPhone(req.db);
 
     if (!userData) {
       res.status(401).json({
@@ -85,7 +85,7 @@ export const postUserSignup = async (
       dob: '',
       phone,
     });
-    const userExists = await existingUser.getUserByEmailOrPhone();
+    const userExists = await existingUser.getUserByEmailOrPhone(req.db);
 
     if (userExists) {
       res.status(400).json({
@@ -96,8 +96,8 @@ export const postUserSignup = async (
     }
 
     // Get default user status and role IDs
-    const userStatusId = await Lookup.getUserStatusPendingId();
-    const userRoleId = await Lookup.getUserRoleUserId();
+    const userStatusId = await Lookup.getUserStatusPendingId(req.db);
+    const userRoleId = await Lookup.getUserRoleUserId(req.db);
 
     // Hash password
     const hashPassword = await getHashPassword(password);
@@ -115,7 +115,7 @@ export const postUserSignup = async (
       userRoleLookupId: userRoleId,
     });
 
-    const createdUser = await newUser.signupUser();
+    const createdUser = await newUser.signupUser(req.db);
 
     res.status(201).json({
       success: true,
@@ -139,7 +139,7 @@ export const createUserProfile = async (
   try {
     const userData = req.body;
     const user = new User(userData);
-    const createdUser = await user.createUserInfo();
+    const createdUser = await user.createUserInfo(req.db);
 
     res.status(201).json({
       success: true,
@@ -161,7 +161,7 @@ export const getUsers = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const users = await User.getUsers();
+    const users = await User.getUsers(req.db);
     res.status(200).json({
       success: true,
       data: users,
@@ -190,7 +190,7 @@ export const getUserById = async (
       phone: '',
       email: '',
     });
-    const userData = await user.getUserById();
+    const userData = await user.getUserById(req.db);
 
     if (!userData) {
       res.status(404).json({
@@ -222,7 +222,7 @@ export const updateUserProfile = async (
     const { id } = req.params;
     const updateData = { ...req.body, id: parseInt(id) };
     const user = new User(updateData);
-    const updatedUser = await user.updateUserInfo();
+    const updatedUser = await user.updateUserInfo(req.db);
 
     res.status(200).json({
       success: true,
@@ -257,7 +257,7 @@ export const updateUserPassword = async (
       phone: '',
       email: '',
     });
-    const updatedUser = await user.updateUserPassword();
+    const updatedUser = await user.updateUserPassword(req.db);
 
     res.status(200).json({
       success: true,

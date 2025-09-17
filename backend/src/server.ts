@@ -1,4 +1,3 @@
-import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,12 +6,12 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 import { envVariable } from './config/envVariable';
-import { errorHandler } from './middleware/errorHandler';
-import { notFound } from './middleware/notFound';
+import { errorHandler, notFound } from './middleware/errorMiddleware';
 import apiRoutes from './routes/routes';
-import openApiRoutes from './doc/openApiRoutes';
-import responseHandler from './middleware/responseHandler';
+import openApiRoutes from './openApiDocs/openApiRoutes';
+import { responseHandler } from './middleware/requestAndResponseHandler';
 import logger from './utils/logger';
+import { dbClientMiddleware } from './middleware/dbClientMiddleware';
 
 const app = express();
 const server = http.createServer(app);
@@ -57,7 +56,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(responseHandler as express.RequestHandler);
 
 // Routes
-app.use('/api', apiRoutes);
+app.use('/api', dbClientMiddleware, apiRoutes);
 app.use('/test', (req, res) => res.send('Chat backend is running.'));
 app.use('/docs', openApiRoutes);
 
@@ -77,7 +76,6 @@ app.use(errorHandler);
 
 // Start server
 server.listen(PORT, () => {
-  logger.info(`🔧 Backend API: http://localhost:${PORT}/api`);
   logger.info(`📚 API Documentation: http://localhost:${PORT}/docs`);
 });
 

@@ -7,7 +7,7 @@ export const retrieveLookupList = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const data = await Lookup.retrieveLookupList();
+    const data = await Lookup.retrieveLookupList(req.db);
     res.status(200).send(data);
   } catch (error) {
     res.status(500).json({
@@ -25,7 +25,7 @@ export const getLookupTypeById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const data = await Lookup.getLookupTypeById(parseInt(id));
+    const data = await Lookup.getLookupTypeById(req.db, parseInt(id));
     res.status(200).send(data);
   } catch (error) {
     res.status(500).json({

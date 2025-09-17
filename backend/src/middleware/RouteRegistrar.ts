@@ -1,7 +1,7 @@
 import { Router, RequestHandler } from 'express';
 import { validateRequest } from './validationMiddleware';
-import { bearerAuth, docRegistry } from '../doc/openAPIDocumentGenerator';
-import { commonDocCreator } from '../doc/openAPIDocumentGenerator';
+import { bearerAuth, docRegistry } from '../openApiDocs/openAPIDocumentGenerator';
+import { commonDocCreator } from '../openApiDocs/openAPIDocumentGenerator';
 
 interface RouteOptions {
   middleware?: RequestHandler[];

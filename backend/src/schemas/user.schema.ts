@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { docRegistry } from '../doc/openAPIDocumentGenerator';
-import { createApiResponse } from '../doc/openAPIDocumentGenerator';
+import { docRegistry } from '../openApiDocs/openAPIDocumentGenerator';
+import { createApiResponse } from '../openApiDocs/openAPIDocumentGenerator';
 import { idSchema } from './common.schema';
 
 interface DocConfig {
