@@ -27,17 +27,18 @@ export async function dbClientMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const tenantSchemaName = req.headers['x-tenant-schema'] as string | undefined;
+  const tenantSchemaId = req.headers['x-tenant-schema'] as string | undefined;
 
   try {
     // Initialize the db object on the request
     req.db = {} as dbClientPool;
-    
+
     // Always get a pool for the main schema
     req.db.mainPool = await db.getSchemaPool(schemaNames.main);
 
     // Get tenant-specific schema pool if provided
-    if (tenantSchemaName) {
+    if (tenantSchemaId) {
+      const tenantSchemaName = schemaNames.tenantSchemaName(tenantSchemaId);
       req.db.tenantPool = await db.getSchemaPool(`tenant_${tenantSchemaName}`);
     }
 

@@ -1,4 +1,4 @@
-import pg from 'pg';
+import pg, { QueryResult } from 'pg';
 import { envVariable } from '../config/envVariable';
 import logger from '../utils/logger';
 
@@ -15,13 +15,28 @@ export const schemaNames = {
 
 interface TransactionHandlers {
   pool: PoolClient;
+  query: (query: string, params?: any[]) => Promise<QueryResult<any>>;
   commit: () => Promise<void>;
   rollback: () => Promise<void>;
 }
 
 class Database {
-  private pool: InstanceType<PoolType> | null = null;
   private client: InstanceType<ClientType> | null = null;
+  private pool: InstanceType<PoolType> | null = null;
+
+  async getDbClient(): Promise<InstanceType<ClientType>> {
+    if (!this.client) {
+      this.client = new Client({
+        host: envVariable.DB_HOST,
+        port: envVariable.DB_PORT,
+        database: envVariable.DB_NAME,
+        user: envVariable.DB_USER,
+        password: envVariable.DB_PASSWORD,
+      });
+      await this.client.connect();
+    }
+    return this.client;
+  }
 
   getDbPool(): InstanceType<PoolType> {
     if (!this.pool) {
@@ -45,36 +60,7 @@ class Database {
     return this.pool;
   }
 
-  async getDbClient(): Promise<InstanceType<ClientType>> {
-    if (!this.client) {
-      this.client = new Client({
-        host: envVariable.DB_HOST,
-        port: envVariable.DB_PORT,
-        database: envVariable.DB_NAME,
-        user: envVariable.DB_USER,
-        password: envVariable.DB_PASSWORD,
-      });
-      await this.client.connect();
-    }
-    return this.client;
-  }
-
-  async query(text: string, params?: any[]): Promise<any[]> {
-    const pool = await this.getDbPool().connect();
-    try {
-      const result = await pool.query(text, params);
-      return result.rows;
-    } catch (error) {
-      logger.error('Database Query Error:', error);
-      throw error;
-    } finally {
-      pool.release(true); // true parameter forces the release even if there's an error
-    }
-  }
-
-  async getSchemaPool(
-    schemaName: string = schemaNames.main
-  ): Promise<PoolClient> {
+  async getSchemaPool(schemaName: string): Promise<PoolClient> {
     const pool = await this.getDbPool().connect();
     try {
       await pool.query(`SET search_path TO ${schemaName}`);
@@ -86,12 +72,10 @@ class Database {
     }
   }
 
-  async transaction(
-    schemaName: string = schemaNames.main
-  ): Promise<TransactionHandlers> {
+  async transaction(schemaName: string): Promise<TransactionHandlers> {
     const pool = await this.getDbPool().connect();
     try {
-      await pool.query(`SET search_path TO ${schemaName}, ${schemaNames.main}`);
+      await pool.query(`SET search_path TO ${schemaName}`);
       await pool.query('BEGIN');
 
       const commit = async (): Promise<void> => {
@@ -103,8 +87,9 @@ class Database {
         await pool.query('ROLLBACK');
         pool.release(true);
       };
+      const query = pool.query;
 
-      return { pool, commit, rollback };
+      return { pool, query, commit, rollback };
     } catch (error) {
       pool.release(true);
       logger.error('Transaction Error:', error);
