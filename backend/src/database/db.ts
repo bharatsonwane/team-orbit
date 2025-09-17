@@ -10,7 +10,7 @@ type ClientType = typeof Client;
 export const schemaNames = {
   main: 'main',
   tenantSchemaName: (tenantId: string) => `tenant_${tenantId}`,
-  tenantSchemaFolderName: (tenantId: string) => `tenant_${tenantId}`,
+  tenantSchemaFolderName: (tenantId: string) => `tenant`,
 };
 
 interface TransactionHandlers {

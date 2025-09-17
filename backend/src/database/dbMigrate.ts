@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import { pathToFileURL } from 'url';
+import { Client } from 'pg';
 import db, { schemaNames } from './db';
 import logger from '../utils/logger';
 
@@ -62,16 +63,11 @@ class DatabaseMigrationManager {
   }
 
   /**
-   * Setup schema and migration table
+   * Prepare migration directory
    */
-  private async runMigrationForSchema({
-    schemaName,
-    schemaFolderName,
-  }: {
-    schemaName: string;
-    schemaFolderName: string;
-  }): Promise<void> {
-    const client = await db.getDbClient();
+  private async getOrCreateMigrationDirectory(
+    schemaFolderName: string
+  ): Promise<string> {
     const migrationDir = path.join(
       currentDir,
       `src/database/migrations/${schemaFolderName}`
@@ -80,12 +76,26 @@ class DatabaseMigrationManager {
     // 🔧 Ensure migration directory exists
     await fs.mkdir(migrationDir, { recursive: true });
 
-    await client.query(`
-      CREATE SCHEMA IF NOT EXISTS ${schemaName};
-      SET search_path TO ${schemaName};
-    `);
+    return migrationDir;
+  }
 
-    // Ensure schema + migration table exists
+  /**
+   * Setup database schema and table and get applied migrations
+   */
+  private async setupDBSchemaAndGetAppliedMigrations({
+    client,
+    schemaName,
+  }: {
+    client: Client;
+    schemaName: string;
+  }): Promise<AppliedMigration[]> {
+    /* Ensure schema exists */
+    await client.query(`
+        CREATE SCHEMA IF NOT EXISTS ${schemaName};
+        SET search_path TO ${schemaName};
+      `);
+
+    /* Ensure schema + migration table exists */
     await client.query(`
         CREATE TABLE IF NOT EXISTS migrations (
           version BIGINT PRIMARY KEY,
@@ -95,6 +105,23 @@ class DatabaseMigrationManager {
         );
       `);
 
+    const { rows: appliedMigrations } = (await client.query(
+      `SELECT version, name, md5 FROM migrations ORDER BY version::int`
+    )) as { rows: AppliedMigration[] };
+
+    return appliedMigrations;
+  }
+
+  /**
+   * Get pending migrations
+   */
+  private async getPendingMigration({
+    appliedMigrations,
+    migrationDir,
+  }: {
+    appliedMigrations: AppliedMigration[];
+    migrationDir: string;
+  }): Promise<MigrationFile[]> {
     const files = await fs.readdir(migrationDir);
     const allMigrations: MigrationFile[] = files
       .filter(f => f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.sql'))
@@ -106,11 +133,7 @@ class DatabaseMigrationManager {
       .filter((m): m is MigrationFile => m.version !== null)
       .sort((a, b) => a.version - b.version);
 
-    const { rows: applied } = (await client.query(
-      `SELECT version, name, md5 FROM migrations ORDER BY version::int`
-    )) as { rows: AppliedMigration[] };
-
-    const appliedVersions = applied.map(r => parseInt(r.version, 10));
+    const appliedVersions = appliedMigrations.map(r => parseInt(r.version, 10));
     const lastAppliedVersion = appliedVersions.at(-1) ?? 0;
     const expectedNextVersion = lastAppliedVersion + 1;
 
@@ -127,6 +150,34 @@ class DatabaseMigrationManager {
         );
       }
     }
+
+    return pendingMigrations;
+  }
+
+  /**
+   * Setup schema and migration table
+   */
+  private async runMigrationForSchema({
+    schemaName,
+    schemaFolderName,
+  }: {
+    schemaName: string;
+    schemaFolderName: string;
+  }): Promise<void> {
+    const client = await db.getDbClient();
+
+    const migrationDir =
+      await this.getOrCreateMigrationDirectory(schemaFolderName);
+
+    const appliedMigrations = await this.setupDBSchemaAndGetAppliedMigrations({
+      client,
+      schemaName,
+    });
+
+    const pendingMigrations = await this.getPendingMigration({
+      appliedMigrations,
+      migrationDir,
+    });
 
     // 🛠 Run migrations using Umzug
     const umzug = new Umzug({
@@ -173,7 +224,7 @@ class DatabaseMigrationManager {
       storage: {
         executed: async () => {
           /** 🔍 Validate MD5 hashes for previously applied migrations */
-          for (const row of applied) {
+          for (const row of appliedMigrations) {
             const { version, name: recordedName, md5: recordedMd5 } = row;
             const filePath = path.join(migrationDir, recordedName);
             try {
@@ -192,7 +243,7 @@ class DatabaseMigrationManager {
               throw err;
             }
           }
-          return applied.map(r => r.name);
+          return appliedMigrations.map(r => r.name);
         },
         logMigration: async (migration: any) => {
           const { name, path: migrationPath } = migration;
@@ -240,12 +291,13 @@ class DatabaseMigrationManager {
       });
 
       const client = await db.getDbClient();
-      const { rows: tenants } = await client.query(
-        'SELECT id, name FROM common.tenants'
-      );
 
+      /*
+      const { rows: tenants } = await client.query(
+        `SELECT id, name FROM ${schemaNames.main}.tenants`
+      );
       for (const tenant of tenants) {
-        const schemaName = `tenant_${tenant.id}`;
+        const schemaName = schemaNames.tenantSchemaName(tenant.id);
         logger.info(`ℹ️ Running migration for: ${tenant.name} (${schemaName})`);
         try {
           await this.runMigrationForSchema({
@@ -258,7 +310,7 @@ class DatabaseMigrationManager {
           );
         }
       }
-
+      */
       await db.shutdown();
       logger.info('✅ All migrations completed');
     } catch (error) {
