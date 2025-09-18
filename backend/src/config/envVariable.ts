@@ -19,6 +19,9 @@ const envVariableSchema = z.object({
 
   /* auth */
   JWT_SECRET: z.string().min(6, 'JWT_SECRET is mandatory'),
+  PLATFORM_SUPER_ADMIN_PASSWORD: z
+    .string()
+    .min(5, 'PLATFORM_SUPER_ADMIN_PASSWORD is mandatory'),
 });
 
 // Type inference from the schema
@@ -38,6 +41,7 @@ const getEnvVariable = (): EnvVariable => {
       DB_NAME: process.env.DB_NAME,
       DB_PORT: process.env.DB_PORT,
       JWT_SECRET: process.env.JWT_SECRET,
+      PLATFORM_SUPER_ADMIN_PASSWORD: process.env.PLATFORM_SUPER_ADMIN_PASSWORD,
     });
 
     const environmentVariable: EnvVariable = {
@@ -50,6 +54,7 @@ const getEnvVariable = (): EnvVariable => {
       DB_NAME: process.env.DB_NAME!,
       DB_PORT: Number(process.env.DB_PORT),
       JWT_SECRET: process.env.JWT_SECRET!,
+      PLATFORM_SUPER_ADMIN_PASSWORD: process.env.PLATFORM_SUPER_ADMIN_PASSWORD!,
     };
 
     envVariableSchema.parse(environmentVariable);
