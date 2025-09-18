@@ -1,6 +1,9 @@
-import { Router, RequestHandler } from 'express';
+import express, { Router, RequestHandler } from 'express';
 import { validateRequest } from './validationMiddleware';
-import { bearerAuth, docRegistry } from '../openApiDocs/openAPIDocumentGenerator';
+import {
+  bearerAuth,
+  docRegistry,
+} from '../openApiDocs/openAPIDocumentGenerator';
 import { commonDocCreator } from '../openApiDocs/openAPIDocumentGenerator';
 
 interface RouteOptions {
@@ -30,15 +33,12 @@ interface ConstructorOptions {
 }
 
 class RouteRegistrar {
-  private router: Router;
+  public router: Router;
   private basePath: string;
   private tags: string[];
 
-  constructor(
-    router: Router,
-    { basePath = '', tags = [] }: ConstructorOptions
-  ) {
-    this.router = router;
+  constructor({ basePath = '', tags = [] }: ConstructorOptions) {
+    this.router = express.Router();
     this.basePath = basePath;
     this.tags = tags;
   }

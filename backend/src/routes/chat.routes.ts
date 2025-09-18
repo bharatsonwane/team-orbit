@@ -1,4 +1,3 @@
-import express from 'express';
 import RouteRegistrar from '../middleware/RouteRegistrar';
 import { authRoleMiddleware } from '../middleware/authRoleMiddleware';
 import {
@@ -6,9 +5,7 @@ import {
   sendMessage,
 } from '../controllers/chat.controller';
 
-const router = express.Router();
-
-const registrar = new RouteRegistrar(router, {
+const registrar = new RouteRegistrar({
   basePath: '/api/chat',
   tags: ['Chat'],
 });
@@ -21,4 +18,4 @@ registrar.post('/send', {
   controller: sendMessage,
 });
 
-export default router;
+export default registrar;

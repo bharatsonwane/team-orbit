@@ -1,6 +1,3 @@
-import express from 'express';
-
-import { z } from 'zod';
 import {
   UserSchema,
   UserLoginSchema,
@@ -23,9 +20,7 @@ import {
 import RouteRegistrar from '../middleware/RouteRegistrar';
 import { authRoleMiddleware } from '../middleware/authRoleMiddleware';
 
-const router = express.Router();
-
-const registrar = new RouteRegistrar(router, {
+const registrar = new RouteRegistrar({
   basePath: '/api/user',
   tags: ['User'],
 });
@@ -102,4 +97,4 @@ registrar.post('/signout', {
 //   },
 // });
 
-export default router;
+export default registrar;

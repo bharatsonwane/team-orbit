@@ -1,4 +1,3 @@
-import express from 'express';
 
 import {
   retrieveLookupList,
@@ -8,8 +7,7 @@ import RouteRegistrar from '../middleware/RouteRegistrar';
 import { lookupListSchema, lookupTypeSchema } from '../schemas/lookup.schema';
 import { idValidation } from '../schemas/common.schema';
 
-const router = express.Router();
-const registrar = new RouteRegistrar(router, {
+const registrar = new RouteRegistrar({
   basePath: '/api/lookup',
   tags: ['Lookup'],
 });
@@ -27,4 +25,4 @@ registrar.get('/type/:id', {
   controller: getLookupTypeById,
 });
 
-export default router;
+export default registrar;
