@@ -73,12 +73,12 @@ CREATE TABLE chat_messages (
 - `is_read` - Read status flag
 - `created_at` - Message creation timestamp
 
-### Chat Rooms Table
+### Chat Channels Table
 
-Stores chat room information for group chats.
+Stores chat channel information for group chats.
 
 ```sql
-CREATE TABLE chat_rooms (
+CREATE TABLE chat_channels (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -92,34 +92,34 @@ CREATE TABLE chat_rooms (
 **Columns:**
 
 - `id` - Primary key, auto-incrementing
-- `name` - Room name
-- `description` - Room description
+- `name` - Channel name
+- `description` - Channel description
 - `created_by` - Foreign key to users table
 - `is_private` - Privacy flag
-- `created_at` - Room creation timestamp
+- `created_at` - Channel creation timestamp
 - `updated_at` - Last update timestamp
 
-### Room Participants Table
+### Channel Participants Table
 
-Junction table for many-to-many relationship between users and chat rooms.
+Junction table for many-to-many relationship between users and chat channels.
 
 ```sql
-CREATE TABLE room_participants (
+CREATE TABLE channel_participants (
   id SERIAL PRIMARY KEY,
-  room_id INTEGER NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+  channel_id INTEGER NOT NULL REFERENCES chat_channels(id) ON DELETE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   joined_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(room_id, user_id)
+  UNIQUE(channel_id, user_id)
 );
 ```
 
 **Columns:**
 
 - `id` - Primary key, auto-incrementing
-- `room_id` - Foreign key to chat_rooms table
+- `channel_id` - Foreign key to chat_channels table
 - `user_id` - Foreign key to users table
-- `joined_at` - When user joined the room
-- `UNIQUE(room_id, user_id)` - Prevents duplicate participants
+- `joined_at` - When user joined the channel
+- `UNIQUE(channel_id, user_id)` - Prevents duplicate participants
 
 ## 🔗 Relationships
 
@@ -131,18 +131,18 @@ CREATE TABLE room_participants (
 - One user can receive many messages
 - Foreign keys: `sender_id`, `receiver_id`
 
-#### Users → Chat Rooms
+#### Users → Chat Channels
 
-- One user can create many rooms
+- One user can create many channels
 - Foreign key: `created_by`
 
 ### Many-to-Many Relationships
 
-#### Users ↔ Chat Rooms (via Room Participants)
+#### Users ↔ Chat Channels (via Channel Participants)
 
-- One user can be in many rooms
-- One room can have many users
-- Junction table: `room_participants`
+- One user can be in many channels
+- One channel can have many users
+- Junction table: `channel_participants`
 
 ## 📈 Indexes
 
@@ -150,13 +150,13 @@ CREATE TABLE room_participants (
 
 - `users.id` - Primary key
 - `chat_messages.id` - Primary key
-- `chat_rooms.id` - Primary key
-- `room_participants.id` - Primary key
+- `chat_channels.id` - Primary key
+- `channel_participants.id` - Primary key
 
 ### Unique Indexes
 
 - `users.email` - Unique email constraint
-- `room_participants(room_id, user_id)` - Unique participant constraint
+- `channel_participants(channel_id, user_id)` - Unique participant constraint
 
 ### Performance Indexes
 
@@ -166,9 +166,9 @@ CREATE INDEX idx_chat_messages_sender_id ON chat_messages(sender_id);
 CREATE INDEX idx_chat_messages_receiver_id ON chat_messages(receiver_id);
 CREATE INDEX idx_chat_messages_created_at ON chat_messages(created_at);
 
--- Room participants indexes
-CREATE INDEX idx_room_participants_room_id ON room_participants(room_id);
-CREATE INDEX idx_room_participants_user_id ON room_participants(user_id);
+-- Channel participants indexes
+CREATE INDEX idx_channel_participants_channel_id ON channel_participants(channel_id);
+CREATE INDEX idx_channel_participants_user_id ON channel_participants(user_id);
 
 -- Users indexes
 CREATE INDEX idx_users_email ON users(email);
@@ -190,8 +190,8 @@ Located in `src/database/migrations/`:
 migrations/
 ├── 001_create_users.ts
 ├── 002_create_chat_messages.ts
-├── 003_create_chat_rooms.ts
-└── 004_create_room_participants.ts
+├── 003_create_chat_channels.ts
+└── 004_create_channel_participants.ts
 ```
 
 ### Running Migrations
@@ -243,7 +243,7 @@ Located in `src/database/seed/`:
 seed/
 ├── seed.ts
 ├── users.seed.ts
-├── chat_rooms.seed.ts
+├── chat_channels.seed.ts
 └── chat_messages.seed.ts
 ```
 
@@ -370,7 +370,7 @@ ORDER BY cm.created_at DESC
 LIMIT 50;
 ```
 
-#### Get User's Chat Rooms
+#### Get User's Chat Channels
 
 ```sql
 SELECT
@@ -379,8 +379,8 @@ SELECT
   cr.description,
   cr.created_at,
   COUNT(rp.user_id) as participant_count
-FROM chat_rooms cr
-JOIN room_participants rp ON cr.id = rp.room_id
+FROM chat_channels cr
+JOIN channel_participants rp ON cr.id = rp.channel_id
 WHERE rp.user_id = $1
 GROUP BY cr.id, cr.name, cr.description, cr.created_at
 ORDER BY cr.created_at DESC;

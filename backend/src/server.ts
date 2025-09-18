@@ -27,8 +27,8 @@ async function main() {
   // io.on("connection", (socket) => {
   //   console.log("User connected:", socket.id);
 
-  //   socket.on("joinRoom", ({ userId }) => {
-  //     socket.join(userId); // joining room using user ID
+  //   socket.on("joinChannel", ({ userId }) => {
+  //     socket.join(userId); // joining channel using user ID
   //   });
 
   //   socket.on("sendMessage", async (data) => {

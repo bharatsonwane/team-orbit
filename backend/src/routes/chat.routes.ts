@@ -1,7 +1,7 @@
 import RouteRegistrar from '../middleware/RouteRegistrar';
 import { authRoleMiddleware } from '../middleware/authRoleMiddleware';
 import {
-  getMessagesByChatRoom,
+  getMessagesByChatChannel,
   sendMessage,
 } from '../controllers/chat.controller';
 
@@ -11,7 +11,7 @@ const registrar = new RouteRegistrar({
 });
 
 registrar.get('/chat/:senderId/:receiverId', {
-  controller: getMessagesByChatRoom,
+  controller: getMessagesByChatChannel,
 });
 /**@description send chat */
 registrar.post('/send', {

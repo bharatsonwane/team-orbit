@@ -196,7 +196,7 @@ src/
 ### Real-time Communication
 
 - **Socket.IO** - WebSocket implementation
-- **Room-based messaging** - User and group chats
+- **Channel-based messaging** - User and group chats
 
 ### Validation & Documentation
 
@@ -366,7 +366,7 @@ const io = new Server(server, {
 });
 
 io.on('connection', socket => {
-  socket.on('joinRoom', ({ userId }) => {
+  socket.on('joinChannel', ({ userId }) => {
     socket.join(userId);
   });
 
@@ -383,7 +383,7 @@ io.on('connection', socket => {
 ### Event Flow
 
 1. **Connection:** Client connects to Socket.IO
-2. **Room Join:** User joins specific room
+2. **Channel Join:** User joins specific channel
 3. **Message Send:** Message sent via socket
 4. **Database Save:** Message persisted to database
 5. **Broadcast:** Message sent to recipients

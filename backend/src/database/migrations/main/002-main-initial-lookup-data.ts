@@ -7,22 +7,19 @@ import {
 } from '../../../utils/constants';
 import { getHashPassword } from '../../../utils/authHelper';
 
-interface LookupItem {
-  label: string;
-}
-interface LookupTypeData {
+interface LookupType {
   lookupType: string;
-  lookups: LookupItem[];
+  lookups: { label: string }[];
 }
 
-interface LookupData {
+interface Lookup {
   id: number;
   label: string;
-  lookup_type_id: number;
-  lookup_type_name: string;
+  lookupTypeId: number;
+  lookupTypeName: string;
 }
 
-interface UserData {
+interface AppUser {
   id?: number | null;
   title: string;
   firstName: string;
@@ -43,7 +40,7 @@ interface UserData {
 
 export const up = async (client: PoolClient): Promise<void> => {
   const upsertAndFetchLookupData = async () => {
-    const lookupData: LookupTypeData[] = [
+    const lookupData: LookupType[] = [
       {
         lookupType: lookupTypeKeys.userRole,
         lookups: [
@@ -111,10 +108,10 @@ export const up = async (client: PoolClient): Promise<void> => {
     const getLookupDataByTypeLabel = async (
       lookupTypeName: string,
       lookupLabel: string
-    ): Promise<LookupData> => {
+    ): Promise<Lookup> => {
       /** Get lookup data query */
       const getLookupDataQuery = `
-        SELECT l.id, l.label, l."lookupTypeId" as lookup_type_id, lt.name as lookup_type_name
+        SELECT l.id, l.label, l."lookupTypeId", lt.name
         FROM lookup_type lt
         INNER JOIN lookup l ON lt.id = l."lookupTypeId"
         WHERE lt.name = $1 AND l.label = $2;
@@ -147,7 +144,7 @@ export const up = async (client: PoolClient): Promise<void> => {
   );
 
   const upsertAndFetchUserData = async () => {
-    const userDataList: UserData[] = [
+    const userDataList: AppUser[] = [
       {
         title: 'Mr',
         firstName: 'SuperFirstName',
@@ -229,7 +226,7 @@ export const up = async (client: PoolClient): Promise<void> => {
         ])
       ).rows;
 
-      const userResponse = userResult[0] as UserData;
+      const userResponse = userResult[0] as AppUser;
 
       for (const roleId of userData.userRoles) {
         await client.query(

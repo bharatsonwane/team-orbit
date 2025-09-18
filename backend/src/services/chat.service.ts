@@ -4,7 +4,7 @@ interface ChatMessageData {
   text?: string | null;
   media?: string | null;
   sentUserId: string;
-  chatRoomId: string;
+  chatChannelId: string;
   deliveredTo?: string[];
   readBy?: string[];
   reaction?: Record<string, any>;
@@ -15,7 +15,7 @@ interface ChatMessage {
   text: string | null;
   media: string | null;
   sentUserId: string;
-  chatRoomId: string;
+  chatChannelId: string;
   createdAt: string;
   deliveredTo: string[];
   readBy: string[];
@@ -26,7 +26,7 @@ export default class Chat {
   private text: string | null;
   private media: string | null;
   private sentUserId: string;
-  private chatRoomId: string;
+  private chatChannelId: string;
   private createdAt: string;
   private deliveredTo: string[];
   private readBy: string[];
@@ -36,7 +36,7 @@ export default class Chat {
     text,
     media,
     sentUserId,
-    chatRoomId,
+    chatChannelId,
     deliveredTo,
     readBy,
     reaction,
@@ -44,7 +44,7 @@ export default class Chat {
     this.text = text || null;
     this.media = media || null;
     this.sentUserId = sentUserId;
-    this.chatRoomId = chatRoomId;
+    this.chatChannelId = chatChannelId;
     this.createdAt = new Date().toISOString();
 
     // Ensure JSON-valid defaults
@@ -62,7 +62,7 @@ export default class Chat {
         text,
         media,
         "sentUserId",
-        "chatRoomId",
+        "chatChannelId",
         "createdAt",
         "deliveredTo",
         "readBy",
@@ -75,7 +75,7 @@ export default class Chat {
       this.text,
       this.media,
       this.sentUserId,
-      this.chatRoomId,
+      this.chatChannelId,
       JSON.stringify(this.deliveredTo),
       JSON.stringify(this.readBy),
       JSON.stringify(this.reaction),
@@ -95,21 +95,21 @@ export default class Chat {
     }
   }
 
-  static async getMessagesForRoom(
+  static async getMessagesForChannel(
     dbClient: dbClientPool,
-    chatRoomId: string
+    chatChannelId: string
   ): Promise<ChatMessage[]> {
     const query = `
       SELECT * FROM chat_message
-      WHERE "chatRoomId" = $1
+      WHERE "chatChannelId" = $1
       ORDER BY "createdAt" ASC;
     `;
     try {
-      const result = await dbClient.mainPool.query(query, [chatRoomId]);
+      const result = await dbClient.mainPool.query(query, [chatChannelId]);
       return result.rows as ChatMessage[];
     } catch (error) {
       console.error('Error fetching messages:', error);
-      throw new Error('Failed to fetch messages for chat room');
+      throw new Error('Failed to fetch messages for chat channel');
     }
   }
 
@@ -127,7 +127,7 @@ export default class Chat {
       text: data.message,
       media: data.mediaUrl,
       sentUserId: data.senderId,
-      chatRoomId: data.receiverId, // Using receiverId as chat_room_id for simplicity
+      chatChannelId: data.receiverId, // Using receiverId as chat_channel_id for simplicity
       deliveredTo: [],
       readBy: [],
       reaction: {},

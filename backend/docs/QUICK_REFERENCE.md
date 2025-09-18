@@ -89,7 +89,7 @@ DELETE /api/users/:id
 ```bash
 GET  /api/chat/messages
 POST /api/chat/messages
-GET  /api/chat/rooms
+GET  /api/chat/channels
 ```
 
 ### System

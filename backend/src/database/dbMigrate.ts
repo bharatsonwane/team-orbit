@@ -292,14 +292,15 @@ class DatabaseMigrationManager {
 
       const client = await db.getDbClient();
 
-      /*
       const { rows: tenants } = await client.query(
-        `SELECT id, name FROM ${schemaNames.main}.tenants`
+        `SELECT id, name FROM ${schemaNames.main}.tenant`
       );
       for (const tenant of tenants) {
         const schemaName = schemaNames.tenantSchemaName(tenant.id);
-        logger.info(`ℹ️ Running migration for: ${tenant.name} (${schemaName})`);
         try {
+          logger.info(
+            `ℹ️ Running migration for: ${tenant.name} (${schemaName})`
+          );
           await this.runMigrationForSchema({
             schemaName: schemaName,
             schemaFolderName: schemaNames.tenantSchemaFolderName(tenant.id),
@@ -310,7 +311,7 @@ class DatabaseMigrationManager {
           );
         }
       }
-      */
+
       await db.shutdown();
       logger.info('✅ All migrations completed');
     } catch (error) {

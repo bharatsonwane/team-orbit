@@ -147,7 +147,7 @@ npm run dev
 
 ### Real-time Features (Ready for Implementation)
 - WebSocket connection for live chat
-- Room-based messaging system
+- Channel-based messaging system
 - Real-time notifications
 
 ## 📝 Available Scripts

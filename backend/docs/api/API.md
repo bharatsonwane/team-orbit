@@ -369,7 +369,7 @@ interface LookupItem {
 #### Get Messages
 
 ```http
-GET /api/chat/messages?roomId=1&limit=50&offset=0
+GET /api/chat/messages?channelId=1&limit=50&offset=0
 Authorization: Bearer <token>
 ```
 
@@ -421,10 +421,10 @@ Content-Type: application/json
 }
 ```
 
-#### Get Chat Rooms
+#### Get Chat Channels
 
 ```http
-GET /api/chat/rooms
+GET /api/chat/channels
 Authorization: Bearer <token>
 ```
 
@@ -562,8 +562,8 @@ All requests are validated using Zod schemas:
 ```javascript
 const socket = io('http://localhost:4000');
 
-// Join a room
-socket.emit('joinRoom', { userId: 1 });
+// Join a channel
+socket.emit('joinChannel', { userId: 1 });
 
 // Send a message
 socket.emit('sendMessage', {
@@ -581,7 +581,7 @@ socket.on('receiveMessage', message => {
 
 ### Events
 
-- `joinRoom` - Join a chat room
+- `joinChannel` - Join a chat channel
 - `sendMessage` - Send a message
 - `receiveMessage` - Receive a message
 - `disconnect` - User disconnected

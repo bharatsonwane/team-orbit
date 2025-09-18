@@ -1,275 +1,176 @@
-import logger from '../../utils/logger';
+import { PoolClient } from 'pg';
 import db, { schemaNames } from '../db';
+import logger from '../../utils/logger';
+import { AppUser } from '../../types/appUser';
+import { Lookup } from '../../types/lookup';
+import {
+  lookupTypeKeys,
+  roleKeys,
+  userStatusKeys,
+} from '../../utils/constants';
 import { getHashPassword } from '../../utils/authHelper';
 
-interface LookupType {
-  name: string;
-  lookups: Array<{ label: string }>;
-}
+/** Get lookup data by type label */
+const getLookupDataByTypeLabel = async ({
+  client,
+  lookupTypeName,
+  lookupLabel,
+}: {
+  client: PoolClient;
+  lookupTypeName: string;
+  lookupLabel: string;
+}): Promise<Lookup> => {
+  /** Get lookup data query */
+  const getLookupDataQuery = `
+            SELECT l.id, l.label, l."lookupTypeId", lt.name
+            FROM lookup_type lt
+            INNER JOIN lookup l ON lt.id = l."lookupTypeId"
+            WHERE lt.name = $1 AND l.label = $2;
+          `;
 
-interface UserData {
-  title: string;
-  firstName: string;
-  lastName: string;
-  middleName: string;
-  maidenName: string;
-  gender: string;
-  dob: string;
-  bloodGroup: string;
-  marriedStatus: string;
-  email: string;
-  phone: string;
-  password: string;
-  profilePicture: string;
-  bio: string;
-  userStatusLookupId: number;
-  userRoleLookupId: number;
-}
+  /** Get lookup data result */
+  const lookupDataResult = (
+    await client.query(getLookupDataQuery, [lookupTypeName, lookupLabel])
+  ).rows;
 
-interface LookupData {
-  id: number;
-  label: string;
-  lookup_type_id: number;
-  lookup_type_name: string;
-}
+  /** If lookup data result is empty, throw an error */
+  if (lookupDataResult.length === 0) {
+    throw new Error(
+      `Lookup data not found for type: ${lookupTypeName}, label: ${lookupLabel}`
+    );
+  }
+
+  /** Return lookup data result */
+  return lookupDataResult[0];
+};
 
 async function main(): Promise<void> {
   try {
     logger.info('seed main function called');
 
     const pool = await db.getSchemaPool(schemaNames.main);
+    /** create tenant data */
+    const tenantData = {
+      name: 'iconnect',
+      label: 'iConnect Solutions Pte Ltd',
+      description:
+        'iConnect Solutions Pte Ltd is a software development company that provides software solutions to businesses.',
+    };
+    const tenantResult = await pool.query(
+      `INSERT INTO tenant (name, label, description) 
+       VALUES ($1, $2, $3)
+       ON CONFLICT (name) DO UPDATE SET
+         label = EXCLUDED.label,
+         description = EXCLUDED.description,
+         "updatedAt" = NOW()
+       RETURNING id, name, label`,
+      [tenantData.name, tenantData.label, tenantData.description]
+    );
+    const tenantId = tenantResult.rows[0].id;
 
-    const upsertAndFetchLookupData = async () => {
-      const lookupTypeList: LookupType[] = [
-        {
-          name: 'userRole',
-          lookups: [
-            { label: 'Super Admin' },
-            { label: 'Admin' },
-            { label: 'Standard' },
-          ],
-        },
-        {
-          name: 'userStatus',
-          lookups: [
-            { label: 'Pending' },
-            { label: 'Active' },
-            { label: 'Deleted' },
-            { label: 'Blocked' },
-          ],
-        },
-        {
-          name: 'chatType',
-          lookups: [{ label: '1:1 Chat' }, { label: 'Group Chat' }],
-        },
-      ];
+    const platformSuperAdminRoleData = await getLookupDataByTypeLabel({
+      client: pool,
+      lookupTypeName: lookupTypeKeys.userRole,
+      lookupLabel: roleKeys.platformSuperAdmin,
+    });
 
-      for (const lookupType of lookupTypeList) {
-        /** Step 1: Upsert LookupType */
-        const upsertLookupTypeQuery = `
-          INSERT INTO lookup_type (name, "createdAt", "updatedAt")
-          VALUES ($1, NOW(), NOW())
-          ON CONFLICT (name) DO UPDATE
-          SET "updatedAt" = NOW()
-          RETURNING id, name;
+    const userDataList: AppUser[] = [
+      {
+        title: 'Mr',
+        firstName: 'SuperFirstName',
+        lastName: 'SuperLastName',
+        middleName: 'SuperMiddleName',
+        maidenName: '',
+        gender: 'Male',
+        dob: '1995-07-31',
+        bloodGroup: 'B+',
+        marriedStatus: 'Married',
+        email: 'superadmin@gmail.com',
+        phone: '1234567890',
+        password: 'Super@123',
+        bio: 'This is Super Admin',
+        userStatus: userStatusKeys.active,
+        tenantId: tenantId,
+        userRoles: [platformSuperAdminRoleData.id],
+      },
+    ];
+
+    for (const userData of userDataList) {
+      /** Hash the password */
+      const hashedPassword = await getHashPassword(userData.password);
+
+      /** Check if app_user already exists */
+      const checkUserQuery = `
+          SELECT id, email FROM app_user WHERE email = $1;
+        `;
+      const existingUser = (await pool.query(checkUserQuery, [userData.email]))
+        .rows;
+
+      /** If app_user already exists, continue */
+      if (existingUser.length > 0) {
+        console.log(`User already exists: ${userData.email}`);
+        continue;
+      }
+
+      /** Insert new app_user */
+      const upsertUserQuery = `
+          INSERT INTO app_user (
+            title,
+            "firstName",
+            "lastName",
+            "middleName",
+            "maidenName",
+            gender,
+            dob,
+            "bloodGroup",
+            "marriedStatus",
+            email,
+            phone,
+            password,
+            bio,
+            "userStatus",
+            "createdAt",
+            "updatedAt")
+          VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW()
+          )
+          RETURNING id, email, "firstName", "lastName";
         `;
 
-        const lookupTypeResult = (
-          await pool.query(upsertLookupTypeQuery, [lookupType.name])
-        ).rows;
+      const userResult = (
+        await pool.query(upsertUserQuery, [
+          userData.title,
+          userData.firstName,
+          userData.lastName,
+          userData.middleName,
+          userData.maidenName,
+          userData.gender,
+          userData.dob,
+          userData.bloodGroup,
+          userData.marriedStatus,
+          userData.email,
+          userData.phone,
+          hashedPassword,
+          userData.bio,
+          userData.userStatus,
+        ])
+      ).rows;
 
-        const { id: lookupTypeId, name: lookupTypeName } = lookupTypeResult[0];
+      const userResponse = userResult[0] as AppUser;
 
-        logger.info(
-          `Upserted lookup type: ${lookupTypeName} with ID: ${lookupTypeId}`
-        );
-
-        /** Step 2: Upsert Lookups for this LookupType */
-        for (const lookup of lookupType.lookups) {
-          const upsertLookupQuery = `
-            INSERT INTO lookup (label, "lookupTypeId", "createdAt", "updatedAt")
+      for (const roleId of userData.userRoles) {
+        await pool.query(
+          `
+            INSERT INTO user_role ("userId", "roleId", "createdAt", "updatedAt")
             VALUES ($1, $2, NOW(), NOW())
-            ON CONFLICT (label, "lookupTypeId") DO UPDATE
-            SET "updatedAt" = NOW()
-            RETURNING id, label, "lookupTypeId"
-          `;
-          const lookupResult = (
-            await pool.query(upsertLookupQuery, [lookup.label, lookupTypeId])
-          ).rows;
-
-          if (lookupResult.length > 0) {
-            logger.info(
-              `Upserted lookup: ${lookup.label} with ID: ${lookupResult[0].id}`
-            );
-          }
-        }
+          `,
+          [userResponse.id, roleId]
+        );
       }
+    }
 
-      const getLookupDataByTypeLabel = async (
-        lookupTypeName: string,
-        lookupLabel: string
-      ): Promise<LookupData> => {
-        const getLookupDataQuery = `
-          SELECT l.id, l.label, l."lookupTypeId" as lookup_type_id, lt.name as lookup_type_name
-          FROM lookup_type lt
-          INNER JOIN lookup l ON lt.id = l."lookupTypeId"
-          WHERE lt.name = $1 AND l.label = $2;
-        `;
+    /** create app user data */
 
-        const lookupDataResult = (
-          await pool.query(getLookupDataQuery, [lookupTypeName, lookupLabel])
-        ).rows;
-
-        if (lookupDataResult.length === 0) {
-          throw new Error(
-            `Lookup data not found for type: ${lookupTypeName}, label: ${lookupLabel}`
-          );
-        }
-
-        return lookupDataResult[0];
-      };
-
-      return { getLookupDataByTypeLabel };
-    };
-
-    const { getLookupDataByTypeLabel } = await upsertAndFetchLookupData();
-
-    // Get lookup data for user roles and status
-    const superAdminRoleData = await getLookupDataByTypeLabel(
-      'userRole',
-      'Super Admin'
-    );
-
-    const adminRoleData = await getLookupDataByTypeLabel('userRole', 'Admin');
-
-    const activeUserStatusData = await getLookupDataByTypeLabel(
-      'userStatus',
-      'Active'
-    );
-
-    logger.info(`Super Admin Role ID: ${superAdminRoleData.id}`);
-    logger.info(`Admin Role ID: ${adminRoleData.id}`);
-    logger.info(`Active Status ID: ${activeUserStatusData.id}`);
-
-    const upsertAndFetchUserData = async () => {
-      const userDataList: UserData[] = [
-        {
-          title: 'Mr',
-          firstName: 'SuperFirstName1',
-          lastName: 'SuperLastName',
-          middleName: 'SuperMiddleName',
-          maidenName: '',
-          gender: 'Male',
-          dob: '1995-07-31',
-          bloodGroup: 'B+',
-          marriedStatus: 'Married',
-          email: 'bharatsdev@gmail.com',
-          phone: '1234567890',
-          password: 'Super@123',
-          profilePicture: '',
-          bio: 'This is Super Admin',
-          userStatusLookupId: activeUserStatusData.id,
-          userRoleLookupId: superAdminRoleData.id,
-        },
-        {
-          title: 'Mr',
-          firstName: 'AdminFirstName',
-          lastName: 'AdminLastName',
-          middleName: 'AdminMiddleName',
-          maidenName: '',
-          gender: 'Male',
-          dob: '1995-06-19',
-          bloodGroup: 'B+',
-          marriedStatus: 'Single',
-          email: 'shantanu@gmail.com',
-          phone: '1234567891',
-          password: 'Admin@123',
-          profilePicture: '',
-          bio: 'This is Admin user',
-          userStatusLookupId: activeUserStatusData.id,
-          userRoleLookupId: adminRoleData.id,
-        },
-      ];
-
-      for (const userData of userDataList) {
-        try {
-          // Hash the password
-          const hashedPassword = await getHashPassword(userData.password);
-
-          // Check if user already exists
-          const checkUserQuery = `
-            SELECT id, email FROM user_profile WHERE email = $1;
-          `;
-          const existingUser = (
-            await pool.query(checkUserQuery, [userData.email])
-          ).rows;
-
-          if (existingUser.length > 0) {
-            logger.info(`User already exists: ${userData.email}`);
-            continue;
-          }
-
-          // Insert new user
-          const upsertUserQuery = `
-            INSERT INTO user_profile (
-              title,
-              "firstName",
-              "lastName",
-              "middleName",
-              "maidenName",
-              gender,
-              dob,
-              "bloodGroup",
-              "marriedStatus",
-              email,
-              phone,
-              password,
-              "profilePicture",
-              bio,
-              "userStatusLookupId",
-              "userRoleLookupId",
-              "createdAt",
-              "updatedAt")
-            VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW()
-            )
-            RETURNING id, email, "firstName", "lastName";
-          `;
-
-          const userResult = (
-            await pool.query(upsertUserQuery, [
-              userData.title,
-              userData.firstName,
-              userData.lastName,
-              userData.middleName,
-              userData.maidenName,
-              userData.gender,
-              userData.dob,
-              userData.bloodGroup,
-              userData.marriedStatus,
-              userData.email,
-              userData.phone,
-              hashedPassword,
-              userData.profilePicture,
-              userData.bio,
-              userData.userStatusLookupId,
-              userData.userRoleLookupId,
-            ])
-          ).rows;
-
-          if (userResult.length > 0) {
-            const userResponse = userResult[0];
-            logger.info(
-              `User created successfully: ${userResponse.email} (ID: ${userResponse.id})`
-            );
-          }
-        } catch (userError) {
-          logger.error(`Error creating user ${userData.email}:`, userError);
-        }
-      }
-    };
-
-    await upsertAndFetchUserData();
     logger.info('Seeding completed successfully!');
   } catch (error) {
     logger.error('Error occurred during seeding:', error);

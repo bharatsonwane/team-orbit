@@ -5,7 +5,7 @@ interface ChatMessageBody {
   text: string;
   media?: string;
   sentUserId: string;
-  chatRoomId: string;
+  chatChannelId: string;
   deliveredTo?: string[];
   readBy?: string[];
   reaction?: Record<string, any>;
@@ -20,7 +20,7 @@ export const sendMessage = async (
       text,
       media,
       sentUserId,
-      chatRoomId,
+      chatChannelId,
       deliveredTo,
       readBy,
       reaction,
@@ -30,7 +30,7 @@ export const sendMessage = async (
       text,
       media,
       sentUserId,
-      chatRoomId,
+      chatChannelId,
       deliveredTo,
       readBy,
       reaction: reaction || {},
@@ -52,14 +52,14 @@ export const sendMessage = async (
   }
 };
 
-export const getMessagesByChatRoom = async (
+export const getMessagesByChatChannel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { chatRoomId } = req.params as { chatRoomId: string };
+    const { chatChannelId } = req.params as { chatChannelId: string };
 
-    const messages = await Chat.getMessagesForRoom(req.db, chatRoomId);
+    const messages = await Chat.getMessagesForChannel(req.db, chatChannelId);
     res.status(200).json({
       success: true,
       data: messages,
