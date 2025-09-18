@@ -1,10 +1,10 @@
 # OpenAPI Documentation System
 
-Comprehensive guide to the OpenAPI documentation system in the Lokvani backend.
+Comprehensive guide to the OpenAPI documentation system in the TeamOrbit backend.
 
 ## 🏗️ OpenAPI Architecture
 
-The Lokvani backend uses a sophisticated OpenAPI documentation system built with Zod schemas and automatic generation capabilities, located in the `src/openApiDocs/` directory.
+The TeamOrbit backend uses a sophisticated OpenAPI documentation system built with Zod schemas and automatic generation capabilities, located in the `src/openApiDocs/` directory.
 
 ### Directory Structure
 
@@ -434,8 +434,8 @@ export function generateOpenAPIDocument() {
     openapi: '3.0.0',
     info: {
       version: '1.0.0',
-      title: 'Lokvani API',
-      description: 'Comprehensive API for the Lokvani application',
+      title: 'TeamOrbit API',
+      description: 'Comprehensive API for the TeamOrbit application',
     },
     servers: [
       {

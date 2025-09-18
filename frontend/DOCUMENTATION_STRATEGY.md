@@ -1,6 +1,6 @@
 # Documentation Strategy
 
-This document explains the hybrid documentation approach used in the Lokvani frontend project.
+This document explains the hybrid documentation approach used in the TeamOrbit frontend project.
 
 ## 🎯 **Hybrid Documentation Approach**
 

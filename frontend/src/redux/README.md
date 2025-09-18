@@ -1,6 +1,6 @@
 # Redux Store
 
-Redux store configuration, actions, and slices for the Lokvani frontend application.
+Redux store configuration, actions, and slices for the TeamOrbit frontend application.
 
 ## 📁 Structure
 

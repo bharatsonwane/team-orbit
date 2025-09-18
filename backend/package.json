@@ -1,7 +1,7 @@
 {
-  "name": "lokvani-backend",
+  "name": "teamorbit-backend",
   "version": "1.0.0",
-  "description": "Backend API for Lokvani application",
+  "description": "Backend API for TeamOrbit application",
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
@@ -24,7 +24,7 @@
     "express",
     "typescript",
     "api",
-    "lokvani"
+    "teamorbit"
   ],
   "author": "",
   "license": "ISC",

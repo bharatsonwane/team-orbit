@@ -1,10 +1,10 @@
 # Database Schema Documentation
 
-Complete database schema and relationship documentation for the Lokvani backend.
+Complete database schema and relationship documentation for the TeamOrbit backend.
 
 ## 🗄️ Database Overview
 
-The Lokvani backend uses PostgreSQL as the primary database with the following characteristics:
+The TeamOrbit backend uses PostgreSQL as the primary database with the following characteristics:
 
 - **Database Engine:** PostgreSQL 12+
 - **Connection Pooling:** pg library with connection pooling
@@ -267,14 +267,14 @@ import bcrypt from 'bcryptjs';
 export const seedUsers = async () => {
   const users = [
     {
-      email: 'admin@lokvani.com',
+      email: 'admin@teamorbit.com',
       password: await bcrypt.hash('admin123', 10),
       first_name: 'Admin',
       last_name: 'User',
       role: 'admin',
     },
     {
-      email: 'user@lokvani.com',
+      email: 'user@teamorbit.com',
       password: await bcrypt.hash('user123', 10),
       first_name: 'Regular',
       last_name: 'User',
@@ -302,7 +302,7 @@ import { Pool } from 'pg';
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'lokvani',
+  database: process.env.DB_NAME || 'teamorbit',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
   max: 20, // Maximum number of clients in the pool
@@ -323,7 +323,7 @@ export { pool as db };
 # Database Configuration
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=lokvani
+DB_NAME=teamorbit
 DB_USER=postgres
 DB_PASSWORD=your_password
 
@@ -424,7 +424,7 @@ ORDER BY cr.created_at DESC;
 
 ```bash
 # Create test database
-createdb lokvani_test
+createdb teamorbit_test
 
 # Run migrations on test database
 NODE_ENV=test npm run migrate

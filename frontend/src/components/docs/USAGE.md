@@ -1,6 +1,6 @@
 # Component Usage Guide
 
-Detailed usage examples and patterns for all components in the Lokvani frontend.
+Detailed usage examples and patterns for all components in the TeamOrbit frontend.
 
 ## 🎨 UI Components
 

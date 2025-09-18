@@ -33,7 +33,7 @@ const getEnvVariable = (): EnvVariable => {
     const env = import.meta.env;
 
     const environmentVariable: EnvVariable = {
-      APP_NAME: env.APP_NAME || 'Lokvani',
+      APP_NAME: env.APP_NAME || 'TeamOrbit',
       APP_VERSION: env.APP_VERSION || '1.0.0',
       APP_ENV: (env.APP_ENV as EnvVariable['APP_ENV']) || 'development',
       API_BASE_URL: env.API_BASE_URL || 'http://localhost:5000',

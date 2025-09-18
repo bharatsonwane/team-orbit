@@ -1,10 +1,10 @@
 # Routing System Documentation
 
-Comprehensive documentation for the Lokvani frontend routing system with role-based authentication.
+Comprehensive documentation for the TeamOrbit frontend routing system with role-based authentication.
 
 ## 🎯 Overview
 
-The Lokvani frontend uses a sophisticated routing system that combines React Router with role-based authentication. The system is built around an array-based route configuration that allows for easy management and role-based access control.
+The TeamOrbit frontend uses a sophisticated routing system that combines React Router with role-based authentication. The system is built around an array-based route configuration that allows for easy management and role-based access control.
 
 ## 🏗️ Architecture
 

@@ -1,4 +1,4 @@
-# 🚀 Lokvani - Full Stack TypeScript Application
+# 🚀 TeamOrbit - Full Stack TypeScript Application
 
 A modern, full-stack web application built with React (Vite), Node.js, Express, and TypeScript.
 
@@ -15,7 +15,7 @@ A modern, full-stack web application built with React (Vite), Node.js, Express, 
 ## 🏗️ Project Structure
 
 ```
-lokvani/
+teamorbit/
 ├── frontend/                 # React frontend application
 │   ├── src/
 │   │   ├── components/      # React components
@@ -50,7 +50,7 @@ lokvani/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd lokvani
+   cd teamorbit
    ```
 
 2. **Install backend dependencies**
@@ -203,7 +203,7 @@ If you encounter any issues or have questions, please:
 ---
 
 **Built with ❤️ using React, Node.js, Express, and TypeScript**
-# lokvani
-# lokvani
-# lokvani
-# lokvani
+# teamorbit
+# teamorbit
+# teamorbit
+# teamorbit

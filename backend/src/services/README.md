@@ -1,6 +1,6 @@
 # Services Directory
 
-This directory contains all business logic services for the Lokvani backend application.
+This directory contains all business logic services for the TeamOrbit backend application.
 
 ## 📁 Structure
 

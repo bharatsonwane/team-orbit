@@ -1,10 +1,10 @@
 # Deployment Guide
 
-Comprehensive deployment guide for the Lokvani backend to various platforms.
+Comprehensive deployment guide for the TeamOrbit backend to various platforms.
 
 ## 🚀 Deployment Overview
 
-The Lokvani backend can be deployed to various platforms including cloud providers, containerized environments, and traditional servers.
+The TeamOrbit backend can be deployed to various platforms including cloud providers, containerized environments, and traditional servers.
 
 ### Deployment Options
 
@@ -108,7 +108,7 @@ services:
       - API_PORT=5000
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=lokvani
+      - DB_NAME=teamorbit
       - DB_USER=postgres
       - DB_PASSWORD=your_password
       - JWT_SECRET=your-jwt-secret
@@ -119,7 +119,7 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_DB=lokvani
+      - POSTGRES_DB=teamorbit
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=your_password
     volumes:
@@ -177,7 +177,7 @@ sudo apt install nginx -y
 ```bash
 # Clone repository
 git clone <repository-url>
-cd lokvani/backend
+cd teamorbit/backend
 
 # Install dependencies
 npm install
@@ -190,7 +190,7 @@ cp env.example .env
 # Edit .env with production values
 
 # Set up database
-sudo -u postgres createdb lokvani
+sudo -u postgres createdb teamorbit
 npm run migrate
 npm run seed
 ```
@@ -202,7 +202,7 @@ npm run seed
 module.exports = {
   apps: [
     {
-      name: 'lokvani-backend',
+      name: 'teamorbit-backend',
       script: 'dist/server.js',
       instances: 'max',
       exec_mode: 'cluster',
@@ -236,7 +236,7 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 #### 5. Nginx Configuration
 
 ```nginx
-# /etc/nginx/sites-available/lokvani
+# /etc/nginx/sites-available/teamorbit
 server {
     listen 80;
     server_name your-domain.com;
@@ -273,7 +273,7 @@ env_variables:
   NODE_ENV: production
   API_PORT: 8080
   DB_HOST: your-cloud-sql-ip
-  DB_NAME: lokvani
+  DB_NAME: teamorbit
   DB_USER: postgres
   DB_PASSWORD: your-password
   JWT_SECRET: your-jwt-secret
@@ -310,16 +310,16 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 az login
 
 # Create resource group
-az group create --name lokvani-rg --location eastus
+az group create --name teamorbit-rg --location eastus
 
 # Create App Service plan
-az appservice plan create --name lokvani-plan --resource-group lokvani-rg --sku B1 --is-linux
+az appservice plan create --name teamorbit-plan --resource-group teamorbit-rg --sku B1 --is-linux
 
 # Create web app
-az webapp create --resource-group lokvani-rg --plan lokvani-plan --name lokvani-backend --runtime "NODE|18-lts"
+az webapp create --resource-group teamorbit-rg --plan teamorbit-plan --name teamorbit-backend --runtime "NODE|18-lts"
 
 # Deploy application
-az webapp deployment source config --name lokvani-backend --resource-group lokvani-rg --repo-url <repository-url> --branch main --manual-integration
+az webapp deployment source config --name teamorbit-backend --resource-group teamorbit-rg --repo-url <repository-url> --branch main --manual-integration
 ```
 
 ## 🚀 Serverless Deployment
@@ -342,7 +342,7 @@ npm install aws-sdk
 
 ```yaml
 # serverless.yml
-service: lokvani-backend
+service: teamorbit-backend
 
 provider:
   name: aws
@@ -392,7 +392,7 @@ API_PORT=5000
 # Database Configuration
 DB_HOST=your-production-db-host
 DB_PORT=5432
-DB_NAME=lokvani
+DB_NAME=teamorbit
 DB_USER=postgres
 DB_PASSWORD=your-secure-password
 
@@ -446,12 +446,12 @@ export const envVariable =
 
 ```bash
 # Create production database
-sudo -u postgres createdb lokvani_production
+sudo -u postgres createdb teamorbit_production
 
 # Create production user
-sudo -u postgres createuser lokvani_user
-sudo -u postgres psql -c "ALTER USER lokvani_user PASSWORD 'secure_password';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE lokvani_production TO lokvani_user;"
+sudo -u postgres createuser teamorbit_user
+sudo -u postgres psql -c "ALTER USER teamorbit_user PASSWORD 'secure_password';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE teamorbit_production TO teamorbit_user;"
 ```
 
 #### 2. Run Migrations
@@ -474,7 +474,7 @@ npm run seed
 #!/bin/bash
 # backup.sh
 DATE=$(date +%Y%m%d_%H%M%S)
-pg_dump -h localhost -U lokvani_user -d lokvani_production > backup_$DATE.sql
+pg_dump -h localhost -U teamorbit_user -d teamorbit_production > backup_$DATE.sql
 
 # Schedule backup (crontab)
 0 2 * * * /path/to/backup.sh
@@ -552,10 +552,10 @@ app.use(rateLimiter);
 pm2 monit
 
 # View logs
-pm2 logs lokvani-backend
+pm2 logs teamorbit-backend
 
 # Restart application
-pm2 restart lokvani-backend
+pm2 restart teamorbit-backend
 ```
 
 #### 2. Health Checks
@@ -631,20 +631,20 @@ export default logger;
 
 ```bash
 # Check logs
-pm2 logs lokvani-backend
+pm2 logs teamorbit-backend
 
 # Check environment variables
 pm2 env 0
 
 # Restart application
-pm2 restart lokvani-backend
+pm2 restart teamorbit-backend
 ```
 
 #### 2. Database Connection Issues
 
 ```bash
 # Test database connection
-psql -h localhost -U lokvani_user -d lokvani_production -c "SELECT 1"
+psql -h localhost -U teamorbit_user -d teamorbit_production -c "SELECT 1"
 
 # Check database status
 sudo systemctl status postgresql
@@ -660,7 +660,7 @@ sudo systemctl restart postgresql
 pm2 monit
 
 # Restart application
-pm2 restart lokvani-backend
+pm2 restart teamorbit-backend
 
 # Check system memory
 free -h

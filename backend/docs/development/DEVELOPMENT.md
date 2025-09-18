@@ -1,6 +1,6 @@
 # Development Guidelines
 
-Comprehensive development guidelines and best practices for the Lokvani backend.
+Comprehensive development guidelines and best practices for the TeamOrbit backend.
 
 ## 🎯 Development Principles
 
@@ -67,7 +67,7 @@ src/
 ```bash
 # Clone repository
 git clone <repository-url>
-cd lokvani/backend
+cd teamorbit/backend
 
 # Install dependencies
 npm install
@@ -694,7 +694,7 @@ const processLargeDataset = async () => {
 
 ### Class-based Services
 
-The Lokvani backend has migrated to class-based services for better organization:
+The TeamOrbit backend has migrated to class-based services for better organization:
 
 ```typescript
 // src/services/lookup.service.ts

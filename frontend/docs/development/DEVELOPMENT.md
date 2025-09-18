@@ -1,6 +1,6 @@
 # Development Guide
 
-This document provides guidelines and best practices for developing the Lokvani frontend application.
+This document provides guidelines and best practices for developing the TeamOrbit frontend application.
 
 ## 🏗️ Architecture Overview
 
@@ -67,7 +67,7 @@ frontend/
 ```bash
 # Clone repository
 git clone <repository-url>
-cd lokvani/frontend
+cd teamorbit/frontend
 
 # Install dependencies
 npm install

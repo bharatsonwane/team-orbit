@@ -1,6 +1,6 @@
 # Controllers Directory
 
-This directory contains all HTTP request handlers for the Lokvani backend API.
+This directory contains all HTTP request handlers for the TeamOrbit backend API.
 
 ## 📁 Structure
 

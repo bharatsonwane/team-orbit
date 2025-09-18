@@ -1,6 +1,6 @@
 # Documentation Index
 
-Welcome to the Lokvani Frontend documentation. This directory contains comprehensive guides for development, deployment, and maintenance.
+Welcome to the TeamOrbit Frontend documentation. This directory contains comprehensive guides for development, deployment, and maintenance.
 
 ## 📁 Documentation Structure
 

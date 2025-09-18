@@ -1,6 +1,6 @@
 # Quick Reference Guide
 
-Quick commands and common tasks for the Lokvani backend project.
+Quick commands and common tasks for the TeamOrbit backend project.
 
 ## 🚀 Common Commands
 
@@ -112,7 +112,7 @@ NODE_ENV=development
 # Database
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=lokvani
+DB_NAME=teamorbit
 DB_USER=postgres
 DB_PASSWORD=password
 
@@ -268,7 +268,7 @@ pg_ctl status
 psql -U postgres -l
 
 # Test connection
-psql -U postgres -d lokvani -c "SELECT 1"
+psql -U postgres -d teamorbit -c "SELECT 1"
 ```
 
 ### Port Already in Use

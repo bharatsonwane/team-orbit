@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-The Lokvani frontend has been successfully updated with a comprehensive array-based routing system that includes role-based authentication, similar to the provided example. The system is now fully functional with proper TypeScript support and theme integration.
+The TeamOrbit frontend has been successfully updated with a comprehensive array-based routing system that includes role-based authentication, similar to the provided example. The system is now fully functional with proper TypeScript support and theme integration.
 
 ## ✅ What Has Been Implemented
 

@@ -1,6 +1,6 @@
 # Authentication Implementation
 
-This document describes the authentication system implementation in the Lokvani frontend application.
+This document describes the authentication system implementation in the TeamOrbit frontend application.
 
 ## 🔐 Overview
 

@@ -1,6 +1,6 @@
 # shadcn/ui Components
 
-This directory contains all the shadcn/ui components for the Lokvani frontend application. These components are built on top of Radix UI primitives and styled with Tailwind CSS.
+This directory contains all the shadcn/ui components for the TeamOrbit frontend application. These components are built on top of Radix UI primitives and styled with Tailwind CSS.
 
 ## 📁 Available Components
 

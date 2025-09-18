@@ -1,15 +1,15 @@
 # API Documentation
 
-Complete API reference for the Lokvani backend application.
+Complete API reference for the TeamOrbit backend application.
 
 ## 🌐 Base URL
 
 - **Development:** `http://localhost:4000`
-- **Production:** `https://api.lokvani.com`
+- **Production:** `https://api.teamorbit.com`
 
 ## 📚 API Overview
 
-The Lokvani API is a RESTful API built with Express.js and TypeScript. It provides endpoints for user management, authentication, and real-time chat functionality.
+The TeamOrbit API is a RESTful API built with Express.js and TypeScript. It provides endpoints for user management, authentication, and real-time chat functionality.
 
 ### Features
 
@@ -627,7 +627,7 @@ curl -X GET http://localhost:4000/api/lookup/1 \
 
 ## 📚 OpenAPI Specification
 
-The Lokvani backend features a comprehensive OpenAPI documentation system built with Zod schemas and the ServiceResponse pattern, located in `src/openApiDocs/`.
+The TeamOrbit backend features a comprehensive OpenAPI documentation system built with Zod schemas and the ServiceResponse pattern, located in `src/openApiDocs/`.
 
 ### OpenAPI Endpoints
 

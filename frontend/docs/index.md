@@ -1,6 +1,6 @@
-# Lokvani Frontend Documentation
+# TeamOrbit Frontend Documentation
 
-Welcome to the comprehensive documentation for the Lokvani frontend application.
+Welcome to the comprehensive documentation for the TeamOrbit frontend application.
 
 ## 🚀 Quick Start
 

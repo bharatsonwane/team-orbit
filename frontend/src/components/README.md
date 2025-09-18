@@ -1,6 +1,6 @@
 # Components Directory
 
-This directory contains all reusable components for the Lokvani frontend application.
+This directory contains all reusable components for the TeamOrbit frontend application.
 
 ## 📁 Structure
 

@@ -1,6 +1,6 @@
 # Routing and Navigation Guide
 
-This document describes the routing setup and navigation patterns used in the Lokvani frontend application.
+This document describes the routing setup and navigation patterns used in the TeamOrbit frontend application.
 
 ## 🛣️ Router Setup
 

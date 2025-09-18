@@ -1,6 +1,6 @@
 # Project Setup Guide
 
-This document provides a comprehensive guide for setting up the Lokvani frontend project from scratch.
+This document provides a comprehensive guide for setting up the TeamOrbit frontend project from scratch.
 
 ## 🚀 Quick Start
 
@@ -15,7 +15,7 @@ This document provides a comprehensive guide for setting up the Lokvani frontend
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd lokvani/frontend
+cd teamorbit/frontend
 
 # Install dependencies
 npm install

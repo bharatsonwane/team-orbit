@@ -118,11 +118,11 @@ cp env.example .env.local
 Edit `.env.local`:
 
 ```env
-APP_NAME=Lokvani
+APP_NAME=TeamOrbit
 APP_VERSION=1.0.0
 APP_ENV=development
 API_BASE_URL=http://localhost:3000/api
-JWT_STORAGE_KEY=lokvani_jwt_token
+JWT_STORAGE_KEY=teamorbit_jwt_token
 ENABLE_DEV_TOOLS=true
 ```
 

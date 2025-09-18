@@ -1,10 +1,10 @@
 # System Architecture
 
-Comprehensive architecture documentation for the Lokvani backend system.
+Comprehensive architecture documentation for the TeamOrbit backend system.
 
 ## 🏗️ Architecture Overview
 
-The Lokvani backend follows a layered architecture pattern with clear separation of concerns, making it maintainable, scalable, and testable.
+The TeamOrbit backend follows a layered architecture pattern with clear separation of concerns, making it maintainable, scalable, and testable.
 
 ### High-Level Architecture
 
@@ -419,7 +419,7 @@ export const envVariable = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_PORT: parseInt(process.env.DB_PORT || '5432'),
-  DB_NAME: process.env.DB_NAME || 'lokvani',
+  DB_NAME: process.env.DB_NAME || 'teamorbit',
   DB_USER: process.env.DB_USER || 'postgres',
   DB_PASSWORD: process.env.DB_PASSWORD || 'password',
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret',

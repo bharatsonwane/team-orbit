@@ -1,6 +1,6 @@
 # Utils Directory
 
-This directory contains utility functions, helpers, and shared logic for the Lokvani frontend application.
+This directory contains utility functions, helpers, and shared logic for the TeamOrbit frontend application.
 
 ## 📁 Structure
 

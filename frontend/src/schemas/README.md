@@ -1,6 +1,6 @@
 # Schemas Directory
 
-Validation schemas and type definitions for the Lokvani frontend application.
+Validation schemas and type definitions for the TeamOrbit frontend application.
 
 ## 📁 Structure
 

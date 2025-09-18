@@ -33,7 +33,7 @@ export default function Home() {
         <div className='text-center space-y-8'>
           <div className='space-y-4'>
             <h1 className='text-4xl font-bold tracking-tight sm:text-6xl'>
-              Welcome to <span className='text-primary'>Lokvani</span>
+              Welcome to <span className='text-primary'>TeamOrbit</span>
             </h1>
             <p className='text-xl text-muted-foreground max-w-2xl mx-auto'>
               A modern React application built with Vite, TypeScript, and

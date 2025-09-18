@@ -1,4 +1,4 @@
-# Lokvani Frontend
+# TeamOrbit Frontend
 
 A modern React application built with Vite, TypeScript, and shadcn/ui, featuring comprehensive theming support and authentication pages.
 
@@ -188,4 +188,4 @@ See [THEMING.md](./THEMING.md) for detailed information.
 
 ## 📄 License
 
-This project is part of the Lokvani application.
+This project is part of the TeamOrbit application.

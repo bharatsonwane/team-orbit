@@ -1,6 +1,6 @@
 # Components Documentation
 
-Complete component library documentation for the Lokvani frontend application.
+Complete component library documentation for the TeamOrbit frontend application.
 
 ## 📦 shadcn/ui Components
 
@@ -216,7 +216,7 @@ Custom theme context provider for dark/light mode.
 ```tsx
 import { ThemeProvider } from '@/components/theme-provider';
 
-<ThemeProvider defaultTheme='system' storageKey='lokvani-ui-theme'>
+<ThemeProvider defaultTheme='system' storageKey='teamorbit-ui-theme'>
   <App />
 </ThemeProvider>;
 ```

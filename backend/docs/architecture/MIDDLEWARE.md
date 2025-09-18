@@ -1,10 +1,10 @@
 # Middleware Architecture
 
-Comprehensive documentation for the Lokvani backend middleware stack.
+Comprehensive documentation for the TeamOrbit backend middleware stack.
 
 ## 🏗️ Middleware Overview
 
-The Lokvani backend implements a sophisticated middleware stack that handles cross-cutting concerns including database connection management, authentication, validation, error handling, and response formatting.
+The TeamOrbit backend implements a sophisticated middleware stack that handles cross-cutting concerns including database connection management, authentication, validation, error handling, and response formatting.
 
 ## 🔧 Middleware Stack Order
 
@@ -658,4 +658,4 @@ describe('Database Client Middleware', () => {
 - Use HTTPS in production
 - Set security headers
 
-This middleware architecture provides a robust, scalable foundation for the Lokvani backend with comprehensive error handling, security features, and development-friendly debugging capabilities.
+This middleware architecture provides a robust, scalable foundation for the TeamOrbit backend with comprehensive error handling, security features, and development-friendly debugging capabilities.

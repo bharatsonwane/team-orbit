@@ -1,6 +1,6 @@
 # Pages Directory
 
-This directory contains all page components for the Lokvani frontend application.
+This directory contains all page components for the TeamOrbit frontend application.
 
 ## 📁 Structure
 

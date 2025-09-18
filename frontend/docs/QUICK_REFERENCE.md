@@ -1,6 +1,6 @@
 # Quick Reference Guide
 
-Quick commands and common tasks for the Lokvani frontend project.
+Quick commands and common tasks for the TeamOrbit frontend project.
 
 ## 🚀 Common Commands
 

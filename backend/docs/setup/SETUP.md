@@ -1,6 +1,6 @@
 # Backend Setup Guide
 
-Complete guide for setting up the Lokvani backend from scratch.
+Complete guide for setting up the TeamOrbit backend from scratch.
 
 ## 🚀 Prerequisites
 
@@ -24,7 +24,7 @@ Complete guide for setting up the Lokvani backend from scratch.
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd lokvani/backend
+cd teamorbit/backend
 ```
 
 ### 2. Install Dependencies
@@ -73,11 +73,11 @@ sudo apt install postgresql postgresql-contrib
 psql -U postgres
 
 # Create database
-CREATE DATABASE lokvani;
+CREATE DATABASE teamorbit;
 
 # Create user (optional)
-CREATE USER lokvani_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE lokvani TO lokvani_user;
+CREATE USER teamorbit_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE teamorbit TO teamorbit_user;
 
 # Exit psql
 \q
@@ -95,7 +95,7 @@ NODE_ENV=development
 # Database Configuration
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=lokvani
+DB_NAME=teamorbit
 DB_USER=postgres
 DB_PASSWORD=your_password
 
@@ -282,7 +282,7 @@ Visit `http://localhost:5000/docs` to access Swagger UI documentation.
 
 ```bash
 # Test database connection
-psql -U postgres -d lokvani -c "SELECT COUNT(*) FROM users;"
+psql -U postgres -d teamorbit -c "SELECT COUNT(*) FROM users;"
 ```
 
 ## 🐛 Troubleshooting
@@ -430,4 +430,4 @@ app.use(cors(corsOptions));
 
 ---
 
-_This setup guide should get you up and running with the Lokvani backend. For more detailed information, check the other documentation files._
+_This setup guide should get you up and running with the TeamOrbit backend. For more detailed information, check the other documentation files._

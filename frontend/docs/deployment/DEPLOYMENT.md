@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This document provides comprehensive instructions for deploying the Lokvani frontend application to various platforms.
+This document provides comprehensive instructions for deploying the TeamOrbit frontend application to various platforms.
 
 ## 🚀 Build Process
 
@@ -247,10 +247,10 @@ http {
 
 ```bash
 # Build image
-docker build -t lokvani-frontend .
+docker build -t teamorbit-frontend .
 
 # Run container
-docker run -p 80:80 lokvani-frontend
+docker run -p 80:80 teamorbit-frontend
 ```
 
 ## 🔧 Environment Configuration
@@ -261,8 +261,8 @@ Create `.env.production`:
 
 ```env
 NODE_ENV=production
-VITE_API_URL=https://api.lokvani.com
-APP_NAME=Lokvani
+VITE_API_URL=https://api.teamorbit.com
+APP_NAME=TeamOrbit
 ```
 
 ### 2. Build-time Variables
@@ -282,7 +282,7 @@ For dynamic configuration, use a config file:
 ```typescript
 // public/config.js
 window.APP_CONFIG = {
-  apiUrl: 'https://api.lokvani.com',
+  apiUrl: 'https://api.teamorbit.com',
   theme: 'system',
 };
 ```

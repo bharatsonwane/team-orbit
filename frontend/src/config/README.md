@@ -1,6 +1,6 @@
 # Config Directory
 
-This directory contains configuration files for the Lokvani frontend application.
+This directory contains configuration files for the TeamOrbit frontend application.
 
 ## 📁 Structure
 
@@ -22,11 +22,11 @@ Handles environment variable validation, type safety, and configuration manageme
 
 | Variable          | Description                               | Example                     |
 | ----------------- | ----------------------------------------- | --------------------------- |
-| `APP_NAME`        | Application name                          | `Lokvani`                   |
+| `APP_NAME`        | Application name                          | `TeamOrbit`                   |
 | `APP_VERSION`     | Application version                       | `1.0.0`                     |
 | `APP_ENV`         | Environment (development/production/test) | `development`               |
 | `API_BASE_URL`    | Backend API base URL                      | `http://localhost:3000/api` |
-| `JWT_STORAGE_KEY` | Local storage key for JWT tokens          | `lokvani_jwt_token`         |
+| `JWT_STORAGE_KEY` | Local storage key for JWT tokens          | `teamorbit_jwt_token`         |
 
 ### Optional Variables
 
@@ -151,7 +151,7 @@ API_BASE_URL=http://localhost:3000/api
 ENABLE_DEV_TOOLS=true
 
 # .env.production
-API_BASE_URL=https://api.lokvani.com
+API_BASE_URL=https://api.teamorbit.com
 ENABLE_DEV_TOOLS=false
 ```
 

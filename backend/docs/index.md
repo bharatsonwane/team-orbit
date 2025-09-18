@@ -1,6 +1,6 @@
-# Lokvani Backend Documentation
+# TeamOrbit Backend Documentation
 
-Welcome to the comprehensive documentation for the Lokvani backend API.
+Welcome to the comprehensive documentation for the TeamOrbit backend API.
 
 ## 🚀 Quick Start
 

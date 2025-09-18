@@ -1,4 +1,4 @@
-# Lokvani Backend
+# TeamOrbit Backend
 
 A robust, enterprise-grade Node.js backend API built with Express, TypeScript, and PostgreSQL featuring class-based architecture, advanced middleware, and comprehensive database management.
 
@@ -215,7 +215,7 @@ NODE_ENV=development
 # Database Configuration
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=lokvani
+DB_NAME=teamorbit
 DB_USER=postgres
 DB_PASSWORD=your_password
 
@@ -262,4 +262,4 @@ The application uses PostgreSQL with the following key tables:
 
 ## 📄 License
 
-This project is part of the Lokvani application suite.
+This project is part of the TeamOrbit application suite.
