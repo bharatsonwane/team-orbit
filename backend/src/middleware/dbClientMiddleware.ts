@@ -42,7 +42,12 @@ export async function dbClientMiddleware(
       req.db.tenantPool = await db.getSchemaPool(`tenant_${tenantSchemaName}`);
     }
 
+    let isReleased = false;
+    
     const cleanup = () => {
+      if (isReleased) return; // Prevent double release
+      isReleased = true;
+      
       try {
         if (
           req.db.tenantPool?.release &&

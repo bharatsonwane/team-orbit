@@ -66,8 +66,13 @@ export async function dbClientMiddleware(
       req.db.tenantPool = await db.getSchemaPool(`tenant_${tenantSchemaName}`);
     }
 
-    // Comprehensive connection cleanup
+    // Comprehensive connection cleanup with double-release prevention
+    let isReleased = false;
+    
     const cleanup = () => {
+      if (isReleased) return; // Prevent double release
+      isReleased = true;
+      
       try {
         if (
           req.db.tenantPool?.release &&
