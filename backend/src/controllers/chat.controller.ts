@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import Chat from '../services/chat.service';
 
 interface ChatMessageBody {
@@ -13,7 +13,8 @@ interface ChatMessageBody {
 
 export const sendMessage = async (
   req: Request<{}, {}, ChatMessageBody>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const {
@@ -44,17 +45,14 @@ export const sendMessage = async (
       data: savedMessage,
     });
   } catch (error) {
-    console.error('Error sending message:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error sending message',
-    });
+    next(error);
   }
 };
 
 export const getMessagesByChatChannel = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { chatChannelId } = req.params as { chatChannelId: string };
@@ -65,10 +63,6 @@ export const getMessagesByChatChannel = async (
       data: messages,
     });
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching messages',
-    });
+    next(error);
   }
 };

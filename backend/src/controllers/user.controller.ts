@@ -60,11 +60,7 @@ export const postUserLogin = async (
       },
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error during login',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -123,11 +119,7 @@ export const postUserSignup = async (
       data: createdUser,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error creating user',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -147,11 +139,7 @@ export const createUserProfile = async (
       data: createdUser,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error creating user profile',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -167,11 +155,7 @@ export const getUsers = async (
       data: users,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching users',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -205,11 +189,7 @@ export const getUserById = async (
       data: userData,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching user',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -230,11 +210,7 @@ export const updateUserProfile = async (
       data: updatedUser,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error updating user profile',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -265,11 +241,7 @@ export const updateUserPassword = async (
       data: updatedUser,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error updating password',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -286,10 +258,6 @@ export const signoutUser = async (
       message: 'User signed out successfully',
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error during signout',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };

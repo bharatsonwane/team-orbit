@@ -233,52 +233,58 @@ export const userService = {
 
 ### Controller Patterns
 
-#### Standard Controller Structure
+#### Standard Controller Structure (Updated)
 
 ```typescript
 // src/controllers/user.controller.ts
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { userService } from '../services/user.service';
-import { logger } from '../utils/logger';
 
 export const userController = {
-  async getUsers(req: Request, res: Response) {
+  async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await userService.getAllUsers();
-      res.success(users);
+      res.status(200).json({
+        success: true,
+        message: 'Users retrieved successfully',
+        data: users
+      });
     } catch (error) {
-      logger.error('Error fetching users:', error);
-      res.error(error);
+      next(error); // Pass to global error handler
     }
   },
 
-  async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await userService.getUserById(id);
 
       if (!user) {
         return res.status(404).json({
-          success: false,
-          error: { message: 'User not found' },
+          message: 'User not found'
         });
       }
 
-      res.success(user);
+      res.status(200).json({
+        success: true,
+        data: user
+      });
     } catch (error) {
-      logger.error('Error fetching user:', error);
-      res.error(error);
+      next(error); // Pass to global error handler
     }
   },
 
-  async createUser(req: Request, res: Response) {
+  async createUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userData = req.body;
       const user = await userService.createUser(userData);
-      res.status(201).success(user);
+      res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        data: user
+      });
     } catch (error) {
-      logger.error('Error creating user:', error);
-      res.error(error);
+      next(error); // Pass to global error handler
     }
   },
 };
@@ -297,24 +303,29 @@ const createUserSchema = z.object({
   last_name: z.string().min(1),
 });
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     // Validate request body
     const validatedData = createUserSchema.parse(req.body);
 
     const user = await userService.createUser(validatedData);
-    res.status(201).success(user);
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: user
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
-        success: false,
-        error: {
-          message: 'Validation error',
-          details: error.errors,
-        },
+        message: 'Validation error',
+        details: error.errors,
       });
     }
-    res.error(error);
+    next(error); // Pass other errors to global handler
   }
 };
 ```
@@ -801,28 +812,50 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 ```
 
-### Response Handler Middleware (Alternative)
+### Modern Controller Patterns (Updated)
 
-Extended Response interface for middleware-based responses:
+Direct response handling without middleware extensions:
 
 ```typescript
-// Extended Response interface
-interface Response {
-  success(data?: any, message?: string): Response;
-  error(error: any, statusCode?: number): Response;
-}
-
-// Usage in controllers
-export const getUsers = async (req: Request, res: Response) => {
+// Modern controller pattern
+export const getUsers = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     const serviceResponse = await UserService.getAllUsers();
+    
     if (serviceResponse.success) {
-      res.success(serviceResponse.responseObject, serviceResponse.message);
+      res.status(serviceResponse.statusCode).json({
+        success: true,
+        message: serviceResponse.message,
+        data: serviceResponse.responseObject
+      });
     } else {
-      res.error(serviceResponse, serviceResponse.statusCode);
+      res.status(serviceResponse.statusCode).json({
+        message: serviceResponse.message
+      });
     }
   } catch (error) {
-    res.error(error);
+    next(error); // Pass to global error handler
+  }
+};
+
+// Simplified pattern for basic operations
+export const getUserById = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
+  try {
+    const user = await UserService.getUserById(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    next(error);
   }
 };
 ```
@@ -847,34 +880,40 @@ export default class UserService {
 
 ### 2. Database Access Patterns
 
-Leverage the database middleware:
+Leverage the database middleware with proper error handling:
 
 ```typescript
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     // Use injected database connection
     const result = await req.db.mainPool.query(
-      'SELECT * FROM users WHERE id = $1', 
+      'SELECT * FROM app_user WHERE id = $1', 
       [req.params.id]
     );
     
     if (result.rows.length === 0) {
       return res.status(404).json({
-        success: false,
-        error: { message: 'User not found' }
+        message: 'User not found'
       });
     }
 
-    res.success(result.rows[0]);
+    res.status(200).json({
+      success: true,
+      data: result.rows[0]
+    });
   } catch (error) {
-    res.error(error);
+    next(error); // Pass to global error handler
   }
 };
 ```
 
-### 3. Error Handling Patterns
+### 3. Error Handling Patterns (Updated)
 
-Use the standardized error response:
+Use centralized error handling with proper error classes:
 
 ```typescript
 // Custom error classes
@@ -892,6 +931,23 @@ export class HttpError extends Error {
 if (!user) {
   throw new HttpError('User not found', 404);
 }
+
+// Controller pattern - pass errors to global handler
+export const getUser = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
+  try {
+    const user = await userService.getUserById(req.params.id);
+    if (!user) {
+      throw new HttpError('User not found', 404);
+    }
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error); // Global error handler will process this
+  }
+};
 ```
 
 ### 4. OpenAPI Documentation Patterns

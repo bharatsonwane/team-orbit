@@ -1,33 +1,55 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
+import { HttpError } from '../utils/httpError';
 
-export const notFound = (req: Request, res: Response, next: NextFunction) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`) as any;
-  error.statusCode = 404;
-  next(error);
-};
-
-export interface AppError extends Error {
-  statusCode?: number;
-  isOperational?: boolean;
-}
-
-export const errorHandler = (
-  err: AppError,
+/**
+ * 404 Not Found middleware
+ * This should be placed after all routes but before the error handler
+ */
+export const routeNotFoundMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
-  const statusCode = err.statusCode || 500;
+): void => {
+  const error = new HttpError(`Route ${req.originalUrl} not found`, 404);
+  next(error);
+};
+
+/**
+ * Global error middleware
+ * This should be the last middleware in the application
+ */
+export const globalErrorMiddleware = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'Internal Server Error';
 
-  console.error(`Error ${statusCode}: ${message}`);
-  console.error(err.stack);
+  // ✅ Comprehensive logging
+  logger.error('Global error handler:', {
+    statusCode,
+    message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+  });
 
+  // ✅ Prevent double responses
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  // ✅ Clean response - just message (as you suggested)
   res.status(statusCode).json({
-    success: false,
-    error: {
-      message,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-    },
+    message,
+    ...(process.env.NODE_ENV === 'development' && {
+      stack: err.stack,
+    }),
   });
 };

@@ -42,7 +42,7 @@ export async function dbClientMiddleware(
       req.db.tenantPool = await db.getSchemaPool(`tenant_${tenantSchemaName}`);
     }
 
-    res.on('finish', () => {
+    const cleanup = () => {
       try {
         if (
           req.db.tenantPool?.release &&
@@ -50,7 +50,6 @@ export async function dbClientMiddleware(
         ) {
           req.db.tenantPool.release(true);
         }
-
         if (
           req.db.mainPool?.release &&
           typeof req.db.mainPool?.release === 'function'
@@ -60,7 +59,12 @@ export async function dbClientMiddleware(
       } catch (releaseError) {
         logger.error('Error releasing database connections:', releaseError);
       }
-    });
+    };
+
+    // Listen to multiple events for comprehensive cleanup
+    res.on('finish', cleanup); // Normal response completion
+    res.on('close', cleanup); // Connection closed/aborted
+    res.on('error', cleanup); // Response errors
 
     next();
   } catch (err: unknown) {

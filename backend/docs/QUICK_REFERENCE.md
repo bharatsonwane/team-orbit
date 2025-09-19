@@ -95,9 +95,8 @@ GET  /api/chat/channels
 ### System
 
 ```bash
-GET /health          # Health check
+GET /health         # Health check endpoint (replaces /test)
 GET /docs           # API documentation
-GET /test           # Test endpoint
 ```
 
 ## 🔧 Environment Variables
@@ -133,20 +132,27 @@ LOG_LEVEL=info
 
 ## 🎨 Code Patterns
 
-### Controller Pattern
+### Controller Pattern (Updated)
 
 ```typescript
 // src/controllers/user.controller.ts
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { userService } from '../services/user.service';
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const user = await userService.findById(id);
-    res.success(user);
+    res.status(200).json({
+      success: true,
+      data: user
+    });
   } catch (error) {
-    res.error(error);
+    next(error); // Pass to global error handler
   }
 };
 ```

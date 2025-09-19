@@ -4,13 +4,12 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import http from 'http';
 // import { Server } from 'socket.io';
+import logger from './utils/logger';
 
 import { envVariable } from './config/envVariable';
-import { errorHandler, notFound } from './middleware/errorMiddleware';
 import apiRoutes from './routes/routes';
 import openApiRoutes from './openApiDocs/openApiRoutes';
-import { responseHandler } from './middleware/requestAndResponseHandler';
-import logger from './utils/logger';
+import {  globalErrorMiddleware, routeNotFoundMiddleware } from './middleware/errorMiddleware';
 import { dbClientMiddleware } from './middleware/dbClientMiddleware';
 
 async function main() {
@@ -54,11 +53,9 @@ async function main() {
   app.use(morgan('combined'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(responseHandler as express.RequestHandler);
 
   // Routes
   app.use('/api', dbClientMiddleware, apiRoutes);
-  app.use('/test', (req, res) => res.send('Chat backend is running.'));
   app.use('/docs', openApiRoutes);
 
   // Health check endpoint
@@ -70,10 +67,11 @@ async function main() {
     });
   });
 
-  // Error handling middleware
-  app.use((req, res, next) => next(new Error('Url not found')));
-  app.use(notFound);
-  app.use(errorHandler);
+  // 404 handler - must come after all routes
+  app.use(routeNotFoundMiddleware);
+
+  // Global error handler - must be last
+  app.use(globalErrorMiddleware);
 
   // Start server
   server.listen(PORT, () => {

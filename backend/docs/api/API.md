@@ -470,17 +470,23 @@ GET /docs
 
 Returns the Swagger UI documentation interface.
 
-### Test Endpoint
+### Health Check Endpoint
 
 ```http
-GET /test
+GET /health
 ```
 
 **Response:**
 
-```text
-Chat backend is running.
+```json
+{
+  "status": "OK",
+  "message": "Server is running",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
 ```
+
+**Note:** The `/test` endpoint has been removed in favor of the standardized `/health` endpoint.
 
 ## 📊 Response Format
 
@@ -489,14 +495,31 @@ Chat backend is running.
 ```json
 {
   "success": true,
+  "message": "Operation completed successfully",
   "data": {
     // Response data
-  },
-  "message": "Optional success message"
+  }
 }
 ```
 
-### Error Response
+### Error Response (Updated Format)
+
+```json
+{
+  "message": "Error description"
+}
+```
+
+### Error Response (Development Mode)
+
+```json
+{
+  "message": "Error description",
+  "stack": "Error: Detailed error stack trace..."
+}
+```
+
+### Legacy Error Response (Being Phased Out)
 
 ```json
 {

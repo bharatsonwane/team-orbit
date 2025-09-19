@@ -110,7 +110,7 @@ export default class User {
   async signupUser(dbClient: dbClientPool): Promise<UserProfile> {
     /* insert user */
     const userSignupQuery = `
-        INSERT INTO user_profile (
+        INSERT INTO app_user (
                 email,
                 password,
                 phone,
@@ -164,7 +164,7 @@ export default class User {
         up."createdAt",
         up."updatedAt"
       FROM 
-        user_profile up
+        app_user up
       LEFT JOIN 
         lookup usl ON up."userStatusLookupId" = usl.id
       LEFT JOIN 
@@ -201,7 +201,7 @@ export default class User {
     up."createdAt",
     up."updatedAt"
   FROM 
-    user_profile up
+    app up
   LEFT JOIN 
     lookup usl ON up."userStatusLookupId" = usl.id
   LEFT JOIN 
@@ -238,7 +238,7 @@ export default class User {
           up."createdAt",
           up."updatedAt"
       FROM 
-        user_profile up
+        app up
       LEFT JOIN 
         lookup usl ON up."userStatusLookupId" = usl.id
       LEFT JOIN 
@@ -279,7 +279,7 @@ export default class User {
       .join(', ');
 
     const queryString = `
-      UPDATE user_profile
+      UPDATE app
       SET ${setQueryString}
       WHERE id = ${this.id} RETURNING *;`;
     const results = await dbClient.mainPool.query(queryString);
@@ -290,7 +290,7 @@ export default class User {
 
   async updateUserPassword(dbClient: dbClientPool): Promise<UserProfile> {
     const queryString = `
-      UPDATE user_profile
+      UPDATE app
       SET password = '${this.hashPassword}'
       WHERE id = ${this.id} RETURNING *;`;
     const results = await dbClient.mainPool.query(queryString);
@@ -327,7 +327,7 @@ export default class User {
     const values = keysToInsert.map(key => `'${(this as any)[key]}'`);
 
     const queryString = `
-    INSERT INTO user_profile (
+    INSERT INTO app (
       ${columns.join(', ')},
       "createdAt",
       "updatedAt"

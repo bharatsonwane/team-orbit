@@ -10,11 +10,7 @@ export const retrieveLookupList = async (
     const data = await Lookup.retrieveLookupList(req.db);
     res.status(200).send(data);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error retrieving lookup list',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };
 
@@ -28,10 +24,6 @@ export const getLookupTypeById = async (
     const data = await Lookup.getLookupTypeById(req.db, parseInt(id));
     res.status(200).send(data);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error retrieving lookup type',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    next(error);
   }
 };

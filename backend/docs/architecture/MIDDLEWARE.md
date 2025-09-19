@@ -15,13 +15,15 @@ app.use(cors({ origin: '*', credentials: true })); // CORS configuration
 app.use(morgan('combined'));          // Request logging
 app.use(express.json());              // JSON body parsing
 app.use(express.urlencoded({ extended: true })); // URL-encoded parsing
-app.use(responseHandler);             // Standardized response formatting
-app.use(dbClientMiddleware);          // Database connection injection
+app.use('/api', dbClientMiddleware, apiRoutes);  // Database connection + API routes
+app.use('/docs', openApiRoutes);      // API documentation routes
+// Health check endpoint
+app.get('/health', healthCheckHandler);
 // Routes...
 app.use(validationMiddleware);        // Request validation (route-specific)
 app.use(authRoleMiddleware);          // Authentication & authorization (route-specific)
-app.use(notFound);                    // 404 handler
-app.use(errorHandler);                // Global error handler
+app.use(routeNotFoundMiddleware);     // 404 handler for undefined routes
+app.use(globalErrorMiddleware);       // Global error handler
 ```
 
 ## 🗄️ Database Client Middleware
@@ -64,19 +66,30 @@ export async function dbClientMiddleware(
       req.db.tenantPool = await db.getSchemaPool(`tenant_${tenantSchemaName}`);
     }
 
-    // Cleanup connections when response finishes
-    res.on('finish', () => {
+    // Comprehensive connection cleanup
+    const cleanup = () => {
       try {
-        if (req.db.tenantPool?.release) {
+        if (
+          req.db.tenantPool?.release &&
+          typeof req.db.tenantPool?.release === 'function'
+        ) {
           req.db.tenantPool.release(true);
         }
-        if (req.db.mainPool?.release) {
+        if (
+          req.db.mainPool?.release &&
+          typeof req.db.mainPool?.release === 'function'
+        ) {
           req.db.mainPool.release(true);
         }
       } catch (releaseError) {
         logger.error('Error releasing database connections:', releaseError);
       }
-    });
+    };
+
+    // Listen to multiple events for comprehensive cleanup
+    res.on('finish', cleanup); // Normal response completion
+    res.on('close', cleanup);  // Connection closed/aborted
+    res.on('error', cleanup);  // Response errors
 
     next();
   } catch (err: unknown) {
@@ -100,7 +113,11 @@ export async function dbClientMiddleware(
 
 ### Usage in Controllers
 ```typescript
-export const getLookupList = async (req: Request, res: Response) => {
+export const getLookupList = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     // Access main database pool
     const results = await req.db.mainPool.query('SELECT * FROM lookup_type');
@@ -110,9 +127,12 @@ export const getLookupList = async (req: Request, res: Response) => {
       const tenantData = await req.db.tenantPool.query('SELECT * FROM tenant_data');
     }
     
-    res.success(results.rows);
+    res.status(200).json({
+      success: true,
+      data: results.rows
+    });
   } catch (error) {
-    res.error(error);
+    next(error); // Pass error to global error handler
   }
 };
 ```
@@ -325,92 +345,125 @@ router.get('/users/:id',
 );
 ```
 
-## 📤 Response Handler Middleware
+## 🚨 Global Error Handler Middleware
 
 ### Purpose
-Standardizes API responses across all endpoints.
+Centralized error handling with comprehensive logging and consistent response format.
 
 ### Implementation
 ```typescript
-// src/middleware/responseHandler.ts
-declare global {
-  namespace Express {
-    interface Response {
-      success(data?: any, message?: string): Response;
-      error(error: any, statusCode?: number): Response;
-    }
-  }
-}
+// src/middleware/errorMiddleware.ts
+import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
+import { HttpError } from '../utils/httpError';
 
-const responseHandler = (req: Request, res: Response, next: NextFunction): void => {
-  // Success response method
-  res.success = function(data?: any, message?: string): Response {
-    const response: any = {
-      success: true,
-      timestamp: new Date().toISOString(),
-      path: req.path
-    };
-
-    if (data !== undefined) {
-      response.data = data;
-    }
-
-    if (message) {
-      response.message = message;
-    }
-
-    return this.json(response);
-  };
-
-  // Error response method
-  res.error = function(error: any, statusCode?: number): Response {
-    const status = statusCode || error.statusCode || 500;
-    
-    const response: any = {
-      success: false,
-      timestamp: new Date().toISOString(),
-      path: req.path,
-      error: {
-        message: error.message || 'Internal server error'
-      }
-    };
-
-    // Add error details in development
-    if (process.env.NODE_ENV === 'development') {
-      response.error.stack = error.stack;
-      response.error.details = error.details;
-    }
-
-    // Log error
-    logger.error('API Error:', {
-      path: req.path,
-      method: req.method,
-      error: error.message,
-      stack: error.stack,
-      statusCode: status
-    });
-
-    return this.status(status).json(response);
-  };
-
-  next();
+/**
+ * 404 Not Found middleware
+ * This should be placed after all routes but before the error handler
+ */
+export const routeNotFoundMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const error = new HttpError(`Route ${req.originalUrl} not found`, 404);
+  next(error);
 };
 
-export default responseHandler;
+/**
+ * Global error middleware
+ * This should be the last middleware in the application
+ */
+export const globalErrorMiddleware = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const statusCode = err.statusCode || err.status || 500;
+  const message = err.message || 'Internal Server Error';
+
+  // Comprehensive logging
+  logger.error('Global error handler:', {
+    statusCode,
+    message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+  });
+
+  // Prevent double responses
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  // Clean response format
+  res.status(statusCode).json({
+    message,
+    ...(process.env.NODE_ENV === 'development' && {
+      stack: err.stack,
+    }),
+  });
+};
 ```
 
-### Response Formats
+### Controller Error Handling Pattern
 ```typescript
-// Success response
+// Modern controller pattern with next() error handling
+export const sendMessage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const savedMessage = await Chat.sendMessage(req.body);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Message sent successfully',
+      data: savedMessage,
+    });
+  } catch (error) {
+    next(error); // Pass to global error handler
+  }
+};
+
+// Old pattern (deprecated)
+export const sendMessageOld = async (req: Request, res: Response) => {
+  try {
+    const savedMessage = await Chat.sendMessage(req.body);
+    res.success(savedMessage, 'Message sent successfully');
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error sending message',
+    });
+  }
+};
+```
+
+## 📋 Response Format Standards
+
+### Current Response Format (Updated)
+```typescript
+// Success response format
 {
   "success": true,
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "path": "/api/users",
-  "data": [...],
-  "message": "Users retrieved successfully"
+  "message": "Operation completed successfully",
+  "data": { /* response data */ }
 }
 
-// Error response
+// Error response format (simplified)
+{
+  "message": "Error description",
+  "stack": "Error stack trace..." // Development only
+}
+
+// Legacy format (being phased out)
 {
   "success": false,
   "timestamp": "2024-01-01T00:00:00.000Z",
@@ -420,93 +473,6 @@ export default responseHandler;
     "stack": "Error: User not found..." // Development only
   }
 }
-```
-
-## 🚨 Error Handler Middleware
-
-### Purpose
-Global error handling with comprehensive logging and user-friendly responses.
-
-### Implementation
-```typescript
-// src/middleware/errorHandler.ts
-export const errorHandler = (
-  error: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  logger.error('Global error handler:', {
-    message: error.message,
-    stack: error.stack,
-    path: req.path,
-    method: req.method,
-    body: req.body,
-    query: req.query,
-    params: req.params
-  });
-
-  // Default error response
-  let statusCode = 500;
-  let message = 'Internal server error';
-
-  // Handle specific error types
-  if (error.name === 'ValidationError') {
-    statusCode = 400;
-    message = error.message;
-  } else if (error.name === 'UnauthorizedError') {
-    statusCode = 401;
-    message = 'Unauthorized access';
-  } else if (error.name === 'ForbiddenError') {
-    statusCode = 403;
-    message = 'Forbidden';
-  } else if (error.statusCode) {
-    statusCode = error.statusCode;
-    message = error.message;
-  }
-
-  const response: any = {
-    success: false,
-    timestamp: new Date().toISOString(),
-    path: req.path,
-    error: { message }
-  };
-
-  // Add stack trace in development
-  if (process.env.NODE_ENV === 'development') {
-    response.error.stack = error.stack;
-  }
-
-  res.status(statusCode).json(response);
-};
-```
-
-## 🔍 Not Found Middleware
-
-### Purpose
-Handles 404 errors for undefined routes.
-
-### Implementation
-```typescript
-// src/middleware/notFound.ts
-export const notFound = (req: Request, res: Response): void => {
-  logger.warn('Route not found:', {
-    path: req.path,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get('User-Agent')
-  });
-
-  res.status(404).json({
-    success: false,
-    timestamp: new Date().toISOString(),
-    path: req.path,
-    error: {
-      message: `Route ${req.method} ${req.path} not found`,
-      code: 'ROUTE_NOT_FOUND'
-    }
-  });
-};
 ```
 
 ## 🔧 Route Registration Middleware
@@ -628,22 +594,24 @@ describe('Database Client Middleware', () => {
 
 ## 📚 Best Practices
 
-### Middleware Order
+### Middleware Order (Updated)
 1. **Security first:** Helmet, CORS
 2. **Logging:** Morgan for request logging
 3. **Parsing:** Body and URL parsing
-4. **Response formatting:** Response handler
-5. **Database:** Connection injection
-6. **Routes:** Application routes
+4. **Database + Routes:** Connection injection with route mounting
+5. **Documentation:** OpenAPI/Swagger routes
+6. **Health checks:** System status endpoints
 7. **Validation:** Request validation (route-specific)
 8. **Authentication:** Auth checks (route-specific)
-9. **Error handling:** 404 and global error handlers
+9. **Error handling:** 404 handler and global error middleware
 
-### Error Handling
-- Always use try-catch in async middleware
-- Log errors with context information
-- Return consistent error response format
-- Clean up resources in finally blocks
+### Error Handling (Updated)
+- Always use try-catch in async controllers and middleware
+- Pass errors to global handler using `next(error)`
+- Log errors with comprehensive context information
+- Use consistent, simplified error response format
+- Implement proper cleanup in database middleware
+- Avoid duplicate error handling in controllers
 
 ### Performance
 - Use connection pooling for database access
@@ -658,4 +626,14 @@ describe('Database Client Middleware', () => {
 - Use HTTPS in production
 - Set security headers
 
-This middleware architecture provides a robust, scalable foundation for the TeamOrbit backend with comprehensive error handling, security features, and development-friendly debugging capabilities.
+This middleware architecture provides a robust, scalable foundation for the TeamOrbit backend with centralized error handling, enhanced database connection management, security features, and streamlined development patterns.
+
+## 🔄 Recent Updates
+
+### Version 2.0 Changes (Current)
+
+- **Centralized Error Handling:** Migrated from individual controller error responses to global error middleware using `next(error)`
+- **Removed Response Handler Middleware:** Simplified response format without custom `res.success()` and `res.error()` methods
+- **Enhanced Database Cleanup:** Improved connection cleanup with multiple event listeners (`finish`, `close`, `error`)
+- **Streamlined Server Configuration:** Simplified middleware stack with direct route mounting
+- **Consistent Response Format:** Standardized error responses with optional development stack traces

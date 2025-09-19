@@ -13,22 +13,24 @@ The TeamOrbit backend uses PostgreSQL as the primary database with the following
 
 ## 📊 Database Schema
 
-### Users Table
+### App User Table
 
 Stores user account information and authentication data.
 
 ```sql
-CREATE TABLE users (
+CREATE TABLE app_user (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
   first_name VARCHAR(100),
   last_name VARCHAR(100),
-  role VARCHAR(50) DEFAULT 'user',
+  "userRoleLookupId" INTEGER REFERENCES lookup(id),
+  "userStatusLookupId" INTEGER REFERENCES lookup(id),
   is_active BOOLEAN DEFAULT true,
   last_login TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  "createdAt" TIMESTAMP DEFAULT NOW(),
+  "updatedAt" TIMESTAMP DEFAULT NOW()
 );
 ```
 
@@ -37,13 +39,15 @@ CREATE TABLE users (
 - `id` - Primary key, auto-incrementing
 - `email` - Unique email address for login
 - `password` - Hashed password using bcrypt
+- `phone` - User's phone number
 - `first_name` - User's first name
 - `last_name` - User's last name
-- `role` - User role (user, admin, moderator)
+- `userRoleLookupId` - Foreign key to lookup table for user roles
+- `userStatusLookupId` - Foreign key to lookup table for user status
 - `is_active` - Account status flag
 - `last_login` - Timestamp of last login
-- `created_at` - Account creation timestamp
-- `updated_at` - Last update timestamp
+- `createdAt` - Account creation timestamp
+- `updatedAt` - Last update timestamp
 
 ### Chat Messages Table
 
@@ -52,8 +56,8 @@ Stores chat messages between users.
 ```sql
 CREATE TABLE chat_messages (
   id SERIAL PRIMARY KEY,
-  sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  sender_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  receiver_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
   message TEXT NOT NULL,
   media_url VARCHAR(500),
   message_type VARCHAR(50) DEFAULT 'text',
@@ -65,8 +69,8 @@ CREATE TABLE chat_messages (
 **Columns:**
 
 - `id` - Primary key, auto-incrementing
-- `sender_id` - Foreign key to users table
-- `receiver_id` - Foreign key to users table
+- `sender_id` - Foreign key to app_user table
+- `receiver_id` - Foreign key to app_user table
 - `message` - Message content
 - `media_url` - URL to attached media file
 - `message_type` - Type of message (text, image, file)
@@ -82,7 +86,7 @@ CREATE TABLE chat_channels (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
-  created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_by INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
   is_private BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -94,7 +98,7 @@ CREATE TABLE chat_channels (
 - `id` - Primary key, auto-incrementing
 - `name` - Channel name
 - `description` - Channel description
-- `created_by` - Foreign key to users table
+- `created_by` - Foreign key to app_user table
 - `is_private` - Privacy flag
 - `created_at` - Channel creation timestamp
 - `updated_at` - Last update timestamp

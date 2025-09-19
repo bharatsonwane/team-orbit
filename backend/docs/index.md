@@ -66,6 +66,23 @@ docs/
     └── DEPLOYMENT.md           # Production deployment guide
 ```
 
+## 🔄 Recent Updates
+
+### Backend Architecture Improvements (Latest)
+
+The backend has undergone significant improvements in error handling and middleware architecture:
+
+- **Centralized Error Handling**: Migrated from individual controller error responses to global error middleware using `next(error)`
+- **Enhanced Database Middleware**: Improved connection cleanup with comprehensive event listeners
+- **Simplified Response Format**: Streamlined API responses with consistent error handling
+- **Updated Database Schema**: Table renamed from `user_profile` to `app_user` with lookup table integration
+- **Removed Deprecated Middleware**: Eliminated `requestAndResponseHandler.ts` in favor of direct response handling
+
+For detailed information, see:
+- [Middleware Architecture Updates](./architecture/MIDDLEWARE.md#recent-updates)
+- [API Response Format Changes](./api/API.md#response-format)
+- [Database Schema Changes](./api/DATABASE.md#app-user-table)
+
 ## 🔄 Keeping Documentation Updated
 
 When making changes to the project, please update the relevant documentation:
