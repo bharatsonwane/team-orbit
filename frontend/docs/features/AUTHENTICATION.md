@@ -357,10 +357,86 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 ### Backend Integration
 
-- Real API endpoints
-- JWT token management
-- Refresh token handling
-- Session management
+The frontend authentication system is designed to integrate with the TeamOrbit backend API:
+
+#### API Endpoints
+- **Login:** `POST /api/user/login`
+- **Signup:** `POST /api/user/signup`
+- **Profile:** `GET /api/user/profile`
+- **Signout:** `POST /api/user/signout`
+
+#### JWT Token Management
+
+```typescript
+// Expected token structure from backend
+interface JwtTokenPayload {
+  userId: number;
+  email: string;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
+}
+
+// Store token in localStorage or secure storage
+localStorage.setItem('authToken', response.token);
+
+// Include token in API requests
+const token = localStorage.getItem('authToken');
+headers: {
+  'Authorization': `Bearer ${token}`,
+  'Content-Type': 'application/json'
+}
+```
+
+#### User Data Structure
+
+```typescript
+interface User {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  tenantId: number;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+#### Integration Example
+
+```typescript
+// Login API call
+const handleLogin = async (email: string, password: string) => {
+  try {
+    const response = await fetch('/api/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      navigate('/dashboard');
+    } else {
+      throw new Error('Login failed');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+  }
+};
+```
 
 ### Advanced Features
 

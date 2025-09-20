@@ -28,12 +28,51 @@ The API uses JWT (JSON Web Tokens) for authentication. Include the token in the 
 Authorization: Bearer <your-jwt-token>
 ```
 
-### Authentication Endpoints
+### JWT Token Structure
+
+The JWT token contains the following payload:
+
+```typescript
+interface JwtTokenPayload {
+  userId: number;
+  email: string;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
+}
+```
+
+### AuthenticatedRequest Interface
+
+Controllers that require authentication should use the `AuthenticatedRequest` type:
+
+```typescript
+import { AuthenticatedRequest } from '../middleware/authRoleMiddleware';
+
+export const getUserProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId; // Access authenticated user data
+    const userRoles = req.user?.userRoles; // Access user roles
+    
+    // Your controller logic here
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+### User Authentication Endpoints
 
 #### Login
 
 ```http
-POST /api/auth/login
+POST /api/user/login
 Content-Type: application/json
 
 {
@@ -46,31 +85,37 @@ Content-Type: application/json
 
 ```json
 {
-  "success": true,
-  "data": {
-    "user": {
-      "id": 1,
-      "email": "user@example.com",
-      "first_name": "John",
-      "last_name": "Doe",
-      "role": "user"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "tenantId": 1,
+    "userRoles": [
+      {
+        "id": 1,
+        "label": "Standard",
+        "lookupTypeId": 1
+      }
+    ]
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-#### Register
+#### Signup
 
 ```http
-POST /api/auth/register
+POST /api/user/signup
 Content-Type: application/json
 
 {
   "email": "user@example.com",
   "password": "password123",
-  "first_name": "John",
-  "last_name": "Doe"
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890"
 }
 ```
 
@@ -78,40 +123,36 @@ Content-Type: application/json
 
 ```json
 {
-  "success": true,
-  "data": {
-    "user": {
-      "id": 1,
-      "email": "user@example.com",
-      "first_name": "John",
-      "last_name": "Doe",
-      "role": "user"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "tenantId": 1,
+    "userRoles": []
   }
 }
 ```
 
-#### Logout
+#### Signout
 
 ```http
-POST /api/auth/logout
-Authorization: Bearer <token>
+POST /api/user/signout
 ```
 
 **Response:**
 
 ```json
 {
-  "success": true,
-  "message": "Logged out successfully"
+  "message": "User signed out successfully"
 }
 ```
 
 #### Get Profile
 
 ```http
-GET /api/auth/profile
+GET /api/user/profile
 Authorization: Bearer <token>
 ```
 
@@ -119,15 +160,21 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "success": true,
-  "data": {
-    "id": 1,
-    "email": "user@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    "role": "user",
-    "created_at": "2024-01-01T00:00:00.000Z"
-  }
+  "id": 1,
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "tenantId": 1,
+  "userRoles": [
+    {
+      "id": 1,
+      "label": "Standard",
+      "lookupTypeId": 1
+    }
+  ],
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -138,7 +185,7 @@ Authorization: Bearer <token>
 #### Get All Users
 
 ```http
-GET /api/users
+GET /api/user/list
 Authorization: Bearer <token>
 ```
 
@@ -146,15 +193,23 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "success": true,
-  "data": [
+  "users": [
     {
       "id": 1,
       "email": "user1@example.com",
-      "first_name": "John",
-      "last_name": "Doe",
-      "role": "user",
-      "created_at": "2024-01-01T00:00:00.000Z"
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "+1234567890",
+      "tenantId": 1,
+      "userRoles": [
+        {
+          "id": 1,
+          "label": "Standard",
+          "lookupTypeId": 1
+        }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ]
 }
@@ -163,7 +218,7 @@ Authorization: Bearer <token>
 #### Get User by ID
 
 ```http
-GET /api/users/:id
+GET /api/user/:id
 Authorization: Bearer <token>
 ```
 
@@ -171,28 +226,69 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "success": true,
-  "data": {
+  "user": {
     "id": 1,
     "email": "user@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    "role": "user",
-    "created_at": "2024-01-01T00:00:00.000Z"
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "tenantId": 1,
+    "userRoles": [
+      {
+        "id": 1,
+        "label": "Standard",
+        "lookupTypeId": 1
+      }
+    ],
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 }
 ```
 
-#### Update User
+#### Create User
 
 ```http
-PUT /api/users/:id
+POST /api/user/create-user
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "phone": "+1987654321"
+}
+```
+
+**Response:**
+
+```json
+{
+  "user": {
+    "id": 2,
+    "email": "newuser@example.com",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "phone": "+1987654321",
+    "tenantId": 1,
+    "userRoles": [],
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+#### Update User Profile
+
+```http
+PUT /api/user/:id
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "first_name": "Jane",
-  "last_name": "Smith"
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "phone": "+1987654321"
 }
 ```
 
@@ -200,31 +296,57 @@ Content-Type: application/json
 
 ```json
 {
-  "success": true,
-  "data": {
+  "user": {
     "id": 1,
     "email": "user@example.com",
-    "first_name": "Jane",
-    "last_name": "Smith",
-    "role": "user",
-    "updated_at": "2024-01-01T00:00:00.000Z"
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "phone": "+1987654321",
+    "tenantId": 1,
+    "userRoles": [
+      {
+        "id": 1,
+        "label": "Standard",
+        "lookupTypeId": 1
+      }
+    ],
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 }
 ```
 
-#### Delete User
+#### Update User Password
 
 ```http
-DELETE /api/users/:id
+PUT /api/user/:id/update-password
 Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "password": "newSecurePassword123"
+}
 ```
 
 **Response:**
 
 ```json
 {
-  "success": true,
-  "message": "User deleted successfully"
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "tenantId": 1,
+    "userRoles": [
+      {
+        "id": 1,
+        "label": "Standard",
+        "lookupTypeId": 1
+      }
+    ],
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
 }
 ```
 

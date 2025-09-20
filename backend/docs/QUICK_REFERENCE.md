@@ -43,6 +43,56 @@ npm test
 npm run test:watch
 ```
 
+## 🔄 Recent Updates (TypeScript Authentication)
+
+### AuthenticatedRequest Interface
+
+```typescript
+// Import the interface
+import { AuthenticatedRequest } from '../middleware/authRoleMiddleware';
+
+// Use in controller functions
+export const getUserProfile = async (
+  req: AuthenticatedRequest, // Instead of Request
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const userId = req.user?.userId; // Type-safe access
+  const userRoles = req.user?.userRoles; // Array of role objects
+  // ... rest of controller logic
+};
+```
+
+### JWT Token Payload
+
+```typescript
+interface JwtTokenPayload {
+  userId: number;
+  email: string;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
+}
+```
+
+### Route Protection Examples
+
+```typescript
+// Authentication only
+registrar.get('/profile', {
+  middleware: [authRoleMiddleware()],
+  controller: getUserProfile,
+});
+
+// Role-specific access
+registrar.get('/admin/users', {
+  middleware: [authRoleMiddleware('admin', 'superadmin')],
+  controller: getAllUsers,
+});
+```
+
 ## 🏗️ Project Structure
 
 ```

@@ -157,82 +157,113 @@ Handles JWT token validation and role-based access control.
 ### Implementation
 ```typescript
 // src/middleware/authRoleMiddleware.ts
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    role: string;
-  };
+export interface AuthenticatedRequest extends Request {
+  user?: JwtTokenPayload;
 }
 
-export const authenticateToken = (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+export interface JwtTokenPayload {
+  userId: number;
+  email: string;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
+}
 
-  if (!token) {
-    res.status(401).json({
-      success: false,
-      error: { message: 'Access token required' }
-    });
-    return;
-  }
+export const authRoleMiddleware = (...allowedRoles: string[]) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const bearerToken = req.headers['authorization'];
 
-  jwt.verify(token, envVariable.JWT_SECRET, (err: any, decoded: any) => {
-    if (err) {
-      return res.status(403).json({
-        success: false,
-        error: { message: 'Invalid or expired token' }
-      });
+    if (!bearerToken) {
+      res.status(401).json({ message: 'Access denied. No token provided.' });
+      return;
     }
 
-    req.user = decoded;
-    next();
-  });
-};
+    try {
+      // if the token is in the format "Bearer <token>", extract the token if not use the token as is
+      const token = bearerToken.split(' ')?.[1] || bearerToken;
 
-export const requireRole = (allowedRoles: string[]) => {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        error: { message: 'Authentication required' }
-      });
+      // Validate the token
+      const decodedJwt = (await validateJwtToken(token)) as JwtTokenPayload;
+      req.user = decodedJwt;
+
+      // Extract user roles from the decodedJwt token
+      const userRoles =
+        typeof decodedJwt === 'object' ? decodedJwt?.userRoles : null;
+
+      // If no specific roles are required, proceed to the next middleware
+      if (allowedRoles.length === 0) {
+        next();
+        return;
+      }
+
+      if (
+        !userRoles ||
+        !userRoles.some((role: { label: string }) =>
+          allowedRoles.includes(role.label)
+        )
+      ) {
+        res
+          .status(403)
+          .json({ message: 'Access forbidden: Insufficient permissions.' });
+        return;
+      }
+
+      // Proceed to the next middleware
+      next();
+    } catch (err) {
+      res.status(401).json({ message: 'Invalid token.' });
+      return;
     }
-
-    if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        error: { message: 'Insufficient permissions' }
-      });
-    }
-
-    next();
   };
 };
 ```
 
 ### Usage
 ```typescript
-// Protect routes with authentication
-router.get('/profile', authenticateToken, getUserProfile);
+// Protect routes with authentication only (no specific roles required)
+registrar.get('/profile', {
+  middleware: [authRoleMiddleware()],
+  controller: getUserProfile,
+});
 
-// Protect routes with role-based access
-router.get('/admin/users', 
-  authenticateToken, 
-  requireRole(['admin', 'superadmin']), 
-  getAllUsers
-);
+// Protect routes with specific role requirements
+registrar.get('/admin/users', {
+  middleware: [authRoleMiddleware('admin', 'superadmin')],
+  controller: getAllUsers,
+});
 
-// Multiple roles
-router.post('/moderate', 
-  authenticateToken, 
-  requireRole(['admin', 'moderator']), 
-  moderateContent
-);
+// Multiple roles allowed
+registrar.post('/moderate', {
+  middleware: [authRoleMiddleware('admin', 'moderator')],
+  controller: moderateContent,
+});
+
+// Using in controller functions
+export const getUserProfile = async (
+  req: AuthenticatedRequest, // Use AuthenticatedRequest type
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId; // Access authenticated user data
+    
+    if (!userId) {
+      throw { statusCode: 401, message: 'User not authenticated' };
+    }
+
+    // Use userId for business logic
+    const userData = await User.getUserById(req.db, { userId });
+    res.status(200).json(userData);
+  } catch (error) {
+    next(error);
+  }
+};
 ```
 
 ## ✅ Validation Middleware

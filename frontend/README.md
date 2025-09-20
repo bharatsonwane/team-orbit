@@ -43,10 +43,12 @@ frontend/
 
 ### Authentication
 
-- **Login Page** - Email/password authentication
-- **Signup Page** - User registration with validation
-- **Form Validation** - Real-time validation with error messages
+- **Login Page** - Email/password authentication with backend integration ready
+- **Signup Page** - User registration with comprehensive validation
+- **Form Validation** - Real-time validation with error messages and backend compatibility
 - **Loading States** - User feedback during form submission
+- **JWT Token Support** - Ready for backend JWT token integration
+- **Role-based UI** - Prepared for user role-based interface rendering
 
 ### Theming
 

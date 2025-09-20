@@ -62,8 +62,9 @@ backend/
 - **Factory Patterns** - Reusable service instantiation with dependency injection
 
 ### 🔒 Security & Authentication
-- **JWT Authentication** - Secure token-based user authentication
-- **Role-based Access Control** - Granular permission management
+- **JWT Authentication** - Secure token-based user authentication with comprehensive payload structure
+- **Role-based Access Control** - Granular permission management with user role arrays
+- **TypeScript Integration** - Full type safety with `AuthenticatedRequest` interface and `JwtTokenPayload`
 - **Input Validation** - Comprehensive request validation with Zod schemas
 - **Security Headers** - Helmet.js for security best practices
 - **CORS Configuration** - Configurable cross-origin resource sharing
@@ -188,11 +189,37 @@ export default class Lookup {
 // Database connection injection
 app.use(dbClientMiddleware);
 
-// Request validation
-app.use(validationMiddleware);
+// Authentication with role-based access control
+registrar.get('/profile', {
+  middleware: [authRoleMiddleware()],
+  controller: getUserProfile,
+});
 
-// Standardized responses
-app.use(responseHandler);
+// Role-specific endpoints
+registrar.get('/admin/users', {
+  middleware: [authRoleMiddleware('admin', 'superadmin')],
+  controller: getAllUsers,
+});
+```
+
+### TypeScript Authentication Integration
+```typescript
+// Properly typed controller functions
+export const getUserProfile = async (
+  req: AuthenticatedRequest, // Type-safe access to user data
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId; // Fully typed user access
+    const userRoles = req.user?.userRoles; // Array of role objects
+    
+    const userData = await User.getUserById(req.db, { userId });
+    res.status(200).json(userData);
+  } catch (error) {
+    next(error);
+  }
+};
 ```
 
 ### Migration System
