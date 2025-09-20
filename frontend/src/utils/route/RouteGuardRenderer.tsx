@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAuthService } from '@/contexts/authContext';
+import { useAuthService } from '@/contexts/AuthContextProvider';
 import type { Route as RouteType } from '../../schemas/route';
 import { roleKeys } from '../constants';
 import { hasRoleAccess } from '../authHelper';
@@ -17,7 +17,7 @@ const RouteGuardRenderer: React.FC<RouteGuardRendererProps> = ({
   authRoles = [],
   routes = [],
 }) => {
-  const { user, isAuthenticated } = useAuthService();
+  const { loggedInUser } = useAuthService();
 
   const checkUserAuthorization = (): boolean => {
     if (authRoles.length === 0) {
@@ -25,7 +25,7 @@ const RouteGuardRenderer: React.FC<RouteGuardRendererProps> = ({
       return true;
     }
 
-    if (!isAuthenticated || !user) {
+    if (!loggedInUser) {
       return false;
     }
 
@@ -42,7 +42,7 @@ const RouteGuardRenderer: React.FC<RouteGuardRendererProps> = ({
     // Use the new hasRoleAccess helper
     return hasRoleAccess({
       allowedRoles,
-      userRoles: [user.role],
+      userRoles: [loggedInUser.role],
     });
   };
 

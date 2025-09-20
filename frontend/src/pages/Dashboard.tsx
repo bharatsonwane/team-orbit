@@ -8,24 +8,24 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuthService } from '../contexts/authContext';
+import { useAuthService } from '../contexts/AuthContextProvider';
 import { hasRoleAccess } from '../utils/authHelper';
 
 export default function Dashboard() {
-  const { user, logout } = useAuthService();
+  const { loggedInUser, logout } = useAuthService();
 
   // Check user roles using the new authHelper
-  const isAdmin = user
+  const isAdmin = loggedInUser
     ? hasRoleAccess({
         allowedRoles: ['ADMIN', 'SUPER'],
-        userRoles: [user.role],
+        userRoles: [loggedInUser.role],
       })
     : false;
 
-  const isSuper = user
+  const isSuper = loggedInUser
     ? hasRoleAccess({
         allowedRoles: ['SUPER'],
-        userRoles: [user.role],
+        userRoles: [loggedInUser.role],
       })
     : false;
 
@@ -56,12 +56,12 @@ export default function Dashboard() {
         <div className='space-y-8'>
           <div>
             <h2 className='text-3xl font-bold text-foreground mb-2'>
-              Welcome back, {user?.first_name}!
+              Welcome back, {loggedInUser?.first_name}!
             </h2>
             <p className='text-muted-foreground'>
               You are logged in as{' '}
               <span className='font-semibold capitalize'>
-                {user?.role?.toLowerCase()}
+                {loggedInUser?.role?.toLowerCase()}
               </span>
               . This page demonstrates role-based access and the theme system.
             </p>

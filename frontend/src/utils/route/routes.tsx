@@ -11,7 +11,7 @@ import Admin from '../../pages/Admin';
 import SuperAdmin from '../../pages/SuperAdmin';
 
 /**@description Public routes (no authentication required) */
-const publicRouteList: Route[] = [
+export const publicRouteList: Route[] = [
   {
     path: '/login',
     element: <Login />,
@@ -29,7 +29,7 @@ const publicRouteList: Route[] = [
 ];
 
 /**@description User routes (any authenticated user) */
-const userRouteList: Route[] = [
+export const userRouteList: Route[] = [
   {
     path: '/dashboard',
     element: <Dashboard />,
@@ -47,7 +47,7 @@ const userRouteList: Route[] = [
 ];
 
 /**@description Admin routes (admin and super admin access) */
-const adminRouteList: Route[] = [
+export const adminRouteList: Route[] = [
   {
     path: '/admin',
     element: <Admin />,
@@ -58,7 +58,7 @@ const adminRouteList: Route[] = [
 ];
 
 /**@description Super admin routes (super admin only) */
-const superAdminRouteList: Route[] = [
+export const superAdminRouteList: Route[] = [
   {
     path: '/super-admin',
     element: <SuperAdmin />,
@@ -69,7 +69,7 @@ const superAdminRouteList: Route[] = [
 ];
 
 /**@description Main route list with nested routes */
-const mainRouteList: Route[] = [
+export const mainRouteList: Route[] = [
   // Public routes
   ...publicRouteList,
 
@@ -91,11 +91,3 @@ const mainRouteList: Route[] = [
   // Super admin routes
   ...superAdminRouteList,
 ];
-
-export {
-  publicRouteList,
-  userRouteList,
-  adminRouteList,
-  superAdminRouteList,
-  mainRouteList,
-};

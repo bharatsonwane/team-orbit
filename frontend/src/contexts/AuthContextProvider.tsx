@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import type {
   User,
   LoginCredentials,
@@ -6,20 +8,101 @@ import type {
   AuthResponse,
 } from '../schemas/user';
 import { envVariable } from '../config/envVariable';
+import { publicRouteList } from '../utils/route/routes';
 import getAxios from '../utils/axiosApi';
 import { loginAction } from '../redux/actions/userActions';
 import { store } from '../redux/store';
-import type { AuthContextType } from './authContext';
-import { AuthContext } from './authContext';
+
+// Auth context type
+export interface AuthContextType {
+  loggedInUser: User | null;
+  isLoading: boolean;
+  error: string | null;
+
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  logout: () => void;
+  clearError: () => void;
+}
+
+export const defaultContext: AuthContextType = {
+  loggedInUser: null,
+  isLoading: false,
+  error: null,
+  login: async () => {},
+  register: async () => {},
+  logout: () => {},
+  clearError: () => {},
+};
+
+// Create context
+export const AuthContext = createContext<AuthContextType | undefined>(
+  defaultContext
+);
+
+export const useAuthService = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuthService must be used within an AuthProvider');
+  }
+
+  return context;
+};
 
 // Auth provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Handle automatic navigation based on auth state
+  useEffect(() => {
+    manageUserSessionAndAuthNavigation();
+  }, [loggedInUser, location.pathname, navigate]);
+
+  const manageUserSessionAndAuthNavigation = async () => {
+    const publicRoutes = publicRouteList.map(route => route.path);
+    const token = Cookies.get(envVariable.JWT_STORAGE_KEY);
+
+    if (token) {
+      if (!loggedInUser) {
+        try {
+          // Call API to get user details using the token
+          const response = await getAxios().get<{ user: User }>(
+            '/api/user/profile'
+          );
+
+          if (response.data && response.data.user) {
+            setLoggedInUser(response.data.user);
+          }
+        } catch (error: unknown) {
+          // Token might be invalid/expired, remove it
+          Cookies.remove(envVariable.JWT_STORAGE_KEY);
+          setLoggedInUser(null);
+          console.error('Failed to restore user session:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (
+        loggedInUser &&
+        (location.pathname === '/' || publicRoutes.includes(location.pathname))
+      ) {
+        navigate('/dashboard', { replace: true });
+      }
+    } else {
+      if (
+        location.pathname === '/' ||
+        !publicRoutes.includes(location.pathname)
+      ) {
+        navigate('/login', { replace: true });
+      }
+    }
+  };
 
   // Login function - handles all auth logic
   const login = async (credentials: LoginCredentials) => {
@@ -28,31 +111,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const result = await store.dispatch(loginAction(credentials));
-
       if (loginAction.fulfilled.match(result)) {
         // Login successful - handle localStorage and state
-        const { data } = result.payload;
+        const user = result.payload.user;
+        const token = result.payload.token;
 
         // Store token in localStorage
-        localStorage.setItem(envVariable.JWT_STORAGE_KEY, data.token);
+        Cookies.set(envVariable.JWT_STORAGE_KEY, token);
 
         // Update local state
-        setUser(data.user);
-        setIsAuthenticated(true);
+        setLoggedInUser(user);
         setIsLoading(false);
         setError(null);
       } else {
         // Login failed
-        setUser(null);
-        setIsAuthenticated(false);
+        setLoggedInUser(null);
         setIsLoading(false);
         setError(result.payload as string);
       }
     } catch (error: unknown) {
-      setUser(null);
-      setIsAuthenticated(false);
+      setLoggedInUser(null);
       setIsLoading(false);
-      setError(error instanceof Error ? error.message : 'Network error. Please try again.');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Network error. Please try again.'
+      );
     }
   };
 
@@ -68,35 +152,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (response.data.success) {
-        localStorage.setItem(
-          envVariable.JWT_STORAGE_KEY,
-          response.data.data!.token
-        );
-        setUser(response.data.data!.user);
-        setIsAuthenticated(true);
+        Cookies.set(envVariable.JWT_STORAGE_KEY, response.data.data!.token);
+        setLoggedInUser(response.data.data!.user);
         setIsLoading(false);
         setError(null);
       } else {
-        setUser(null);
-        setIsAuthenticated(false);
+        setLoggedInUser(null);
         setIsLoading(false);
         setError(response.data.message || 'Registration failed');
       }
     } catch (error: unknown) {
-      setUser(null);
-      setIsAuthenticated(false);
+      setLoggedInUser(null);
       setIsLoading(false);
-      setError(error instanceof Error ? error.message : 'Network error. Please try again.');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Network error. Please try again.'
+      );
     }
   };
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem(envVariable.JWT_STORAGE_KEY);
-    setUser(null);
-    setIsAuthenticated(false);
+    Cookies.remove(envVariable.JWT_STORAGE_KEY);
+    setLoggedInUser(null);
     setIsLoading(false);
     setError(null);
+    navigate('/login', { replace: true });
   };
 
   // Clear error function
@@ -105,8 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const value: AuthContextType = {
-    user,
-    isAuthenticated,
+    loggedInUser,
     isLoading,
     error,
     login,

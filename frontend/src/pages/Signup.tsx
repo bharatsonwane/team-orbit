@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuthService } from '@/contexts/authContext';
+import { useAuthService } from '@/contexts/AuthContextProvider';
 import { signupSchema, type SignupFormData } from '../schemas/validation';
 
 export default function Signup() {
-  const navigate = useNavigate();
   const {
     register: registerUser,
-    isAuthenticated,
     error,
     clearError,
     isLoading,
@@ -35,13 +33,6 @@ export default function Signup() {
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
 
   // Clear error when component mounts
   useEffect(() => {
@@ -57,7 +48,7 @@ export default function Signup() {
         password: data.password,
       });
       // Navigation will be handled by useEffect
-    } catch (error) {
+    } catch {
       // Error is handled by the auth context
     }
   };

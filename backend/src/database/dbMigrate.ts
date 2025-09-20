@@ -40,10 +40,155 @@ class DatabaseMigrationManager {
   }
 
   /**
+   * Validate migration file - check imports and exports for security and standards compliance
+   */
+  private async validateMigrationFile(filePath: string): Promise<void> {
+    const content = await fs.readFile(filePath, 'utf8');
+    const fileName = path.basename(filePath);
+    const violations: string[] = [];
+
+    // === IMPORT VALIDATION ===
+    // Regular expressions to match different import patterns
+    const importPatterns = [
+      // ES6 imports: import ... from '...'
+      /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"`]([^'"`]+)['"`]/g,
+      // CommonJS require: require('...')
+      /require\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
+      // Dynamic imports: import('...')
+      /import\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
+    ];
+
+    const localImportPatterns = [
+      /^\.\.?\//, // Relative imports: ./ or ../
+      /^\/.*$/, // Absolute local paths: /path/to/file
+      /^[A-Za-z]:[\\\/].*$/, // Windows absolute paths: C:\path\to\file
+    ];
+
+    // Check for forbidden local imports
+    for (const pattern of importPatterns) {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const importPath = match[1];
+
+        // Check if it's a local import
+        const isLocalImport = localImportPatterns.some(localPattern =>
+          localPattern.test(importPath)
+        );
+
+        if (isLocalImport) {
+          violations.push(`Local import detected: "${importPath}"`);
+        }
+      }
+    }
+
+    // === EXPORT VALIDATION ===
+    // Regular expressions to match different export patterns
+    const exportPatterns = [
+      // All export patterns to detect any exports
+      /export\s+(?:const|let|var|function|class|interface|type|enum|default)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g,
+      // Export declarations: export { name1, name2 }
+      /export\s*\{\s*([^}]+)\s*\}/g,
+      // Direct const/let/var exports: export const name = value
+      /export\s+(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=/g,
+    ];
+
+    // Specific pattern for valid JavaScript function declarations
+    const validFunctionPattern =
+      /export\s+(?:async\s+)?function\s+(up|down)\s*\(/g;
+
+    const allowedExports = new Set(['up', 'down']);
+    const foundExports = new Set<string>();
+    const validFunctionExports = new Set<string>();
+
+    // Find valid function exports first
+    let match;
+    while ((match = validFunctionPattern.exec(content)) !== null) {
+      validFunctionExports.add(match[1]);
+    }
+
+    // Find all exports
+    for (const pattern of exportPatterns) {
+      let exportMatch;
+      while ((exportMatch = pattern.exec(content)) !== null) {
+        if (pattern.source.includes('\\{')) {
+          // Handle export { name1, name2 } syntax
+          const exportList = exportMatch[1].split(',').map(name =>
+            name
+              .trim()
+              .split(/\s+as\s+/)[0]
+              .trim()
+          );
+          exportList.forEach(name => foundExports.add(name));
+        } else {
+          // Handle other export patterns
+          foundExports.add(exportMatch[1]);
+        }
+      }
+    }
+
+    // Check for export violations
+    for (const exportName of foundExports) {
+      if (!allowedExports.has(exportName)) {
+        violations.push(`Forbidden export detected: "${exportName}"`);
+      } else if (!validFunctionExports.has(exportName)) {
+        // It's an allowed name but not a valid function declaration
+        violations.push(
+          `Invalid export format for "${exportName}" - must be a JavaScript function declaration`
+        );
+      }
+    }
+
+    // Check for required exports
+    const requiredExports = ['up'];
+    const missingExports: string[] = [];
+
+    for (const required of requiredExports) {
+      if (!validFunctionExports.has(required)) {
+        missingExports.push(required);
+      }
+    }
+
+    // === ERROR REPORTING ===
+    if (violations.length > 0 || missingExports.length > 0) {
+      let errorMessage = `❌ Migration file ${fileName} validation failed:\n`;
+
+      if (violations.length > 0) {
+        errorMessage += violations.map(v => `  - ${v}`).join('\n') + '\n';
+      }
+
+      if (missingExports.length > 0) {
+        errorMessage += `Missing required exports: ${missingExports.join(', ')}\n`;
+      }
+
+      errorMessage += `
+Migration file requirements:
+📦 IMPORTS: Only package imports allowed (no local imports like ./ or ../)
+🔧 EXPORTS: Only JavaScript function declarations allowed
+
+Valid format:
+  ✅ export async function up(client: PoolClient): Promise<void>
+  ✅ export async function down(client: PoolClient): Promise<void> (optional)
+
+Forbidden:
+  ❌ Local imports: import { ... } from './localFile'
+  ❌ Arrow functions: export const up = async (client) => { ... }
+  ❌ Constants: export const myConstant = "value"
+  ❌ Types/Interfaces: export interface MyInterface { ... }
+  ❌ Classes/Enums: export class MyClass { ... }
+`;
+
+      throw new Error(errorMessage);
+    }
+  }
+
+  /**
    * Load TypeScript/JavaScript migration files
    */
   private async loadTypeScriptMigration(filePath: string): Promise<any> {
     try {
+      // Validate migration file before loading
+      await this.validateMigrationFile(filePath);
+
       // For TypeScript files, we need to use a different approach
       // Since we're running with ts-node, we can use require() for .ts files
       if (filePath.endsWith('.ts')) {

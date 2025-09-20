@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import getAxios from '../../utils/axiosApi';
+import getAxios, { getAppErrorMessage } from '../../utils/axiosApi';
 
 // User interface
 export interface User {
@@ -20,17 +20,13 @@ export interface LoginCredentials {
 
 // Login response interface
 export interface LoginResponse {
-  success: boolean;
-  data: {
-    user: User;
-    token: string;
-  };
-  message?: string;
+  user: User;
+  token: string;
 }
 
-// Login action - API call only
+/** Login action - API call only */
 export const loginAction = createAsyncThunk(
-  'user/login',
+  'user/loginAction',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       // Make login API call only
@@ -40,13 +36,21 @@ export const loginAction = createAsyncThunk(
       );
 
       return response.data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          'Network error. Please try again.'
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(getAppErrorMessage(error));
+    }
+  }
+);
+
+/** Get user profile action - API call only */
+export const getUserProfileAction = createAsyncThunk(
+  'user/getUserProfileAction',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAxios().get<User>('/api/user/profile');
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(getAppErrorMessage(error));
     }
   }
 );

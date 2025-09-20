@@ -1,4 +1,4 @@
-import { useAuthService } from '@/contexts/authContext';
+import { useAuthService } from '@/contexts/AuthContextProvider';
 import { ThemeToggle } from '../components/theme-toggle';
 import {
   Card,
@@ -10,7 +10,7 @@ import {
 import { Button } from '../components/ui/button';
 
 export default function Profile() {
-  const { user, logout } = useAuthService();
+  const { loggedInUser, logout } = useAuthService();
 
   const handleLogout = () => {
     logout();
@@ -32,14 +32,14 @@ export default function Profile() {
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-6'>
-              {user && (
+              {loggedInUser && (
                 <div className='space-y-4'>
                   <div>
                     <label className='text-sm font-medium text-muted-foreground'>
                       Name
                     </label>
                     <p className='text-lg'>
-                      {user.first_name} {user.last_name}
+                      {loggedInUser.first_name} {loggedInUser.last_name}
                     </p>
                   </div>
 
@@ -47,7 +47,7 @@ export default function Profile() {
                     <label className='text-sm font-medium text-muted-foreground'>
                       Email
                     </label>
-                    <p className='text-lg'>{user.email}</p>
+                    <p className='text-lg'>{loggedInUser.email}</p>
                   </div>
 
                   <div>
@@ -55,7 +55,7 @@ export default function Profile() {
                       Role
                     </label>
                     <p className='text-lg capitalize'>
-                      {user.role.toLowerCase()}
+                      {loggedInUser.role.toLowerCase()}
                     </p>
                   </div>
 
@@ -64,7 +64,7 @@ export default function Profile() {
                       Member Since
                     </label>
                     <p className='text-lg'>
-                      {new Date(user.created_at).toLocaleDateString()}
+                      {new Date(loggedInUser.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

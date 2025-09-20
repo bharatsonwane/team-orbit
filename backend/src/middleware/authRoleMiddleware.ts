@@ -5,9 +5,14 @@ interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
-interface DecodedToken {
-  userRole?: string;
-  [key: string]: any;
+export interface JwtTokenPayload {
+  userId: number;
+  email: string;
+  userRoles: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
 }
 
 export const authRoleMiddleware = (...allowedRoles: string[]) => {
@@ -28,11 +33,12 @@ export const authRoleMiddleware = (...allowedRoles: string[]) => {
       const token = bearerToken.split(' ')?.[1] || bearerToken;
 
       // Validate the token
-      const decoded = (await validateJwtToken(token)) as DecodedToken;
-      req.user = decoded;
+      const decodedJwt = (await validateJwtToken(token)) as JwtTokenPayload;
+      req.user = decodedJwt;
 
-      // Extract user role from the decoded token
-      const userRole = typeof decoded !== 'string' ? decoded?.userRole : null;
+      // Extract user roles from the decodedJwt token
+      const userRoles =
+        typeof decodedJwt === 'object' ? decodedJwt?.userRoles : null;
 
       // If no specific roles are required, proceed to the next middleware
       if (allowedRoles.length === 0) {
@@ -40,8 +46,12 @@ export const authRoleMiddleware = (...allowedRoles: string[]) => {
         return;
       }
 
-      // Check if the user's role is allowed
-      if (userRole && !allowedRoles.includes(userRole)) {
+      if (
+        !userRoles ||
+        !userRoles.some((role: { label: string }) =>
+          allowedRoles.includes(role.label)
+        )
+      ) {
         res
           .status(403)
           .json({ message: 'Access forbidden: Insufficient permissions.' });

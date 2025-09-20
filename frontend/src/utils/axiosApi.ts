@@ -1,4 +1,9 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import type {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import Cookies from 'js-cookie';
 import { envVariable } from '../config/envVariable';
 
@@ -10,8 +15,8 @@ import { envVariable } from '../config/envVariable';
  * the second function handles when the request is invalid and throws an error.
  **/
 
-const axiosApi = (specificBaseUrl?: string) => {
-  const instance = axios.create();
+const axiosApi = (specificBaseUrl?: string): AxiosInstance => {
+  const instance: AxiosInstance = axios.create();
 
   if (specificBaseUrl) {
     instance.defaults.baseURL = specificBaseUrl;
@@ -21,19 +26,20 @@ const axiosApi = (specificBaseUrl?: string) => {
 
   // interceptors Request------------------------------------
   instance.interceptors.request.use(
-    async config => {
-      // let userToken = Cookies.get('authJwtToken');
-      // let token = userToken ? JSON.parse(userToken) : '';
-      const token = localStorage.getItem(envVariable.JWT_STORAGE_KEY) || '';
-      const tenant_schema = localStorage.getItem('x-tenant-schema') || '';
+    async (
+      config: InternalAxiosRequestConfig
+    ): Promise<InternalAxiosRequestConfig> => {
+      const userToken: string = Cookies.get(envVariable.JWT_STORAGE_KEY) || '';
+      const token: string = userToken || '';
+      const tenant_schema: string = Cookies.get('x-tenant-schema') || '';
 
-      if (token) {
+      if (token && config.headers) {
         config.headers.Authorization = 'bearer ' + token;
         config.headers['x-tenant-schema'] = tenant_schema;
       }
       return config;
     },
-    async error => {
+    async (error: AxiosError): Promise<AxiosError> => {
       return Promise.reject(error);
     }
   );
@@ -41,19 +47,19 @@ const axiosApi = (specificBaseUrl?: string) => {
   //validating the token expiration scenario --------------------------
   // interceptors Response------------------------------------
   instance.interceptors.response.use(
-    async Response => {
-      return Response;
+    async (response: AxiosResponse): Promise<AxiosResponse> => {
+      return response;
     },
-    async error => {
+    async (error: AxiosError): Promise<AxiosError> => {
       if (error.response && error.response.status === 401) {
         // Check if Authorization header exists (token was sent)
-        const hasAuthHeader = error.config?.headers?.Authorization;
+        const hasAuthHeader: string | undefined = error.config?.headers
+          ?.Authorization as string;
 
         if (hasAuthHeader) {
           // Token was sent but got 401 - token expired/invalid
           //dispatch action using store to show token expire popup-----
-          Cookies.remove('authJwtToken');
-          localStorage.removeItem(envVariable.JWT_STORAGE_KEY);
+          Cookies.remove(envVariable.JWT_STORAGE_KEY);
           window.location.pathname = '/';
         }
         // If no Authorization header, it's a login attempt failure - don't redirect
@@ -63,6 +69,13 @@ const axiosApi = (specificBaseUrl?: string) => {
   );
 
   return instance;
+};
+
+export const getAppErrorMessage = (error: unknown) => {
+  if (error instanceof AxiosError) {
+    return error.response?.data.message;
+  }
+  return error instanceof Error ? error.message : 'Something went wrong';
 };
 
 export default axiosApi;

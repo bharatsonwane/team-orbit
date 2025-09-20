@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -15,13 +15,11 @@ import {
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { loginSchema, type LoginFormData } from '../schemas/validation';
-import { useAuthService } from '@/contexts/authContext';
+import { useAuthService } from '@/contexts/AuthContextProvider';
 
 
 export default function Login() {
-  const navigate = useNavigate();
-
-  const { login, isAuthenticated, isLoading, error, clearError } = useAuthService();
+  const { login, isLoading, error, clearError } = useAuthService();
 
   // React Hook Form setup with Zod resolver
   const {
@@ -31,13 +29,6 @@ export default function Login() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
 
   // Clear error when component mounts
   useEffect(() => {

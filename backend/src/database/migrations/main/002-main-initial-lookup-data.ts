@@ -1,11 +1,37 @@
 import { PoolClient } from 'pg';
-import {
-  chatTypeKeys,
-  lookupTypeKeys,
-  roleKeys,
-  userStatusKeys,
-} from '../../../utils/constants';
-import { getHashPassword } from '../../../utils/authHelper';
+import bcrypt from 'bcryptjs';
+
+const lookupTypeKeys = {
+  userRole: 'userRole',
+  userStatus: 'userStatus',
+  chatType: 'chatType',
+};
+
+const roleKeys = {
+  platformSuperAdmin: 'Platform Super Admin',
+  platformAdmin: 'Platform Admin',
+  platformUser: 'Platform User',
+  platformAgent: 'Platform Agent',
+  platformManager: 'Platform Manager',
+  platformAuditor: 'Platform Auditor',
+  tenantAdmin: 'Tenant Admin',
+  tenantManager: 'Tenant Manager',
+  tenantAgent: 'Tenant Agent',
+  tenantUser: 'Tenant User',
+  tenantEmployee: 'Tenant Employee',
+};
+
+const userStatusKeys = {
+  pending: 'Pending',
+  active: 'Active',
+  archived: 'Archived',
+  suspended: 'Suspended',
+};
+
+const chatTypeKeys = {
+  oneToOne: '1:1 Chat',
+  group: 'Group Chat',
+};
 
 interface LookupType {
   lookupType: string;
@@ -38,7 +64,7 @@ interface AppUser {
   userRoles: number[];
 }
 
-export const up = async (client: PoolClient): Promise<void> => {
+export async function up(client: PoolClient): Promise<void> {
   const upsertAndFetchLookupData = async () => {
     const lookupData: LookupType[] = [
       {
@@ -165,8 +191,9 @@ export const up = async (client: PoolClient): Promise<void> => {
     ];
 
     for (const userData of userDataList) {
-      /** Hash the password */
-      const hashedPassword = await getHashPassword(userData.password);
+      /** Hash the password using bcrypt directly */
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
 
       /** Check if app_user already exists */
       const checkUserQuery = `
@@ -241,9 +268,8 @@ export const up = async (client: PoolClient): Promise<void> => {
   };
 
   await upsertAndFetchUserData();
-};
+}
 
-export const down = async (client: PoolClient): Promise<void> => {
+export async function down(client: PoolClient): Promise<void> {
   // Rollback logic can be implemented here if needed
-  // For now, we'll leave it empty as removing lookup data might affect other parts of the system
-};
+}

@@ -19,5 +19,10 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Allow exporting non-components alongside components
+      // This is useful for context providers, hooks, types, etc.
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ]);

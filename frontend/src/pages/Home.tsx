@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,19 +8,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useAuthService } from '../contexts/authContext';
-import { useEffect } from 'react';
 
 export default function Home() {
-  const { isAuthenticated } = useAuthService();
-  const navigate = useNavigate();
-
-  // Redirect authenticated users to dashboard
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
 
   return (
     <div className='min-h-screen bg-background relative'>
