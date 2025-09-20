@@ -15,7 +15,7 @@ interface LookupItem {
 }
 
 export default class Lookup {
-  constructor(reqObj: any) {}
+  constructor() {}
 
   static async retrieveLookupList(
     dbClient: dbClientPool

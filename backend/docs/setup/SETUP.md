@@ -89,7 +89,7 @@ Create `.env` file with the following configuration:
 
 ```env
 # Server Configuration
-API_PORT=5000
+API_PORT=5100
 NODE_ENV=development
 
 # Database Configuration
@@ -133,7 +133,7 @@ npm run dev
 
 #### Server Configuration
 
-- `API_PORT` - Port number for the API server (default: 5000)
+- `API_PORT` - Port number for the API server (default: 5100)
 - `NODE_ENV` - Environment mode (development, production, test)
 
 #### Database Configuration
@@ -264,7 +264,7 @@ npm run format
 
 ```bash
 # Health check
-curl http://localhost:5000/health
+curl http://localhost:5100/health
 
 # Expected response
 {
@@ -276,7 +276,7 @@ curl http://localhost:5000/health
 
 ### 2. Check API Documentation
 
-Visit `http://localhost:5000/docs` to access Swagger UI documentation.
+Visit `http://localhost:5100/docs` to access Swagger UI documentation.
 
 ### 3. Check Database Connection
 
@@ -292,8 +292,8 @@ psql -U postgres -d teamorbit -c "SELECT COUNT(*) FROM users;"
 #### 1. Port Already in Use
 
 ```bash
-# Find process using port 5000
-lsof -i :5000
+# Find process using port 5100
+lsof -i :5100
 
 # Kill process
 kill -9 <PID>
@@ -424,7 +424,7 @@ app.use(cors(corsOptions));
 ## 🤝 Getting Help
 
 - **Documentation** - Check the `docs/` directory
-- **API Reference** - Visit `http://localhost:5000/docs`
+- **API Reference** - Visit `http://localhost:5100/docs`
 - **Issues** - Create an issue in the repository
 - **Discussions** - Use GitHub discussions for questions
 

@@ -28,7 +28,7 @@ export const getNotificationAction = createAsyncThunk(
         ...notification,
         id: notificationId,
         timestamp: Date.now(),
-        duration: notification.duration || 5000,
+        duration: notification.duration || 5100,
       };
 
       return fullNotification;

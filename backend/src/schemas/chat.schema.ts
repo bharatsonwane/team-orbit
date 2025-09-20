@@ -1,48 +1,12 @@
 import { z } from 'zod';
-import {
-  createApiResponse,
-  docRegistry,
-} from '../openApiDocs/openAPIDocumentGenerator';
-import { ChatMessageSchema } from './user.schema';
 
-interface SendMessageDocConfig {
-  routePath: string;
-  method: 'get' | 'post' | 'put' | 'delete' | 'patch';
-  tags: string[];
-  security?: Array<Record<string, string[]>>;
-}
+export const chatMessageSchema = z
+  .object({
+    senderId: z.string().uuid({ message: 'Invalid sender ID' }),
+    receiverId: z.string().uuid({ message: 'Invalid receiver ID' }),
+    message: z.string().min(1, 'Message is required'),
+    mediaUrl: z.string().url().optional(),
+  })
+  .openapi('ChatMessage'); // ✅
 
-export const sendMessageDoc = ({
-  routePath,
-  method,
-  tags,
-  security,
-}: SendMessageDocConfig): void => {
-  docRegistry.registerPath({
-    method,
-    path: routePath,
-    tags,
-    security,
-    request: {
-      body: {
-        description: 'Send one-to-one message',
-        content: {
-          'application/json': {
-            schema: ChatMessageSchema.openapi({}),
-          },
-        },
-      },
-    },
-    responses: createApiResponse(
-      z.object({
-        id: z.string().uuid(),
-        senderId: z.string().uuid(),
-        receiverId: z.string().uuid(),
-        message: z.string(),
-        mediaUrl: z.string().optional(),
-        timestamp: z.string(),
-      }),
-      'Message sent'
-    ),
-  });
-};
+export type ChatMessageSchema = z.infer<typeof chatMessageSchema>;

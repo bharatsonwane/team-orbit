@@ -21,16 +21,14 @@ export const validatePassword = async (
   return isPasswordValid;
 };
 
-export const createJwtToken = async (
-  tokenDataObject: JwtPayload
-): Promise<string> => {
+export const createJwtToken = (tokenDataObject: JwtPayload): string => {
   const jwtToken = jwt.sign({ ...tokenDataObject }, envVariable.JWT_SECRET, {
     expiresIn: 24 * 60 * 60, // 24 hours
   });
   return jwtToken;
 };
 
-export const validateJwtToken = async (token: string): Promise<any> => {
+export const validateJwtToken = (token: string): any => {
   // verify a token symmetric - synchronous
   const decodedToken = jwt.verify(token, envVariable.JWT_SECRET);
   return decodedToken;

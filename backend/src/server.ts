@@ -5,11 +5,15 @@ import morgan from 'morgan';
 import http from 'http';
 // import { Server } from 'socket.io';
 import logger from './utils/logger';
+import { displayServerInfo } from './utils/terminalUtils';
 
 import { envVariable } from './config/envVariable';
 import apiRoutes from './routes/routes';
-import openApiRoutes from './openApiDocs/openApiRoutes';
-import {  globalErrorMiddleware, routeNotFoundMiddleware } from './middleware/errorMiddleware';
+import openApiRoutes from './openApiSpecification/openApiRoutes';
+import {
+  globalErrorMiddleware,
+  routeNotFoundMiddleware,
+} from './middleware/errorMiddleware';
 import { dbClientMiddleware } from './middleware/dbClientMiddleware';
 
 async function main() {
@@ -45,20 +49,20 @@ async function main() {
   //   });
   // });
 
-  const PORT = envVariable.API_PORT || 4000;
+  const PORT = envVariable.API_PORT;
 
   // Middleware
   app.use(helmet());
   app.use(cors({ origin: '*', credentials: true }));
-  app.use(morgan('combined'));
+  app.use(morgan('dev'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Routes
+  /** Routes */
   app.use('/api', dbClientMiddleware, apiRoutes);
   app.use('/docs', openApiRoutes);
 
-  // Health check endpoint
+  /** Health check endpoint */
   app.get('/health', (req, res) => {
     res.status(200).json({
       status: 'OK',
@@ -67,15 +71,20 @@ async function main() {
     });
   });
 
-  // 404 handler - must come after all routes
+  /** 404 handler - must come after all routes */
   app.use(routeNotFoundMiddleware);
 
-  // Global error handler - must be last
+  /** Global error handler - must be last */
   app.use(globalErrorMiddleware);
 
-  // Start server
+  /** Start server */
   server.listen(PORT, () => {
-    logger.info(`📚 API Documentation: http://localhost:${PORT}/docs`);
+    displayServerInfo({
+      port: PORT,
+      host: envVariable.API_HOST,
+      appName: '📚 Team Orbit Backend',
+      docsPath: '/docs',
+    });
   });
 }
 

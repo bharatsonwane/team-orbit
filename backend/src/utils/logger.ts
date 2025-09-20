@@ -16,5 +16,4 @@ class LoggerC {
 }
 
 const logger = new LoggerC();
-export { logger };
 export default logger;

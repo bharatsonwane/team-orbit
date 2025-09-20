@@ -70,13 +70,29 @@ docs/
 
 ### Backend Architecture Improvements (Latest)
 
-The backend has undergone significant improvements in error handling and middleware architecture:
+The backend has undergone significant improvements in architecture, service patterns, and middleware:
 
-- **Centralized Error Handling**: Migrated from individual controller error responses to global error middleware using `next(error)`
-- **Enhanced Database Middleware**: Improved connection cleanup with comprehensive event listeners
+#### Service Layer Refactoring
+- **Static Method Migration**: All service methods converted to static pattern for better performance and consistency
+- **Object Parameter Pattern**: Service methods now accept structured object parameters for improved maintainability
+- **Enhanced User Service**: Added conditional password inclusion and role aggregation in user queries
+- **Role Integration**: User queries now return roles as structured arrays with lookup table relationships
+
+#### Middleware and Error Handling
+- **Morgan Removal**: Eliminated HTTP request logging middleware for cleaner terminal output
+- **Centralized Error Handling**: Migrated from individual controller error responses to global error middleware
+- **Enhanced Database Middleware**: Improved connection cleanup with double-release prevention
 - **Simplified Response Format**: Streamlined API responses with consistent error handling
-- **Updated Database Schema**: Table renamed from `user_profile` to `app_user` with lookup table integration
-- **Removed Deprecated Middleware**: Eliminated `requestAndResponseHandler.ts` in favor of direct response handling
+
+#### Database and Schema Updates
+- **Updated Database Schema**: Table renamed from `user_profile` to `app_user` with enhanced field structure
+- **Role System Integration**: Implemented user-role relationships through junction tables
+- **Query Optimization**: Enhanced queries with JSON aggregation for complex data structures
+
+#### Developer Experience
+- **Terminal Output Enhancement**: Vite-style colored and clickable API documentation URLs
+- **Improved Logging**: Cleaner development experience with focused application logs
+- **Better Type Safety**: Enhanced TypeScript interfaces and type inference throughout
 
 For detailed information, see:
 - [Middleware Architecture Updates](./architecture/MIDDLEWARE.md#recent-updates)

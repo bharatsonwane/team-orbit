@@ -13,10 +13,11 @@ Comprehensive development guidelines and best practices for the TeamOrbit backen
 
 ### 2. Architecture Patterns
 
-- **Layered Architecture:** Controllers → Services → Repositories
-- **Dependency Injection:** Inject dependencies rather than importing directly
+- **Layered Architecture:** Controllers → Services → Database Layer
+- **Static Service Pattern:** Services use static methods for utility-style operations
+- **Object Parameter Pattern:** Methods accept structured object parameters for clarity
 - **Single Responsibility:** Each module has one reason to change
-- **Open/Closed Principle:** Open for extension, closed for modification
+- **Centralized Error Handling:** Global error middleware with structured error propagation
 
 ### 3. Testing Strategy
 

@@ -6,6 +6,7 @@ import {
   createJwtToken,
 } from '../utils/authHelper';
 import Lookup from '../services/lookup.service';
+import { UserLoginSchema } from '../schemas/user.schema';
 
 export const postUserLogin = async (
   req: Request,
@@ -13,24 +14,12 @@ export const postUserLogin = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body as UserLoginSchema;
 
-    const user = new User({
-      email,
-      password,
-      firstName: '',
-      lastName: '',
-      dob: '',
-      phone: '',
-    });
-    const userData = await user.getUserByEmailOrPhone(req.db);
+    const userData = await User.getUserByEmailOrPhone(req.db, { email, includePassword: true });
 
     if (!userData) {
-      res.status(401).json({
-        success: false,
-        message: 'Invalid email or password',
-      });
-      return;
+      throw { statusCode: 401, message: 'Invalid email or password' };
     }
 
     const isValidPassword = await validatePassword(
@@ -38,26 +27,19 @@ export const postUserLogin = async (
       userData.password || ''
     );
     if (!isValidPassword) {
-      res.status(401).json({
-        success: false,
-        message: 'Invalid email or password',
-      });
-      return;
+      throw { statusCode: 401, message: 'Invalid email or password' };
     }
+    delete userData.password;
 
     const token = createJwtToken({
       userId: userData.id,
       email: userData.email,
-      userRole: userData.userRole,
+      userRole: userData.userRoles,
     });
 
     res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      data: {
-        user: userData,
-        token,
-      },
+      user: userData,
+      token,
     });
   } catch (error) {
     next(error);
@@ -73,22 +55,16 @@ export const postUserSignup = async (
     const { email, password, phone, firstName, lastName } = req.body;
 
     // Check if user already exists
-    const existingUser = new User({
+    const userExists = await User.getUserByEmailOrPhone(req.db, {
       email,
-      password,
-      firstName,
-      lastName,
-      dob: '',
       phone,
     });
-    const userExists = await existingUser.getUserByEmailOrPhone(req.db);
 
     if (userExists) {
-      res.status(400).json({
-        success: false,
+      throw {
+        statusCode: 400,
         message: 'User already exists with this email or phone',
-      });
-      return;
+      };
     }
 
     // Get default user status and role IDs
@@ -99,24 +75,20 @@ export const postUserSignup = async (
     const hashPassword = await getHashPassword(password);
 
     // Create user
-    const newUser = new User({
-      email,
-      password,
-      phone,
-      firstName,
-      lastName,
-      dob: new Date().toISOString().split('T')[0], // Default DOB
-      hashPassword,
-      userStatusLookupId: userStatusId,
-      userRoleLookupId: userRoleId,
+    const createdUser = await User.signupUser(req.db, {
+      userData: {
+        email,
+        hashPassword,
+        phone,
+        firstName,
+        lastName,
+        // userStatus: userStatusId,
+        tenantId: 1, // Default tenant ID, adjust as needed
+      },
     });
 
-    const createdUser = await newUser.signupUser(req.db);
-
     res.status(201).json({
-      success: true,
-      message: 'User created successfully',
-      data: createdUser,
+      user: createdUser,
     });
   } catch (error) {
     next(error);
@@ -130,13 +102,10 @@ export const createUserProfile = async (
 ): Promise<void> => {
   try {
     const userData = req.body;
-    const user = new User(userData);
-    const createdUser = await user.createUserInfo(req.db);
+    const createdUser = await User.createUserInfo(req.db, { userData });
 
     res.status(201).json({
-      success: true,
-      message: 'User profile created successfully',
-      data: createdUser,
+      user: createdUser,
     });
   } catch (error) {
     next(error);
@@ -151,8 +120,7 @@ export const getUsers = async (
   try {
     const users = await User.getUsers(req.db);
     res.status(200).json({
-      success: true,
-      data: users,
+      users,
     });
   } catch (error) {
     next(error);
@@ -166,27 +134,14 @@ export const getUserById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const user = new User({
-      id: parseInt(id),
-      firstName: '',
-      lastName: '',
-      dob: '',
-      phone: '',
-      email: '',
-    });
-    const userData = await user.getUserById(req.db);
+    const userData = await User.getUserById(req.db, { userId: parseInt(id) });
 
     if (!userData) {
-      res.status(404).json({
-        success: false,
-        message: 'User not found',
-      });
-      return;
+      throw { statusCode: 404, message: 'User not found' };
     }
 
     res.status(200).json({
-      success: true,
-      data: userData,
+      user: userData,
     });
   } catch (error) {
     next(error);
@@ -200,14 +155,14 @@ export const updateUserProfile = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const updateData = { ...req.body, id: parseInt(id) };
-    const user = new User(updateData);
-    const updatedUser = await user.updateUserInfo(req.db);
+    const updateData = req.body;
+    const updatedUser = await User.updateUserInfo(req.db, {
+      userId: parseInt(id),
+      updateData,
+    });
 
     res.status(200).json({
-      success: true,
-      message: 'User profile updated successfully',
-      data: updatedUser,
+      user: updatedUser,
     });
   } catch (error) {
     next(error);
@@ -224,21 +179,13 @@ export const updateUserPassword = async (
     const { password } = req.body;
 
     const hashPassword = await getHashPassword(password);
-    const user = new User({
-      id: parseInt(id),
+    const updatedUser = await User.updateUserPassword(req.db, {
+      userId: parseInt(id),
       hashPassword,
-      firstName: '',
-      lastName: '',
-      dob: '',
-      phone: '',
-      email: '',
     });
-    const updatedUser = await user.updateUserPassword(req.db);
 
     res.status(200).json({
-      success: true,
-      message: 'Password updated successfully',
-      data: updatedUser,
+      user: updatedUser,
     });
   } catch (error) {
     next(error);
@@ -254,7 +201,6 @@ export const signoutUser = async (
     // In a real application, you might want to invalidate the token
     // For now, just return a success message
     res.status(200).json({
-      success: true,
       message: 'User signed out successfully',
     });
   } catch (error) {

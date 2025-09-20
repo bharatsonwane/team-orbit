@@ -224,5 +224,3 @@ Add to this README with description and examples.
 - Check file is named correctly (`.env.local` not `.env`)
 
 ### Debug Mode
-
-Enable debug logging by checking the console for "Loaded ENV values:" to see all parsed variables.

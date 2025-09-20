@@ -382,7 +382,7 @@ export default function ExamplePage() {
 
 ```env
 # API Configuration
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5100
 API_TIMEOUT=10000
 
 # Authentication

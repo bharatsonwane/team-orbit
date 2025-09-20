@@ -415,7 +415,7 @@ io.on('connection', socket => {
 ```typescript
 // src/config/envVariable.ts
 export const envVariable = {
-  API_PORT: process.env.API_PORT || 5000,
+  API_PORT: process.env.API_PORT || 5100,
   NODE_ENV: process.env.NODE_ENV || 'development',
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_PORT: parseInt(process.env.DB_PORT || '5432'),

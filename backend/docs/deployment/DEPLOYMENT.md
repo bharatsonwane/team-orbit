@@ -82,11 +82,7 @@ RUN chown -R nodejs:nodejs /app
 USER nodejs
 
 # Expose port
-EXPOSE 5000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+EXPOSE 5100
 
 # Start application
 CMD ["npm", "start"]
@@ -102,10 +98,10 @@ services:
   app:
     build: .
     ports:
-      - '5000:5000'
+      - '5100:5100'
     environment:
       - NODE_ENV=production
-      - API_PORT=5000
+      - API_PORT=5100
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=teamorbit
@@ -208,7 +204,7 @@ module.exports = {
       exec_mode: 'cluster',
       env: {
         NODE_ENV: 'production',
-        API_PORT: 5000,
+        API_PORT: 5100,
       },
       error_file: './logs/err.log',
       out_file: './logs/out.log',
@@ -242,7 +238,7 @@ server {
     server_name your-domain.com;
 
     location / {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:5100;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -387,7 +383,7 @@ serverless deploy --stage production
 ```env
 # Server Configuration
 NODE_ENV=production
-API_PORT=5000
+API_PORT=5100
 
 # Database Configuration
 DB_HOST=your-production-db-host
@@ -418,12 +414,12 @@ RATE_LIMIT_MAX_REQUESTS=100
 // src/config/envVariable.ts
 const config = {
   development: {
-    API_PORT: process.env.API_PORT || 5000,
+    API_PORT: process.env.API_PORT || 5100,
     DB_HOST: process.env.DB_HOST || 'localhost',
     LOG_LEVEL: 'debug',
   },
   production: {
-    API_PORT: process.env.API_PORT || 5000,
+    API_PORT: process.env.API_PORT || 5100,
     DB_HOST: process.env.DB_HOST,
     LOG_LEVEL: 'info',
   },

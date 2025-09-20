@@ -1,40 +1,35 @@
 import { z } from 'zod';
-import { docRegistry } from '../openApiDocs/openAPIDocumentGenerator';
-import { createApiResponse } from '../openApiDocs/openAPIDocumentGenerator';
-import { idSchema } from './common.schema';
-
-interface DocConfig {
-  routePath: string;
-  method: 'get' | 'post' | 'put' | 'delete' | 'patch';
-  tags: string[];
-  security?: Array<Record<string, string[]>>;
-}
+import { docRegistry } from '../openApiSpecification/openAPIDocumentGenerator';
 
 /**@description user Login schema */
-export const UserLoginSchema = z.object({
+export const userLoginSchema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string(),
 });
-docRegistry.register('UserLogin', UserLoginSchema);
+export type UserLoginSchema = z.infer<typeof userLoginSchema>;
+docRegistry.register('UserLogin', userLoginSchema);
 
 /**@description user signup schema */
-export const UserSignupSchema = z.object({
+export const userSignupSchema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(6, 'Password should be at least 6 characters long'),
   phone: z.string().min(10),
   firstName: z.string().min(2),
   lastName: z.string().min(2),
 });
-docRegistry.register('UserSignup', UserSignupSchema);
+export type UserSignupSchema = z.infer<typeof userSignupSchema>;
+docRegistry.register('UserSignup', userSignupSchema);
 
-export const UserUpdatePasswordSchema = z.object({
+export const userUpdatePasswordSchema = z.object({
   password: z.string().min(6, 'Password should be at least 6 characters long'),
   email: z.string().email('Invalid email'),
   phone: z.string().min(10),
 });
+export type UserUpdatePasswordSchema = z.infer<typeof userUpdatePasswordSchema>;
+docRegistry.register('UserUpdatePassword', userUpdatePasswordSchema);
 
 /**@description User schema */
-export const UserSchema = z.object({
+export const userSchema = z.object({
   id: z.number().int().optional(),
   title: z.enum(['Mr', 'Mrs', 'Ms']),
   firstName: z.string().min(1),
@@ -58,10 +53,11 @@ export const UserSchema = z.object({
   userStatusLookupId: z.number().int().optional(),
   userRoleLookupId: z.number().int().optional(),
 });
-docRegistry.register('User', UserSchema);
+export type UserSchema = z.infer<typeof userSchema>;
+docRegistry.register('User', userSchema);
 
 /**@description User Update schema */
-export const UserUpdateSchema = z.object({
+export const userUpdateSchema = z.object({
   title: z.enum(['Mr', 'Mrs', 'Ms']).optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
@@ -78,89 +74,25 @@ export const UserUpdateSchema = z.object({
   marriedStatus: z.enum(['Single', 'Married']).optional(),
   bio: z.string().optional(),
 });
-docRegistry.register('UserUpdate', UserUpdateSchema);
+export type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
+docRegistry.register('UserUpdate', userUpdateSchema);
 
-/**@description Update User Password Doc */
-export const updateUserPasswordDoc = ({
-  routePath,
-  method,
-  tags,
-  security,
-}: DocConfig): void => {
-  docRegistry.registerPath({
-    method,
-    path: routePath,
-    tags,
-    security,
-    request: {
-      params: idSchema.shape.params,
-      body: {
-        description: 'User login',
-        content: {
-          'application/json': { schema: UserUpdatePasswordSchema.openapi({}) },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Success',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                message: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-};
-
-/**@description Get User Doc */
-export const getUserDoc = ({
-  routePath,
-  method,
-  tags,
-  security,
-}: DocConfig): void => {
-  docRegistry.registerPath({
-    method,
-    path: routePath,
-    tags,
-    security,
-    responses: createApiResponse(z.array(UserSchema), 'Success'),
-  });
-};
-
-/** test route with two query parameters */
-export const TestQuerySchema = z.object({
-  query1: z.string().min(1),
-  query2: z.string().min(1),
-});
-
-/** test query doc */
-export const testQueryDoc = ({
-  routePath,
-  method,
-  tags,
-}: Omit<DocConfig, 'security'>): void => {
-  docRegistry.registerPath({
-    method,
-    path: routePath,
-    tags,
-    request: { query: TestQuerySchema },
-    responses: createApiResponse(z.object({ message: z.string() }), 'Success'),
-  });
-};
-
-export const ChatMessageSchema = z
-  .object({
-    senderId: z.string().uuid({ message: 'Invalid sender ID' }),
-    receiverId: z.string().uuid({ message: 'Invalid receiver ID' }),
-    message: z.string().min(1, 'Message is required'),
-    mediaUrl: z.string().url().optional(),
-  })
-  .openapi('ChatMessage'); // ✅
+export interface AppUser {
+  id?: number | null;
+  title: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  maidenName: string;
+  gender: string;
+  dob: string;
+  bloodGroup: string;
+  marriedStatus: string;
+  email: string;
+  phone: string;
+  password: string;
+  bio: string;
+  userStatus: string;
+  tenantId: number;
+  userRoles: number[];
+}

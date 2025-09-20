@@ -17,8 +17,8 @@ interface UserData {
   hashPassword?: string;
   profilePicture?: string | null;
   bio?: string | null;
-  userStatusLookupId?: number | null;
-  userRoleLookupId?: number | null;
+  userStatus?: string | null;
+  tenantId?: number | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -39,75 +39,52 @@ interface UserProfile {
   password?: string;
   profilePicture: string | null;
   bio: string | null;
-  userStatusLookupId: number | null;
-  userRoleLookupId: number | null;
-  userStatus?: string;
-  userRole?: string;
+  userStatus: string | null;
+  tenantId: number | null;
   createdAt: string;
   updatedAt: string;
+  userRoles?: Array<{
+    id: number;
+    label: string;
+    lookupTypeId: number;
+  }>;
 }
 
 export default class User {
-  private id: number | null;
-  private title: string | null;
-  private firstName: string;
-  private lastName: string;
-  private middleName: string | null;
-  private maidenName: string | null;
-  private gender: string | null;
-  private dob: string;
-  private bloodGroup: string | null;
-  private marriedStatus: string | null;
-  private email: string;
-  private phone: string;
-  private password: string | undefined;
-  private hashPassword: string | undefined;
-  private profilePicture: string | null;
-  private bio: string | null;
-  private userStatusLookupId: number | null;
-  private userRoleLookupId: number | null;
-  private createdAt: string;
-  private updatedAt: string;
-
-  // Static column mapping for database column names
-  static columnMapping: { [key: string]: string } = {
-    firstName: '"firstName"',
-    lastName: '"lastName"',
-    middleName: '"middleName"',
-    maidenName: '"maidenName"',
-    bloodGroup: '"bloodGroup"',
-    marriedStatus: '"marriedStatus"',
-    profilePicture: '"profilePicture"',
-    userStatusLookupId: '"userStatusLookupId"',
-    userRoleLookupId: '"userRoleLookupId"',
-    createdAt: '"createdAt"',
-    updatedAt: '"updatedAt"',
-  };
-
-  constructor(reqObj: UserData) {
-    this.id = reqObj.id || null;
-    this.title = reqObj.title || null; // ENUM type
-    this.firstName = reqObj.firstName;
-    this.lastName = reqObj.lastName;
-    this.middleName = reqObj.middleName || null;
-    this.maidenName = reqObj.maidenName || null;
-    this.gender = reqObj.gender || null;
-    this.dob = reqObj.dob;
-    this.bloodGroup = reqObj.bloodGroup || null; // ENUM type
-    this.marriedStatus = reqObj.marriedStatus || null;
-    this.email = reqObj.email;
-    this.phone = reqObj.phone;
-    this.password = reqObj.password;
-    this.hashPassword = reqObj.hashPassword;
-    this.profilePicture = reqObj.profilePicture || null; // Picture URL
-    this.bio = reqObj.bio || null; // User biography
-    this.userStatusLookupId = reqObj.userStatusLookupId || null; // Foreign key to lookup table
-    this.userRoleLookupId = reqObj.userRoleLookupId || null; // Foreign key to lookup table
-    this.createdAt = reqObj.createdAt || new Date().toISOString();
-    this.updatedAt = new Date().toISOString();
+  // Helper function to map field names to database column names
+  private static getColumnName(key: string): string {
+    const columnMapping: { [key: string]: string } = {
+      firstName: '"firstName"',
+      lastName: '"lastName"',
+      middleName: '"middleName"',
+      maidenName: '"maidenName"',
+      bloodGroup: '"bloodGroup"',
+      marriedStatus: '"marriedStatus"',
+      profilePicture: '"profilePicture"',
+      userStatus: '"userStatus"',
+      tenantId: '"tenantId"',
+      createdAt: '"createdAt"',
+      updatedAt: '"updatedAt"',
+    };
+    return columnMapping[key] || key;
   }
 
-  async signupUser(dbClient: dbClientPool): Promise<UserProfile> {
+  static async signupUser(
+    dbClient: dbClientPool,
+    {
+      userData,
+    }: {
+      userData: {
+        email: string;
+        hashPassword: string;
+        phone: string;
+        firstName: string;
+        lastName: string;
+        userStatus?: string;
+        tenantId?: number;
+      };
+    }
+  ): Promise<UserProfile> {
     /* insert user */
     const userSignupQuery = `
         INSERT INTO app_user (
@@ -116,18 +93,18 @@ export default class User {
                 phone,
                 "firstName",
                 "lastName",
-                "userStatusLookupId",
-                "userRoleLookupId",
+                "userStatus",
+                "tenantId",
                 "createdAt",
                 "updatedAt"
             ) VALUES (
-                '${this.email}',
-                '${this.hashPassword}',
-                '${this.phone}',
-                '${this.firstName}',
-                '${this.lastName}',
-                ${this.userStatusLookupId},
-                ${this.userRoleLookupId},
+                '${userData.email}',
+                '${userData.hashPassword}',
+                '${userData.phone}',
+                '${userData.firstName}',
+                '${userData.lastName}',
+                '${userData.userStatus || 'active'}',
+                ${userData.tenantId || 'NULL'},
                 NOW(),
                 NOW()
         )
@@ -137,9 +114,144 @@ export default class User {
     return response;
   }
 
-  async getUserByEmailOrPhone(
-    dbClient: dbClientPool
+  static async createUserInfo(
+    dbClient: dbClientPool,
+    { userData }: { userData: Partial<UserData> }
+  ): Promise<UserProfile> {
+    const acceptedKeys = [
+      'title',
+      'firstName',
+      'lastName',
+      'middleName',
+      'maidenName',
+      'gender',
+      'dob',
+      'bloodGroup',
+      'marriedStatus',
+      'email',
+      'phone',
+      'hashPassword',
+      'profilePicture',
+      'bio',
+      'userStatus',
+      'tenantId',
+    ];
+
+    const keysToInsert = acceptedKeys.filter(
+      key =>
+        (userData as any)[key] !== undefined && (userData as any)[key] !== null
+    );
+
+    const columns = keysToInsert.map(key => User.getColumnName(key));
+    const values = keysToInsert.map(key => `'${(userData as any)[key]}'`);
+
+    const queryString = `
+    INSERT INTO app_user (
+      ${columns.join(', ')},
+      "createdAt",
+      "updatedAt"
+    ) VALUES (
+      ${values.join(', ')},
+      NOW(),
+      NOW()
+    )
+    RETURNING *;
+  `;
+
+    const results = await dbClient.mainPool.query(queryString);
+    const response = results.rows[0] as UserProfile;
+    delete (response as any).password;
+
+    return response;
+  }
+
+  static async updateUserInfo(
+    dbClient: dbClientPool,
+    {
+      userId,
+      updateData,
+    }: {
+      userId: number;
+      updateData: Partial<UserData>;
+    }
+  ): Promise<UserProfile> {
+    const acceptedKeys = [
+      'title',
+      'firstName',
+      'lastName',
+      'middleName',
+      'maidenName',
+      'gender',
+      'dob',
+      'bloodGroup',
+      'marriedStatus',
+      'bio',
+    ];
+
+    const setQueryString = Object.keys(updateData)
+      .filter(
+        key =>
+          (updateData as any)[key] !== undefined &&
+          (updateData as any)[key] !== null &&
+          acceptedKeys.includes(key)
+      )
+      .map(key => `${User.getColumnName(key)} = '${(updateData as any)[key]}'`)
+      .join(', ');
+
+    if (!setQueryString) {
+      throw new Error('No valid fields to update');
+    }
+
+    const queryString = `
+      UPDATE app_user
+      SET ${setQueryString}, "updatedAt" = NOW()
+      WHERE id = ${userId} RETURNING *;`;
+    const results = await dbClient.mainPool.query(queryString);
+
+    delete (results.rows[0] as any).password;
+    return results.rows[0] as UserProfile;
+  }
+
+  static async updateUserPassword(
+    dbClient: dbClientPool,
+    {
+      userId,
+      hashPassword,
+    }: {
+      userId: number;
+      hashPassword: string;
+    }
+  ): Promise<UserProfile> {
+    const queryString = `
+      UPDATE app_user
+      SET password = '${hashPassword}', "updatedAt" = NOW()
+      WHERE id = ${userId} RETURNING *;`;
+    const results = await dbClient.mainPool.query(queryString);
+
+    delete (results.rows[0] as any).password;
+    return results.rows[0] as UserProfile;
+  }
+
+  static async getUserByEmailOrPhone(
+    dbClient: dbClientPool,
+    {
+      email,
+      phone,
+      includePassword = false,
+    }: {
+      email?: string;
+      phone?: string;
+      includePassword?: boolean;
+    }
   ): Promise<UserProfile | undefined> {
+    const whereConditions = [];
+    if (email) whereConditions.push(`email = '${email}'`);
+    if (phone) whereConditions.push(`phone = '${phone}'`);
+
+    if (whereConditions.length === 0) {
+      throw new Error('Either email or phone must be provided');
+    }
+
     const queryString = `
         SELECT 
         up.id,
@@ -154,22 +266,31 @@ export default class User {
         up."marriedStatus",
         up.email,
         up.phone,
-        up.password,
-        up."profilePicture",
+        ${includePassword ? 'up.password,' : ''}
         up.bio,
-        up."userStatusLookupId",
-        up."userRoleLookupId",
-        usl.label AS "userStatus",
-        url.label AS "userRole",
+        up."userStatus",
+        up."tenantId",
         up."createdAt",
-        up."updatedAt"
+        up."updatedAt",
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'id', l.id,
+              'label', l.label,
+              'lookupTypeId', l."lookupTypeId"
+            )
+          ) FILTER (WHERE l.id IS NOT NULL), 
+          '[]'::json
+        ) as "userRoles"
       FROM 
         app_user up
-      LEFT JOIN 
-        lookup usl ON up."userStatusLookupId" = usl.id
-      LEFT JOIN 
-        lookup url ON up."userRoleLookupId" = usl.id
-      WHERE email = '${this.email}' OR phone = '${this.phone}';`;
+      LEFT JOIN user_role_xref urx ON up.id = urx."userId"
+      LEFT JOIN lookup l ON urx."roleId" = l.id
+      WHERE ${whereConditions.join(' OR ')}
+      GROUP BY up.id, up.title, up."firstName", up."lastName", up."middleName", 
+               up."maidenName", up.gender, up.dob, up."bloodGroup", up."marriedStatus",
+               up.email, up.phone, up.password, up.bio, up."userStatus", up."tenantId",
+               up."createdAt", up."updatedAt";`;
 
     const results = await dbClient.mainPool.query(queryString);
     const response = results.rows[0] as UserProfile | undefined;
@@ -177,7 +298,10 @@ export default class User {
     return response;
   }
 
-  async getUserById(dbClient: dbClientPool): Promise<UserProfile | undefined> {
+  static async getUserById(
+    dbClient: dbClientPool,
+    { userId }: { userId: number }
+  ): Promise<UserProfile | undefined> {
     const queryString = `
     SELECT 
     up.id,
@@ -194,19 +318,13 @@ export default class User {
     up.phone,
     up."profilePicture",
     up.bio,
-    up."userStatusLookupId",
-    up."userRoleLookupId",
-    usl.label AS "userStatus",
-    url.label AS "userRole",
+    up."userStatus",
+    up."tenantId",
     up."createdAt",
     up."updatedAt"
   FROM 
-    app up
-  LEFT JOIN 
-    lookup usl ON up."userStatusLookupId" = usl.id
-  LEFT JOIN 
-    lookup url ON up."userRoleLookupId" = usl.id
-  WHERE up.id = ${this.id};`;
+    app_user up
+  WHERE up.id = ${userId};`;
 
     const results = await dbClient.mainPool.query(queryString);
     const response = results.rows[0] as UserProfile | undefined;
@@ -231,118 +349,15 @@ export default class User {
           up.phone,
           up."profilePicture",
           up.bio,
-          up."userStatusLookupId",
-          up."userRoleLookupId",
-          usl.label AS "userStatus",
-          url.label AS "userRole",
+          up."userStatus",
+          up."tenantId",
           up."createdAt",
           up."updatedAt"
       FROM 
-        app up
-      LEFT JOIN 
-        lookup usl ON up."userStatusLookupId" = usl.id
-      LEFT JOIN 
-        lookup url ON up."userRoleLookupId" = usl.id;`;
+        app_user up;`;
 
     const results = await dbClient.mainPool.query(queryString);
 
     return results.rows as UserProfile[];
-  }
-
-  async updateUserInfo(dbClient: dbClientPool): Promise<UserProfile> {
-    const acceptedKeys = [
-      'title',
-      'firstName',
-      'lastName',
-      'middleName',
-      'maidenName',
-      'gender',
-      'dob',
-      'bloodGroup',
-      'marriedStatus',
-      'bio',
-    ];
-
-    const setQueryString = Object.keys(this)
-      .filter(
-        key =>
-          (this as any)[key] !== undefined &&
-          (this as any)[key] !== null &&
-          acceptedKeys.includes(key)
-      )
-      .map(
-        key =>
-          `${User.columnMapping[key] ? User.columnMapping[key] : key} = '${
-            (this as any)[key]
-          }'`
-      )
-      .join(', ');
-
-    const queryString = `
-      UPDATE app
-      SET ${setQueryString}
-      WHERE id = ${this.id} RETURNING *;`;
-    const results = await dbClient.mainPool.query(queryString);
-
-    delete (results.rows[0] as any).password;
-    return results.rows[0] as UserProfile;
-  }
-
-  async updateUserPassword(dbClient: dbClientPool): Promise<UserProfile> {
-    const queryString = `
-      UPDATE app
-      SET password = '${this.hashPassword}'
-      WHERE id = ${this.id} RETURNING *;`;
-    const results = await dbClient.mainPool.query(queryString);
-
-    delete (results.rows[0] as any).password;
-    return results.rows[0] as UserProfile;
-  }
-
-  async createUserInfo(dbClient: dbClientPool): Promise<UserProfile> {
-    const acceptedKeys = [
-      'title',
-      'firstName',
-      'lastName',
-      'middleName',
-      'maidenName',
-      'gender',
-      'dob',
-      'bloodGroup',
-      'marriedStatus',
-      'email',
-      'phone',
-      'hashPassword',
-      'profilePicture',
-      'bio',
-      'userStatusLookupId',
-      'userRoleLookupId',
-    ];
-
-    const keysToInsert = acceptedKeys.filter(
-      key => (this as any)[key] !== undefined && (this as any)[key] !== null
-    );
-
-    const columns = keysToInsert.map(key => User.columnMapping[key] || key);
-    const values = keysToInsert.map(key => `'${(this as any)[key]}'`);
-
-    const queryString = `
-    INSERT INTO app (
-      ${columns.join(', ')},
-      "createdAt",
-      "updatedAt"
-    ) VALUES (
-      ${values.join(', ')},
-      NOW(),
-      NOW()
-    )
-    RETURNING *;
-  `;
-
-    const results = await dbClient.mainPool.query(queryString);
-    const response = results.rows[0] as UserProfile;
-    delete (response as any).password;
-
-    return response;
   }
 }

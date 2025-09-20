@@ -112,15 +112,15 @@ npm run dev
 ```
 
 **Server endpoints:**
-- API Server: `http://localhost:4000/api`
-- Health Check: `http://localhost:4000/health`
-- API Documentation: `http://localhost:4000/docs`
-- Test Endpoint: `http://localhost:4000/test`
+- API Server: `http://localhost:5100/api`
+- Health Check: `http://localhost:5100/health`
+- API Documentation: `http://localhost:5100/docs`
+- Test Endpoint: `http://localhost:5100/test`
 
 ## 📚 API Documentation
 
 ### Interactive Documentation
-- **Swagger UI:** `http://localhost:4000/docs`
+- **Swagger UI:** `http://localhost:5100/docs`
 - **OpenAPI Spec:** Auto-generated from Zod schemas
 
 ### Core Endpoints
@@ -209,7 +209,7 @@ export class MigrationManager {
 ### Environment Variables
 ```bash
 # Server Configuration
-API_PORT=4000
+API_PORT=5100
 NODE_ENV=development
 
 # Database Configuration

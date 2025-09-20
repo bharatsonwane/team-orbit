@@ -4,7 +4,7 @@ Complete API reference for the TeamOrbit backend application.
 
 ## 🌐 Base URL
 
-- **Development:** `http://localhost:4000`
+- **Development:** `http://localhost:5100`
 - **Production:** `https://api.teamorbit.com`
 
 ## 📚 API Overview
@@ -502,6 +502,23 @@ GET /health
 }
 ```
 
+### Enhanced User Response Format
+
+User endpoints now return comprehensive user data including role information:
+
+**User Object Structure:**
+- Basic user information (id, name, email, phone, etc.)
+- User status and tenant information
+- Roles array with complete role objects including lookup relationships
+- Conditional password field (only included when specifically requested)
+- Timestamp information for creation and updates
+
+**Role Integration:**
+- User roles are returned as structured arrays
+- Each role object contains id, label, and lookup type information
+- Empty array returned for users with no assigned roles
+- Supports multiple role assignments per user
+
 ### Error Response (Updated Format)
 
 ```json
@@ -583,7 +600,7 @@ All requests are validated using Zod schemas:
 ### Connection
 
 ```javascript
-const socket = io('http://localhost:4000');
+const socket = io('http://localhost:5100');
 
 // Join a channel
 socket.emit('joinChannel', { userId: 1 });
@@ -616,7 +633,7 @@ socket.on('receiveMessage', message => {
 #### Login
 
 ```bash
-curl -X POST http://localhost:4000/api/auth/login \
+curl -X POST http://localhost:5100/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
 ```
@@ -624,21 +641,21 @@ curl -X POST http://localhost:4000/api/auth/login \
 #### Get Users
 
 ```bash
-curl -X GET http://localhost:4000/api/users \
+curl -X GET http://localhost:5100/api/users \
   -H "Authorization: Bearer <your-token>"
 ```
 
 #### Get Lookup Data
 
 ```bash
-curl -X GET http://localhost:4000/api/lookup/list \
+curl -X GET http://localhost:5100/api/lookup/list \
   -H "Authorization: Bearer <your-token>"
 ```
 
 #### Get Specific Lookup Type
 
 ```bash
-curl -X GET http://localhost:4000/api/lookup/1 \
+curl -X GET http://localhost:5100/api/lookup/1 \
   -H "Authorization: Bearer <your-token>"
 ```
 
@@ -654,8 +671,8 @@ The TeamOrbit backend features a comprehensive OpenAPI documentation system buil
 
 ### OpenAPI Endpoints
 
-- **Interactive Documentation:** `http://localhost:4000/docs` - Swagger UI interface
-- **JSON Specification:** `http://localhost:4000/docs/swagger.json` - Raw OpenAPI spec
+- **Interactive Documentation:** `http://localhost:5100/docs` - Swagger UI interface
+- **JSON Specification:** `http://localhost:5100/docs/swagger.json` - Raw OpenAPI spec
 
 ### Features
 

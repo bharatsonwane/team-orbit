@@ -1,11 +1,10 @@
 import {
-  UserSchema,
-  UserLoginSchema,
-  getUserDoc,
-  UserSignupSchema,
-  UserUpdateSchema,
-  updateUserPasswordDoc,
+  userSchema,
+  userLoginSchema,
+  userSignupSchema,
+  userUpdateSchema,
 } from '../schemas/user.schema';
+import { getUserDoc, updateUserPasswordDoc } from '../openApiSpecification/oasDoc/user.oas';
 import { idValidation } from '../schemas/common.schema';
 import {
   createUserProfile,
@@ -27,15 +26,15 @@ const registrar = new RouteRegistrar({
 
 // /**@description user login  */
 registrar.post('/login', {
-  requestSchema: { bodySchema: UserLoginSchema },
-  responseSchemas: [{ statusCode: 200, schema: UserSchema }],
+  requestSchema: { bodySchema: userLoginSchema },
+  responseSchemas: [{ statusCode: 200, schema: userSchema }],
   controller: postUserLogin,
 });
 
 /**@description user signup  */
 registrar.post('/signup', {
-  requestSchema: { bodySchema: UserSignupSchema },
-  responseSchemas: [{ statusCode: 200, schema: UserSignupSchema }],
+  requestSchema: { bodySchema: userSignupSchema },
+  responseSchemas: [{ statusCode: 200, schema: userSignupSchema }],
   controller: postUserSignup,
 });
 
@@ -48,8 +47,8 @@ registrar.get('/list', {
 
 /**@description Create User */
 registrar.post('/create-user', {
-  requestSchema: { bodySchema: UserSchema },
-  responseSchemas: [{ statusCode: 200, schema: UserSchema }],
+  requestSchema: { bodySchema: userSchema },
+  responseSchemas: [{ statusCode: 200, schema: userSchema }],
   controller: createUserProfile,
 });
 
@@ -58,7 +57,7 @@ registrar.put('/:id/update-password/', {
   openApiDoc: updateUserPasswordDoc,
   requestSchema: {
     paramsSchema: { id: idValidation },
-    bodySchema: UserUpdateSchema,
+    bodySchema: userUpdateSchema,
   },
   middleware: [authRoleMiddleware()],
   controller: updateUserPassword,
@@ -75,9 +74,9 @@ registrar.get('/:id', {
 registrar.put('/:id', {
   requestSchema: {
     paramsSchema: { id: idValidation },
-    bodySchema: UserUpdateSchema,
+    bodySchema: userUpdateSchema,
   },
-  responseSchemas: [{ statusCode: 200, schema: UserSchema }],
+  responseSchemas: [{ statusCode: 200, schema: userSchema }],
   middleware: [authRoleMiddleware()],
   controller: updateUserProfile,
 });

@@ -15,39 +15,44 @@ The TeamOrbit backend uses PostgreSQL as the primary database with the following
 
 ### App User Table
 
-Stores user account information and authentication data.
+Stores comprehensive user account information with enhanced profile data and authentication.
 
-```sql
-CREATE TABLE app_user (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  "userRoleLookupId" INTEGER REFERENCES lookup(id),
-  "userStatusLookupId" INTEGER REFERENCES lookup(id),
-  is_active BOOLEAN DEFAULT true,
-  last_login TIMESTAMP,
-  "createdAt" TIMESTAMP DEFAULT NOW(),
-  "updatedAt" TIMESTAMP DEFAULT NOW()
-);
-```
+**Table Structure:**
+- Primary user identification and authentication data
+- Comprehensive profile information with ENUM constraints
+- Tenant relationship for multi-tenancy support
+- Status tracking with predefined user states
+- Audit timestamps for creation and modification tracking
 
-**Columns:**
+**Key Features:**
+- Enhanced profile fields including title, middle name, maiden name
+- Demographic information (gender, date of birth, blood group, marital status)
+- Biography field for user descriptions
+- ENUM types for data consistency and validation
+- Unique constraints on email and phone for account security
+- Foreign key relationship to tenant table
+- Flexible user status system using ENUM values
 
-- `id` - Primary key, auto-incrementing
-- `email` - Unique email address for login
-- `password` - Hashed password using bcrypt
-- `phone` - User's phone number
-- `first_name` - User's first name
-- `last_name` - User's last name
-- `userRoleLookupId` - Foreign key to lookup table for user roles
-- `userStatusLookupId` - Foreign key to lookup table for user status
-- `is_active` - Account status flag
-- `last_login` - Timestamp of last login
+**Column Details:**
+
+- `id` - Primary key, auto-incrementing integer
+- `title` - User title using title_enum (Mr, Mrs, Ms)
+- `firstName` - User's first name (camelCase for consistency)
+- `lastName` - User's last name (camelCase for consistency)
+- `middleName` - Optional middle name
+- `maidenName` - Optional maiden name for married users
+- `gender` - Gender using gender_enum (Male, Female, Other)
+- `dob` - Date of birth
+- `bloodGroup` - Blood group using blood_group_enum (A+, A-, B+, B-, AB+, AB-, O+, O-)
+- `marriedStatus` - Marital status using married_status_enum (Single, Married, Divorced, Widowed)
+- `email` - Unique email address for authentication
+- `phone` - Unique phone number
+- `password` - Hashed password for authentication
+- `bio` - User biography or description text
+- `userStatus` - User status using user_status_enum (Pending, Active, Archived, Suspended)
+- `tenantId` - Foreign key reference to tenant table for multi-tenancy
 - `createdAt` - Account creation timestamp
-- `updatedAt` - Last update timestamp
+- `updatedAt` - Last modification timestamp
 
 ### Chat Messages Table
 
@@ -147,6 +152,21 @@ CREATE TABLE channel_participants (
 - One user can be in many channels
 - One channel can have many users
 - Junction table: `channel_participants`
+
+#### Users ↔ Roles (via User Role Cross-Reference)
+
+- One user can have multiple roles
+- One role can be assigned to multiple users
+- Junction table: `user_role_xref`
+- Role definitions stored in `lookup` table with specific lookup types
+- Enables flexible permission and access control systems
+
+**Role System Architecture:**
+- Roles are defined as lookup entries with role-specific lookup types
+- User-role assignments tracked through cross-reference table
+- Supports dynamic role assignment and removal
+- Query optimization through JSON aggregation for role data retrieval
+- Enables conditional role inclusion in user data responses
 
 ## 📈 Indexes
 

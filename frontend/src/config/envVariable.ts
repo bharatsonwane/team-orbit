@@ -36,7 +36,7 @@ const getEnvVariable = (): EnvVariable => {
       APP_NAME: env.APP_NAME || 'TeamOrbit',
       APP_VERSION: env.APP_VERSION || '1.0.0',
       APP_ENV: (env.APP_ENV as EnvVariable['APP_ENV']) || 'development',
-      API_BASE_URL: env.API_BASE_URL || 'http://localhost:5000',
+      API_BASE_URL: env.API_BASE_URL || 'http://localhost:5100',
       API_TIMEOUT: Number(env.API_TIMEOUT) || 10000,
       JWT_STORAGE_KEY: env.JWT_STORAGE_KEY || 'auth_token',
       TOKEN_EXPIRY_BUFFER: Number(env.TOKEN_EXPIRY_BUFFER) || 300000,

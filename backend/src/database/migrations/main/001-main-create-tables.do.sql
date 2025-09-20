@@ -94,13 +94,13 @@ CREATE TABLE IF NOT EXISTS app_user (
     CONSTRAINT fk_user_tenant FOREIGN KEY ("tenantId") REFERENCES tenant (id)
 );
 
--- user_role table
-CREATE TABLE IF NOT EXISTS user_role (
+-- user_role_xref table
+CREATE TABLE IF NOT EXISTS user_role_xref (
     id SERIAL PRIMARY KEY,
     "userId" INT NOT NULL,
     "roleId" INT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL,
     "updatedAt" TIMESTAMP DEFAULT NOW() NOT NULL,
-    CONSTRAINT fk_user_role FOREIGN KEY ("userId") REFERENCES app_user (id),
-    CONSTRAINT fk_role FOREIGN KEY ("roleId") REFERENCES lookup (id)
+    CONSTRAINT fk_user_role_xref_user FOREIGN KEY ("userId") REFERENCES app_user (id),
+    CONSTRAINT fk_user_role_xref_role FOREIGN KEY ("roleId") REFERENCES lookup (id)
 );

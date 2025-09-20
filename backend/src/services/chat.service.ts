@@ -23,40 +23,10 @@ interface ChatMessage {
 }
 
 export default class Chat {
-  private text: string | null;
-  private media: string | null;
-  private sentUserId: string;
-  private chatChannelId: string;
-  private createdAt: string;
-  private deliveredTo: string[];
-  private readBy: string[];
-  private reaction: Record<string, any>;
-
-  constructor({
-    text,
-    media,
-    sentUserId,
-    chatChannelId,
-    deliveredTo,
-    readBy,
-    reaction,
-  }: ChatMessageData) {
-    this.text = text || null;
-    this.media = media || null;
-    this.sentUserId = sentUserId;
-    this.chatChannelId = chatChannelId;
-    this.createdAt = new Date().toISOString();
-
-    // Ensure JSON-valid defaults
-    this.deliveredTo = Array.isArray(deliveredTo) ? deliveredTo : [];
-    this.readBy = Array.isArray(readBy) ? readBy : [];
-    this.reaction =
-      reaction && typeof reaction === 'object' && !Array.isArray(reaction)
-        ? reaction
-        : {};
-  }
-
-  async saveMessage(dbClient: dbClientPool): Promise<ChatMessage> {
+  static async saveMessage(
+    dbClient: dbClientPool,
+    messageData: ChatMessageData
+  ): Promise<ChatMessage> {
     const query = `
       INSERT INTO chat_message (
         text,
@@ -71,14 +41,26 @@ export default class Chat {
       RETURNING *;
     `;
 
+    // Ensure JSON-valid defaults
+    const deliveredTo = Array.isArray(messageData.deliveredTo)
+      ? messageData.deliveredTo
+      : [];
+    const readBy = Array.isArray(messageData.readBy) ? messageData.readBy : [];
+    const reaction =
+      messageData.reaction &&
+      typeof messageData.reaction === 'object' &&
+      !Array.isArray(messageData.reaction)
+        ? messageData.reaction
+        : {};
+
     const values = [
-      this.text,
-      this.media,
-      this.sentUserId,
-      this.chatChannelId,
-      JSON.stringify(this.deliveredTo),
-      JSON.stringify(this.readBy),
-      JSON.stringify(this.reaction),
+      messageData.text || null,
+      messageData.media || null,
+      messageData.sentUserId,
+      messageData.chatChannelId,
+      JSON.stringify(deliveredTo),
+      JSON.stringify(readBy),
+      JSON.stringify(reaction),
     ];
 
     console.log('Inserting chat message with values:', values);
@@ -113,7 +95,7 @@ export default class Chat {
     }
   }
 
-  static async saveMessage(
+  static async saveMessageFromSocket(
     dbClient: dbClientPool,
     data: {
       senderId: string;
@@ -123,7 +105,7 @@ export default class Chat {
     }
   ): Promise<ChatMessage> {
     // This method is used by the socket.io handler
-    const chatMessage = new Chat({
+    return await Chat.saveMessage(dbClient, {
       text: data.message,
       media: data.mediaUrl,
       sentUserId: data.senderId,
@@ -132,7 +114,5 @@ export default class Chat {
       readBy: [],
       reaction: {},
     });
-
-    return await chatMessage.saveMessage(dbClient);
   }
 }

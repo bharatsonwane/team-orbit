@@ -231,7 +231,7 @@ export const up = async (client: PoolClient): Promise<void> => {
       for (const roleId of userData.userRoles) {
         await client.query(
           `
-            INSERT INTO user_role ("userId", "roleId", "createdAt", "updatedAt")
+            INSERT INTO user_role_xref ("userId", "roleId", "createdAt", "updatedAt")
             VALUES ($1, $2, NOW(), NOW())
           `,
           [userResponse.id, roleId]

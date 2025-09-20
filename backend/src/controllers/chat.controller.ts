@@ -27,7 +27,7 @@ export const sendMessage = async (
       reaction,
     } = req.body;
 
-    const chatMessage = new Chat({
+    const savedMessage = await Chat.saveMessage(req.db, {
       text,
       media,
       sentUserId,
@@ -36,8 +36,6 @@ export const sendMessage = async (
       readBy,
       reaction: reaction || {},
     });
-
-    const savedMessage = await chatMessage.saveMessage(req.db);
 
     res.status(201).json({
       success: true,

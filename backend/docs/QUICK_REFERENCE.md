@@ -105,7 +105,7 @@ GET /docs           # API documentation
 
 ```env
 # Server
-API_PORT=5000
+API_PORT=5100
 NODE_ENV=development
 
 # Database
@@ -280,8 +280,8 @@ psql -U postgres -d teamorbit -c "SELECT 1"
 ### Port Already in Use
 
 ```bash
-# Find process using port 5000
-lsof -i :5000
+# Find process using port 5100
+lsof -i :5100
 
 # Kill process
 kill -9 <PID>

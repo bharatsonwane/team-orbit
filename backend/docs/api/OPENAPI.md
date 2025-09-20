@@ -439,7 +439,7 @@ export function generateOpenAPIDocument() {
     },
     servers: [
       {
-        url: process.env.API_BASE_URL || 'http://localhost:4000',
+        url: process.env.API_BASE_URL || 'http://localhost:5100',
         description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
       },
     ],

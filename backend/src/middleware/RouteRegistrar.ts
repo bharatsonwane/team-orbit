@@ -3,8 +3,8 @@ import { validateRequest } from './validationMiddleware';
 import {
   bearerAuth,
   docRegistry,
-} from '../openApiDocs/openAPIDocumentGenerator';
-import { commonDocCreator } from '../openApiDocs/openAPIDocumentGenerator';
+} from '../openApiSpecification/openAPIDocumentGenerator';
+import { commonDocCreator } from '../openApiSpecification/openAPIDocumentGenerator';
 
 interface RouteOptions {
   middleware?: RequestHandler[];
