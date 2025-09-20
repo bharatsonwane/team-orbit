@@ -4,11 +4,12 @@ import {
   userSignupSchema,
   userUpdateSchema,
 } from '../schemas/user.schema';
-import { getUserDoc, updateUserPasswordDoc } from '../openApiSpecification/oasDoc/user.oas';
+import { getUserOASSchema, getUserProfileOASSchema, updateUserPasswordOASSchema } from '../openApiSpecification/oasDoc/user.oas';
 import { idValidation } from '../schemas/common.schema';
 import {
   createUserProfile,
   getUserById,
+  getUserProfile,
   getUsers,
   postUserLogin,
   postUserSignup,
@@ -38,9 +39,16 @@ registrar.post('/signup', {
   controller: postUserSignup,
 });
 
+// /api/user/profile
+registrar.get('/profile', {
+  middleware: [authRoleMiddleware()],
+  controller: getUserProfile,
+  oasSchema: getUserProfileOASSchema
+});
+
 /**@description get all users  */
 registrar.get('/list', {
-  openApiDoc: getUserDoc,
+  oasSchema: getUserOASSchema,
   middleware: [authRoleMiddleware()],
   controller: getUsers,
 });
@@ -54,7 +62,7 @@ registrar.post('/create-user', {
 
 /**@description update user password  */
 registrar.put('/:id/update-password/', {
-  openApiDoc: updateUserPasswordDoc,
+  oasSchema: updateUserPasswordOASSchema,
   requestSchema: {
     paramsSchema: { id: idValidation },
     bodySchema: userUpdateSchema,
@@ -89,7 +97,7 @@ registrar.post('/signout', {
 });
 
 // registrar.get("/test-query", {
-//   openApiDoc: testQueryDoc,
+//   oasSchema: testQueryOASSchema,
 //   requestSchema: { querySchema: TestQuerySchema },
 //   controller: (req, res) => {
 //     res.send("test query");

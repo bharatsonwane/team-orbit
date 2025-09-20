@@ -73,12 +73,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!loggedInUser) {
         try {
           // Call API to get user details using the token
-          const response = await getAxios().get<{ user: User }>(
+          const response = await getAxios().get<User>(
             '/api/user/profile'
           );
 
-          if (response.data && response.data.user) {
-            setLoggedInUser(response.data.user);
+          if (response.data && response.data) {
+            setLoggedInUser(response.data);
           }
         } catch (error: unknown) {
           // Token might be invalid/expired, remove it

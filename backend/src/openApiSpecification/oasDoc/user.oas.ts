@@ -3,7 +3,10 @@ import {
   createApiResponse,
   docRegistry,
 } from '../../openApiSpecification/openAPIDocumentGenerator';
-import { userSchema, userUpdatePasswordSchema } from '../../schemas/user.schema';
+import {
+  userSchema,
+  userUpdatePasswordSchema,
+} from '../../schemas/user.schema';
 import { idSchema } from '../../schemas/common.schema';
 
 interface DocConfig {
@@ -13,8 +16,8 @@ interface DocConfig {
   security?: Array<Record<string, string[]>>;
 }
 
-/**@description Get User Doc */
-export const getUserDoc = ({
+/**@description Get User open api specification */
+export const getUserOASSchema = ({
   routePath,
   method,
   tags,
@@ -29,8 +32,32 @@ export const getUserDoc = ({
   });
 };
 
-/**@description Update User Password Doc */
-export const updateUserPasswordDoc = ({
+/**@description Get User Profile open api specification */
+export const getUserProfileOASSchema = ({
+  routePath,
+  method,
+  tags,
+  security,
+}: DocConfig): void => {
+  docRegistry.registerPath({
+    method,
+    path: routePath,
+    tags,
+    security,
+    summary: 'Get authenticated user profile',
+    description:
+      'Retrieve the profile information of the currently authenticated user including roles',
+    responses: createApiResponse(
+      z.object({
+        user: userSchema,
+      }),
+      'User profile retrieved successfully'
+    ),
+  });
+};
+
+/**@description Update User Password open api specification */
+export const updateUserPasswordOASSchema = ({
   routePath,
   method,
   tags,
@@ -74,8 +101,8 @@ export const TestQuerySchema = z.object({
   query2: z.string().min(1),
 });
 
-/** test query doc */
-export const testQueryDoc = ({
+/** test query open api specification */
+export const testQueryOASSchema = ({
   routePath,
   method,
   tags,

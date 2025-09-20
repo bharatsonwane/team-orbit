@@ -1,8 +1,8 @@
 import { PoolClient } from 'pg';
 import db, { schemaNames } from '../db';
 import logger from '../../utils/logger';
-import { AppUser } from '../../types/appUser';
-import { Lookup } from '../../types/lookup';
+import { Lookup } from '../../schemas/lookup.schema';
+import { AppUser } from '../../schemas/user.schema';
 import {
   lookupTypeKeys,
   roleKeys,

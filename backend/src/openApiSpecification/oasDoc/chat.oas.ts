@@ -13,7 +13,7 @@ interface SendMessageDocConfig {
     security?: Array<Record<string, string[]>>;
   }
   
-  export const sendMessageDoc = ({
+  export const sendMessageOASSchema = ({
     routePath,
     method,
     tags,

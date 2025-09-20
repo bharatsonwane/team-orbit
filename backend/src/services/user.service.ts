@@ -303,28 +303,43 @@ export default class User {
     { userId }: { userId: number }
   ): Promise<UserProfile | undefined> {
     const queryString = `
-    SELECT 
-    up.id,
-    up.title,
-    up."firstName",
-    up."lastName",
-    up."middleName",
-    up."maidenName",
-    up.gender,
-    up.dob,
-    up."bloodGroup",
-    up."marriedStatus",
-    up.email,
-    up.phone,
-    up."profilePicture",
-    up.bio,
-    up."userStatus",
-    up."tenantId",
-    up."createdAt",
-    up."updatedAt"
-  FROM 
-    app_user up
-  WHERE up.id = ${userId};`;
+        SELECT 
+        up.id,
+        up.title,
+        up."firstName",
+        up."lastName",
+        up."middleName",
+        up."maidenName",
+        up.gender,
+        up.dob,
+        up."bloodGroup",
+        up."marriedStatus",
+        up.email,
+        up.phone,
+        up.bio,
+        up."userStatus",
+        up."tenantId",
+        up."createdAt",
+        up."updatedAt",
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'id', l.id,
+              'label', l.label,
+              'lookupTypeId', l."lookupTypeId"
+            )
+          ) FILTER (WHERE l.id IS NOT NULL), 
+          '[]'::json
+        ) as "userRoles"
+      FROM 
+        app_user up
+      LEFT JOIN user_role_xref urx ON up.id = urx."userId"
+      LEFT JOIN lookup l ON urx."roleId" = l.id
+      WHERE up.id = ${userId}
+      GROUP BY up.id, up.title, up."firstName", up."lastName", up."middleName", 
+               up."maidenName", up.gender, up.dob, up."bloodGroup", up."marriedStatus",
+               up.email, up.phone, up.bio, up."userStatus", up."tenantId",
+               up."createdAt", up."updatedAt";`;
 
     const results = await dbClient.mainPool.query(queryString);
     const response = results.rows[0] as UserProfile | undefined;

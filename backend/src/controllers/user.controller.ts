@@ -7,6 +7,7 @@ import {
 } from '../utils/authHelper';
 import Lookup from '../services/lookup.service';
 import { UserLoginSchema } from '../schemas/user.schema';
+import { AuthenticatedRequest } from '../middleware/authRoleMiddleware';
 
 export const postUserLogin = async (
   req: Request,
@@ -16,7 +17,10 @@ export const postUserLogin = async (
   try {
     const { email, password } = req.body as UserLoginSchema;
 
-    const userData = await User.getUserByEmailOrPhone(req.db, { email, includePassword: true });
+    const userData = await User.getUserByEmailOrPhone(req.db, {
+      email,
+      includePassword: true,
+    });
 
     if (!userData) {
       throw { statusCode: 401, message: 'Invalid email or password' };
@@ -140,9 +144,31 @@ export const getUserById = async (
       throw { statusCode: 404, message: 'User not found' };
     }
 
-    res.status(200).json({
-      user: userData,
-    });
+    res.status(200).json(userData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw { statusCode: 401, message: 'User not authenticated' };
+    }
+
+    const userData = await User.getUserById(req.db, { userId });
+
+    if (!userData) {
+      throw { statusCode: 404, message: 'User profile not found' };
+    }
+
+    res.status(200).json(userData);
   } catch (error) {
     next(error);
   }

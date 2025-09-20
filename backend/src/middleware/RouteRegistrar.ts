@@ -9,7 +9,7 @@ import { commonDocCreator } from '../openApiSpecification/openAPIDocumentGenerat
 interface RouteOptions {
   middleware?: RequestHandler[];
   controller: RequestHandler;
-  openApiDoc?: (config: OpenApiDocConfig) => void;
+  oasSchema?: (config: OpenApiDocConfig) => void;
   requestSchema?: {
     bodySchema?: any;
     querySchema?: any;
@@ -49,7 +49,7 @@ class RouteRegistrar {
     {
       middleware = [],
       controller,
-      openApiDoc,
+      oasSchema,
       requestSchema,
       responseSchemas,
     }: RouteOptions
@@ -71,9 +71,9 @@ class RouteRegistrar {
       openApiDocConfig.security = [{ [bearerAuth.name]: [] }];
     }
 
-    if (openApiDoc) {
+    if (oasSchema) {
       // Check if middleware is present in the middleware array
-      openApiDoc(openApiDocConfig);
+      oasSchema(openApiDocConfig);
     } else {
       commonDocCreator(openApiDocConfig);
     }
