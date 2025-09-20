@@ -8,7 +8,7 @@ import type {
   AuthResponse,
 } from '../schemas/user';
 import { envVariable } from '../config/envVariable';
-import { publicRouteList } from '../utils/route/routes';
+import { publicRouteList } from '../utils/route/RouteGuardRenderer';
 import getAxios from '../utils/axiosApi';
 import { loginAction } from '../redux/actions/userActions';
 import { store } from '../redux/store';

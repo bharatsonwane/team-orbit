@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import RouteGuardRenderer from './utils/route/RouteGuardRenderer';
-import { mainRouteList } from './utils/route/routes';
+import { RouteGuardRenderer, mainRouteList} from './utils/route/RouteGuardRenderer';
+import { roleKeys } from './utils/constants';
+import { PageNotFound } from './components/PageNotFound';
 
 function App() {
   return (
@@ -16,6 +17,16 @@ function App() {
           }
         />
       ))}
+      
+      {/* Catch-all route for undefined routes - Page Not Found */}
+      <Route
+        path="*"
+        element={
+          <RouteGuardRenderer authRoles={[roleKeys.ANY]}>
+            <PageNotFound />
+          </RouteGuardRenderer>
+        }
+      />
     </Routes>
   );
 }

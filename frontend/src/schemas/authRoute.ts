@@ -1,7 +1,7 @@
 import type { UserRole } from './user';
 
 // Route interface for routing configuration
-export interface Route {
+export interface AuthRoute {
   path: string;
   element: React.ReactElement;
   authRoles?: UserRole[];
@@ -11,6 +11,6 @@ export interface Route {
 
 // Route configuration type for array-based routing
 export interface RouteConfig {
-  routes: Route[];
+  routes: AuthRoute[];
   fallback?: React.ReactElement;
 }
